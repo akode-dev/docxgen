@@ -24,7 +24,7 @@ flowchart TD
     CLI --> Docx["Akode.DocxGen.Docx"]
     Docx --> Core
     Mcp["Akode.DocxGen.Mcp (Phase 2)"] --> Core
-    Docx --> DXT["DocxTemplater.*"]
+    Docx --> DXT["DocxTemplater core"]
     Docx --> OX["Open XML SDK"]
     Core --> Markdig["Markdig"]
 ```
@@ -39,6 +39,7 @@ Owns domain-level behavior:
 - merge precedence;
 - security and limits;
 - diagnostics;
+- operation request/result contracts and the versioned JSON report envelope;
 - render orchestration abstractions.
 
 Core has no knowledge of DOCX package types or command-line parsing.
@@ -47,8 +48,8 @@ Core has no knowledge of DOCX package types or command-line parsing.
 
 Owns the document technology adapter:
 
-- DocxTemplater rendering;
-- formatter registration;
+- DocxTemplater scalar/object/collection binding and template schema behavior;
+- bounded rendering of the neutral Markdown block model;
 - template package inspection;
 - ordered Open XML post-processing;
 - Open XML validation;
@@ -81,9 +82,10 @@ flowchart TD
     D --> E["Merge sources and overrides"]
     E --> F["Resolve local assets"]
     F --> G["Preprocess Markdown AST"]
-    G --> H["Reconcile template contract"]
-    H --> I["Render DOCX"]
-    I --> J["Post-process OOXML"]
+    G --> H["Build neutral Markdown blocks"]
+    H --> I["Bind template data"]
+    I --> M["Render Markdown blocks into body slots"]
+    M --> J["Post-process OOXML"]
     J --> K["Validate"]
     K --> L["Atomic write and report"]
 ```
@@ -126,7 +128,9 @@ code + severity + message + hint + optional path
 ```
 
 CLI maps the most severe category to a stable exit code. JSON output preserves
-all diagnostics in pipeline order.
+all diagnostics in pipeline order inside `CommandReport<TData>`. The CLI and
+future MCP adapter project the same Core result semantics; only the transport
+changes.
 
 ## Design constraints
 
@@ -135,5 +139,6 @@ all diagnostics in pipeline order.
 - Inline figures are preferred over floating shapes.
 - Word fields are marked for update on open; no layout engine is embedded.
 - Optional whole-page furniture uses explicit template variants initially.
-- No custom Markdown-to-OOXML engine is started until the P0 spike and a
-  superseding ADR justify it.
+- The bounded Markdown block renderer follows ADR-0005. It supports only the
+  normative Phase 1 subset and must not become a general HTML/CSS layout
+  engine.

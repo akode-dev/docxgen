@@ -34,8 +34,15 @@ Before adding a dependency:
 2. verify current package and transitive licenses;
 3. reject GPL, AGPL, LGPL, and proprietary licenses;
 4. record the decision and update notices;
-5. regenerate lock files;
-6. run the full build and tests.
+5. regenerate every affected `packages.lock.json`;
+6. add every new exact package/version and reviewed SPDX expression to
+   `eng/package-license-allowlist.json`;
+7. run the full build and tests.
+
+The license gate is offline and exact: it compares the union of all resolved
+non-project dependencies in lock files with the allow-list. A package add,
+remove, or version change therefore requires an explicit inventory update.
+See `docs/package-license-policy.md`.
 
 ## Build policy
 
@@ -70,15 +77,61 @@ Update in the same change:
 
 ## Adding a diagnostic
 
-- use the correct category prefix;
-- add a stable constant;
-- add default message and actionable hint;
-- include a path where possible;
-- cover it with a test;
-- do not reuse a code for different behavior.
+1. Use the correct category prefix from `docs/diagnostics.md`.
+2. Add a stable constant to `DiagnosticCode`.
+3. Add exactly one `DiagnosticDescriptor` to `DiagnosticRegistry`.
+4. Supply a default message and concrete remediation hint.
+5. Create the runtime value through `DiagnosticRegistry.Create` or
+   `DiagnosticCollector.Add(code, ...)`.
+6. Include an exact JSON Pointer or document path when possible.
+7. Run the registry completeness tests and full verification.
+
+Never reuse a code for different behavior or construct ad-hoc diagnostics when
+a registered code exists.
+
+## Changing machine-readable reports
+
+Treat `--json` as a public API. In the same change:
+
+1. update the relevant data record under `Akode.DocxGen.Core/Reports`;
+2. preserve the common `CommandReport<TData>` envelope invariants;
+3. update `docs/schemas/docxgen-report-1.0.schema.json`;
+4. update `docs/report-format.md` and affected CLI examples;
+5. add serialization and schema-reference tests;
+6. use a new report major version for breaking field changes.
+
+Do not write a separate JSON shape in a CLI handler or omit the remediation
+`hint` from a failed report.
 
 ## DOCX work
 
 Do not inspect layout only through XML. Render representative DOCX output to
 pages and inspect every page. Also run structural checks because visual export
 does not validate every package relationship or field.
+
+## Packaging
+
+Create the dotnet tool:
+
+```powershell
+dotnet pack src/Akode.DocxGen.Cli `
+  --configuration Release `
+  --no-build `
+  --output artifacts/packages
+```
+
+Create one self-contained executable:
+
+```powershell
+dotnet publish src/Akode.DocxGen.Cli `
+  --configuration Release `
+  --runtime win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:PublishTrimmed=false `
+  --output artifacts/publish/win-x64
+```
+
+Approved release RIDs are `win-x64`, `linux-x64`, and `osx-x64`. The SDK
+resolves its RID-specific runtime and single-file build tasks during the
+explicit release job; application NuGet dependencies remain locked.

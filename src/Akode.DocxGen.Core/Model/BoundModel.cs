@@ -5,7 +5,11 @@ public sealed record BoundModel(
     IReadOnlyDictionary<string, object?> Roots,
     IReadOnlyList<string> BoundPaths,
     IReadOnlyList<string> UnboundPaths,
-    MarkdownStats MarkdownStats);
+    MarkdownStats MarkdownStats)
+{
+    /// <summary>Gets the optional business document version used for output naming.</summary>
+    public string? DocumentVersion { get; init; }
+}
 
 /// <summary>Summary of Markdown constructs processed during a render.</summary>
 public sealed record MarkdownStats(

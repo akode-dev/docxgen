@@ -1,13 +1,12 @@
 # Project structure
 
-This map describes the intended repository. Files already present form the
-compileable scaffold; files marked “planned” are implementation targets.
-
 ```text
 Akode.DocxGen.sln
 AGENTS.md
 CLAUDE.md
 README.md
+CHANGELOG.md
+THIRD-PARTY-NOTICES.md
 Directory.Build.props
 Directory.Packages.props
 global.json
@@ -15,20 +14,27 @@ nuget.config
 
 src/
   Akode.DocxGen.Core/
-    Abstractions/
-    Diagnostics/
-    Markdown/                 planned
-    Model/
-    Pipeline/
-    Security/                 planned
+    Abstractions/       technology-neutral adapter boundaries
+    Diagnostics/        stable codes, registry, exit codes
+    Markdown/           anchors, GFM tables, neutral Markdown AST/parser
+    Model/              JSON reader, values, merge, binding, schema contract
+    Pipeline/           requests/results and DocxGenPipeline orchestration
+    Reports/            versioned command-report DTOs
+    Security/           containment, limits, local/remote asset resolution
   Akode.DocxGen.Docx/
-    Formatters/
-    PostProcessing/
+    Conversion/         standalone Markdown-to-DOCX
+    Inspection/         package-wide template inspection
+    PostProcessing/     fields, properties, leftover markers
+    Rendering/          DocxTemplater binding and Open XML Markdown rendering
+    Utilities/          stream ownership helpers
+    Validation/         Open XML SDK validation
   Akode.DocxGen.Cli/
-    Commands/
-    Output/
-  Akode.DocxGen.Mcp/
-    Tools/
+    Commands/           System.CommandLine command factory/handlers
+    Output/             JSON/human output, atomic files, versioned names
+    Properties/         test visibility metadata
+    CompositionRoot.cs  dependency registration
+    Program.cs           thin executable host
+  Akode.DocxGen.Mcp/     Phase 2 placeholder only
 
 tests/
   Akode.DocxGen.Core.Tests/
@@ -37,184 +43,75 @@ tests/
   TestAssets/
 
 templates/
+  proposal.docx
+  proposal.schema.json
 samples/
+  model.json
+  proposal.md
+  architecture.svg
 docs/
   adr/
   schemas/
+  spikes/
 eng/
   hooks/
-.codex/
-.claude/
-.azuredevops/
+  verify.ps1
+  verify.sh
+  generate-third-party-notices.ps1
+  package-license-allowlist.json
 .github/workflows/
+  ci.yml
+  release.yml
 ```
 
-## Root files
+## Responsibilities and boundaries
 
-| Path | Responsibility |
-|---|---|
-| `README.md` | Human entry point and product overview |
-| `AGENTS.md` | Durable Codex repository instructions |
-| `CLAUDE.md` | Claude Code instructions importing shared rules |
-| `Directory.Build.props` | Framework, language, analyzers, reproducibility |
-| `Directory.Packages.props` | Every NuGet version |
-| `global.json` | .NET SDK feature-band policy |
-| `nuget.config` | Approved package sources |
-| `.editorconfig` | Formatting and code-style policy |
-| `.gitattributes` | Text/binary and line-ending behavior |
-| `.gitignore` | Generated output, local settings, secrets |
-| `CHANGELOG.md` | User-visible release history |
-| `THIRD-PARTY-NOTICES.md` | Resolved package license inventory |
+### Core
 
-## `Akode.DocxGen.Core`
+Core contains no Open XML or CLI implementation types. It owns:
 
-### `Abstractions`
+- model/schema reading and adjacent-template reconciliation;
+- deterministic Markdown preprocessing and source merging;
+- local/remote asset security policy;
+- strict/lenient binding;
+- adapter contracts and pipeline orchestration;
+- diagnostics and report DTOs.
 
-- `ITemplateInspector`: converts a template stream into `TemplateSchema`.
-- `IDocumentRenderer`: converts template plus `BoundModel` into a document
-  stream.
-- `IDocumentPostProcessor`: ordered deterministic output mutation.
-- `IOoxmlValidator`: technology-neutral validation contract.
-- `IAssetResolver`: local path-controlled asset loading.
+### DOCX adapter
 
-### `Model`
+The adapter is the only production project that references DocxTemplater and
+Open XML SDK. It owns template discovery, binding, native Word elements,
+post-processing, conversion, and validation. The rejected
+`DocxTemplater.Markdown` dependency remains only in the retained spike.
 
-Present:
+### CLI
 
-- `TemplateSchema` and `TemplatePlaceholder`;
-- `BoundModel` and `MarkdownStats`;
-- asset and validation result contracts;
-- `ModelValueKind`.
+The CLI translates options and streams into Core requests, maps results to
+stable reports/exit codes, and writes output atomically. Business/rendering
+logic does not belong in command handlers. Console access is confined to
+`Output`.
 
-Planned:
+### MCP
 
-- `ModelJsonReader`;
-- `ModelSchemaValidator`;
-- directive converters for `$md`, `$mdFile`, `$file`, `$text`;
-- template identity and contract metadata;
-- document-output naming model.
-
-### `Markdown` (planned)
-
-- `MarkdownPipelineFactory`;
-- `MarkdownPreprocessor`;
-- `SectionAnchorParser`;
-- `MarkdownTableToCollection`;
-- image-reference resolver;
-- unsupported-feature downgrade visitor.
-
-### `Pipeline`
-
-Present options and outcomes will be extended with:
-
-- `RenderRequest`;
-- `RenderResult`;
-- `ValidateModelRequest`;
-- `RenderPipeline`;
-- source merge/reconciliation services;
-- output-name resolution.
-
-### `Diagnostics`
-
-Contains stable process exit codes and the diagnostic registry. A completeness
-test must ensure every registered error has default message and hint metadata.
-
-### `Security` (planned)
-
-- `PathGuard`;
-- file/aggregate size limits;
-- ZIP safety policy;
-- URI policy;
-- safe media-type detection.
-
-## `Akode.DocxGen.Docx`
-
-Planned implementation files:
-
-- `DocxTemplaterRenderer`;
-- `DocxTemplaterInspector`;
-- `OpenXmlValidatorAdapter`;
-- formatter registration;
-- `UpdateFieldsPostProcessor`;
-- `DocumentPropertiesPostProcessor`;
-- `TableGeometryPostProcessor`;
-- `ImageGeometryPostProcessor`;
-- `EmptyParagraphCleanup`;
-- `LeftoverPlaceholderScanner`;
-- `DocxNormalizer` for tests.
-
-This project is the only production project allowed to depend on
-DocxTemplater or Open XML SDK.
-
-## `Akode.DocxGen.Cli`
-
-Planned command pairs:
-
-```text
-Commands/
-  InspectCommand.cs
-  InspectCommandHandler.cs
-  ScaffoldModelCommand.cs
-  ScaffoldModelCommandHandler.cs
-  ValidateModelCommand.cs
-  ValidateModelCommandHandler.cs
-  RenderCommand.cs
-  RenderCommandHandler.cs
-  ConvertCommand.cs
-  ConvertCommandHandler.cs
-  ValidateCommand.cs
-  ValidateCommandHandler.cs
-```
-
-`Output` contains JSON and human writers. No other project writes to
-`Console`.
-
-## `Akode.DocxGen.Mcp`
-
-Phase 2 only. Tool methods convert MCP DTOs to Core requests and return Core
-results. The MCP package/version is not pinned until implementation begins.
-
-## Tests
-
-### Core tests
-
-Fast unit and property tests. Avoid disk I/O where streams and in-memory models
-are sufficient.
-
-### Docx tests
-
-Integration, package structure, normalized golden outputs, style behavior, and
-rendered visual fixtures.
-
-### CLI tests
-
-Command parsing, stdout/stderr separation, JSON schemas, exit codes, atomic
-write behavior, and process-level scenarios.
-
-### TestAssets
-
-Synthetic templates, Markdown, models, images, and normalized golden output.
-Customer material is prohibited.
+MCP is deferred to Phase 2. It must adapt Core requests/results and must not
+shell out to the CLI or duplicate validation/rendering.
 
 ## Templates and samples
 
-`templates/` holds reference template packages only after branding has been
-approved and anonymized. Every template has an adjacent schema.
+`templates/` contains synthetic or approved governed templates. Each production
+template has an adjacent `.schema.json` with exact ID, version, hash, fields,
+and collections. `samples/` is a complete non-confidential runnable example.
 
-`samples/` holds a complete non-confidential authoring example and scripts that
-will become executable once Phase 1 CLI commands are implemented.
+## Tests and gates
 
-## Agent configuration
+- Core tests cover schemas, parsing, merge, security, diagnostics, reports,
+  architecture, and license inventory.
+- DOCX tests run the real reference render and inspect the generated package.
+- CLI tests cover naming and host behavior.
+- visual QA follows `docs/template-authoring-guide.md`;
+- every resolved NuGet package/version must match the reviewed allow-list.
 
-- `.codex/config.toml`: minimal trusted-project root detection; durable behavior
-  remains in `AGENTS.md`.
-- `.claude/settings.json`: shared command permissions and explicit destructive
-  command denials.
-- `eng/hooks/`: hook entrypoints that call `validate-model`; activation waits
-  until that command is implemented and tested.
+## Generated output
 
-## CI
-
-`.azuredevops/azure-pipelines.yml` is the primary build definition.
-`.github/workflows/ci.yml` provides equivalent GitHub validation for the
-current remote.
+Builds, packages, published binaries, rendered samples, and QA page images go
+under ignored `artifacts/`, `bin/`, and `obj/` directories.

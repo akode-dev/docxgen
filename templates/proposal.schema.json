@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akode.example/schemas/proposal-reference-1.0.schema.json",
+  "title": "Akode proposal reference template contract 1.0",
+  "x-docxgen-templateId": "akode-proposal-reference",
+  "x-docxgen-templateVersion": "1.0.0",
+  "x-docxgen-templateHash": "sha256:a6d338db24416cd849402e0bc6a7d5e8fc9fc13ddec40416d5da36804c80bdba",
+  "allOf": [
+    {
+      "$ref": "../docs/schemas/docxgen-model-1.0.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "template": {
+          "properties": {
+            "id": {
+              "const": "akode-proposal-reference"
+            },
+            "version": {
+              "const": "1.0.0"
+            }
+          }
+        },
+        "data": {
+          "required": [
+            "ds"
+          ],
+          "properties": {
+            "ds": {
+              "type": "object",
+              "required": [
+                "Document",
+                "Revisions",
+                "Body"
+              ],
+              "properties": {
+                "Document": {
+                  "$ref": "#/$defs/document"
+                },
+                "Revisions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/revision"
+                  }
+                },
+                "Body": {
+                  "$ref": "#/$defs/markdown"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document": {
+      "type": "object",
+      "required": [
+        "Title",
+        "Description",
+        "Project",
+        "Client",
+        "Version",
+        "Status",
+        "Date",
+        "Classification",
+        "Author"
+      ],
+      "properties": {
+        "Title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Project": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Client": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Version": {
+          "type": "string",
+          "pattern": "^v?[0-9]+(?:\\.[0-9A-Za-z-]+)*$"
+        },
+        "Status": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "Classification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Author": {
+          "type": "object",
+          "required": [
+            "FirstName",
+            "LastName",
+            "Role",
+            "Email"
+          ],
+          "properties": {
+            "FirstName": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "LastName": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "Role": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "Email": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "revision": {
+      "type": "object",
+      "required": [
+        "Version",
+        "Date",
+        "Author",
+        "Description"
+      ],
+      "properties": {
+        "Version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "Author": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Description": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "markdown": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "$md"
+          ],
+          "properties": {
+            "$md": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "$mdFile"
+          ],
+          "properties": {
+            "$mdFile": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

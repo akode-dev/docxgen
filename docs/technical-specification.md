@@ -6,7 +6,7 @@
 |---|---|
 | Product | Akode.DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Implementation-ready scaffold; P0 spike required |
+| Status | Phase 1 implemented and release-ready |
 | Primary users | Bid teams, developers, CI, coding agents |
 | Runtime model | Offline deterministic CLI |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -284,6 +284,42 @@ collection item shapes, and template metadata. It includes an
 Requiredness cannot be inferred reliably from placeholder text alone, so the
 schema is maintained alongside the template and checked against it.
 
+### 8.4 Machine-readable command reports
+
+Every `--json` response uses report contract `1.0` and the same top-level
+envelope:
+
+```json
+{
+  "reportVersion": "1.0",
+  "command": "validate-model",
+  "ok": false,
+  "exitCode": 4,
+  "errorCode": "E-MDL-002",
+  "message": "Model validation failed.",
+  "hint": "Update the reported value to satisfy the adjacent template schema.",
+  "diagnostics": [
+    {
+      "code": "E-MDL-002",
+      "severity": "error",
+      "message": "The model violates the schema.",
+      "hint": "Update the reported value to satisfy the adjacent template schema.",
+      "path": "/data/ds/Document/Title"
+    }
+  ]
+}
+```
+
+`exitCode` is numeric. Diagnostic severities and model value kinds are
+lower-camel-case strings. Successful reports have exit code `0`, omit
+`errorCode` and `hint`, contain no error diagnostics, and include typed
+command-specific `data`. Failed reports have a non-zero exit code, promote the
+first error diagnostic to `errorCode` and `hint`, and omit `data`.
+
+The normative schema is
+`docs/schemas/docxgen-report-1.0.schema.json`. Breaking field changes require a
+new report major version; additive optional data may remain within `1.x`.
+
 ## 9. Markdown contract
 
 Phase 1 supports:
@@ -310,6 +346,64 @@ Not supported in Phase 1:
 - remote images by default.
 
 All transformations operate on a Markdig AST, not whole-document regexes.
+
+### 9.1 Section-anchored Markdown
+
+One Markdown file may populate several template paths:
+
+```markdown
+<!-- docxgen:section ExecutiveSummary -->
+
+Akode proposes a **digital platform**.
+
+<!-- docxgen:section ds.Approach -->
+
+## Delivery approach
+
+1. Discovery
+2. Foundation
+
+<!-- docxgen:section Team format=table columns=Name,Role -->
+
+| Name | Role |
+|---|---|
+| Alexei | Solution Architect |
+
+<!-- docxgen:end -->
+```
+
+The normative comment marker is:
+
+```text
+<!-- docxgen:section <Name> [key=value ...] -->
+```
+
+- `docxgen:section` and `docxgen:end` are case-insensitive; `Name` and resolved
+  model paths are case-sensitive;
+- names match `[A-Za-z_][A-Za-z0-9_.]{0,127}`;
+- an unqualified name resolves under `ds`; a dotted name is already absolute;
+- a section ends at the next section marker, `docxgen:end`, or EOF;
+- content before the first marker is ignored with `W-MD-005`;
+- duplicate or structurally overlapping paths fail with `E-MDL-005`;
+- markers inside fenced code blocks or inline code are content, not anchors;
+- UTF-8 BOM and CRLF are accepted, output blocks use LF, and only blank edge
+  lines are trimmed.
+
+`format=table` requires `columns=Name,Role,...` and exactly one GFM pipe table.
+Each data row becomes an object in a collection, with cells mapped by position
+to the case-sensitive column names. Invalid table contracts fail with
+`E-MD-006`.
+
+Core merges sources recursively with this precedence:
+
+```text
+--set > model.json > anchored Markdown
+```
+
+An explicit model leaf that replaces anchored content emits `W-MRG-001`.
+`--set` infers JSON numbers, booleans, and null; other values are strings.
+Prefix the value with `@` to force a string, for example
+`--set ds.Code=@0042`.
 
 ## 10. Images and figures
 

@@ -75,6 +75,7 @@
   "additionalProperties": false,
   "$defs": {
     "modelValue": {
+      "$dynamicAnchor": "modelValue",
       "oneOf": [
         {
           "type": [
@@ -87,7 +88,7 @@
         {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/modelValue"
+            "$dynamicRef": "#modelValue"
           }
         },
         {
@@ -165,7 +166,7 @@
         }
       },
       "additionalProperties": {
-        "$ref": "#/$defs/modelValue"
+        "$dynamicRef": "#modelValue"
       }
     }
   }

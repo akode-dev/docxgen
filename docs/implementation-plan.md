@@ -1,124 +1,106 @@
-# Implementation plan
+# Implementation record
 
-Work in vertical acceptance slices. Every phase ends with executable evidence,
-not only source files.
+Phase 1 was completed on 2026-07-24 as one vertically verified product slice.
+This file records the result and separates shipped work from deferred Phase 2.
 
-## P0 — Rendering-engine spike
+## Phase 1 acceptance status
 
-Goal: prove or reject ADR-0001 before production architecture grows around it.
+### P0 — Rendering-engine decision
 
-### Inputs
+Complete. The spike retained DocxTemplater core for binding, rejected its
+Markdown and Images extensions, and selected the bounded Markdig/Open XML
+renderer in ADR-0005.
 
-- anonymized Akode-branded template;
-- cover, Document Control, TOC, one body marker, final page;
-- Markdown containing H1-H4, nested lists, table, link, quote, code, and local
-  images;
-- placeholders in main body, header, footer, first-page header, and text box.
+### P1 — Foundation
 
-### Experiments
+Complete:
 
-1. Render Markdown through DocxTemplater 2.8.3.
-2. Record actual formatter syntax and API behavior.
-3. Verify style mapping and numbering.
-4. Determine whether heading offset must be applied to Markdig AST.
-5. Verify image sizing and local resolution.
-6. Verify TOC ignore behavior and `w:updateFields`.
-7. Verify that the final page and section-specific headers remain correct.
-8. Render short, 30-page, and 60-page fixtures.
-9. Inspect package validity and every rendered page.
-10. Run license inventory.
+- .NET 10 solution and project boundaries;
+- stable diagnostics, exit codes, requests/results, and JSON reports;
+- locked restore and permissive-license gate;
+- Windows/Linux/macOS CI.
 
-### Exit
+### P2 — Model, schema, Markdown, and security
 
-- ADR-0001 confirmed or superseded;
-- spike code/fixtures retained under `spike/`;
-- limitations and workarounds documented;
-- no production renderer work begins before this decision.
+Complete:
 
-## P1 — Foundation
+- Draft 2020-12 base model validation;
+- adjacent template schema validation and hash/identity reconciliation;
+- `$md`, `$mdFile`, `$file`, and `$text`;
+- section anchors and table-to-collection anchors;
+- source precedence and CLI overrides;
+- model-option/explicit-CLI precedence;
+- neutral Markdown AST, heading offset/clamp, raw HTML policy;
+- local path containment and size/depth/count limits;
+- offline-by-default remote image policy with bounded opt-in downloads;
+- strict/lenient placeholder semantics.
 
-- complete Core request/result contracts;
-- base diagnostic registry and completeness tests;
-- architecture tests;
-- CI on Windows, Linux, and macOS;
-- locked restores and package-license gate;
-- JSON report schemas.
+The heading-style anchor alternative was removed from Phase 1: standalone
+comment anchors are deterministic, invisible in rendered Markdown, and already
+cover the agent workflow without coupling content to a visual style name.
 
-## P2 — Model and Markdown
+### P3 — DOCX adapter
 
-- base model schema validation;
-- template-specific schema reconciliation;
-- `ModelJsonReader`;
-- `$md`, `$mdFile`, `$file`, `$text`;
-- `SectionAnchorParser`;
-- table-to-collection anchors;
-- AST heading offset;
-- raw HTML and remote image policy;
-- `PathGuard` and limits;
-- model merge precedence;
-- `validate-model` Core service.
+Complete:
 
-Exit: Core test coverage at least 90% for these components.
+- package-wide template inspection;
+- DocxTemplater scalar/collection/conditional binding;
+- Markdown formatter and Open XML block renderer;
+- native headings, lists, tables, quotes, code, links, and images;
+- field-update, custom-property, and leftover-marker post-processors;
+- standalone Markdown conversion;
+- Open XML validation.
 
-## P3 — DOCX adapter
+### P4 — CLI
 
-- renderer proven in P0;
-- template inspector across package parts;
-- formatter registration;
-- update-fields and property post-processors;
-- image/table geometry;
-- leftover scanner;
-- Open XML validation;
-- normalization and golden fixtures.
+Complete:
 
-## P4 — CLI
+- `inspect`, `scaffold-model`, `validate-model`, `render`, `convert`,
+  `validate`;
+- stdin model support, atomic output, dry-run, overwrite guards;
+- stable JSON/human output and exit mapping;
+- versioned output names.
 
-- composition root and logging;
-- `inspect`;
-- `scaffold-model`;
-- `validate-model`;
-- `render`;
-- `convert`;
-- `validate`;
-- stdout/stderr contract;
-- stable exit mapping;
-- atomic output;
-- versioned filename option;
-- complete process-level tests.
+### P5 — Reference template and samples
 
-## P5 — Reference template and samples
+Complete for the synthetic reference:
 
-- approved template style contract;
-- cover, Document Control, TOC, body marker, final page;
-- adjacent template schema;
-- representative non-confidential sample;
-- Windows Word acceptance;
-- rendered visual review.
+- cover, Document Control, TOC, Markdown body slot, final page;
+- adjacent schema and non-confidential sample;
+- local Microsoft Word field refresh and PDF/page rendering;
+- all six final pages visually inspected;
+- Open XML, section, headings, images, fields, styles, and accessibility
+  audits.
 
-## P6 — Packaging and release
+Acceptance of an official corporate Akode template remains a template-content
+governance task. The product implementation does not depend on its branding.
 
-- dotnet tool package;
-- self-contained packages for approved RIDs;
-- CI artifacts;
-- changelog/release notes;
-- generated third-party notices;
-- signed/checksummed artifacts if required;
-- operations and upgrade guide.
+### P6 — Packaging and release
 
-## Phase 2
+Complete:
 
-- MCP adapter;
-- RTL/Arabic spike and separate template;
-- PDF strategy and legal review;
-- DOCX diff;
+- NuGet dotnet tool package;
+- self-contained single-file release workflow for `win-x64`, `linux-x64`,
+  and `osx-x64`;
+- checksums, license, third-party notices, changelog, and operations guide;
+- release workflow runs only on explicit dispatch or a `v*` tag.
+
+## Verification baseline
+
+- `dotnet build ... --configuration Release`: zero warnings/errors;
+- 80 automated tests;
+- complete sample render and conversion;
+- final six-page DOCX visually reviewed;
+- generated and Word-refreshed DOCX packages validate with zero Open XML
+  errors and warnings;
+- local dotnet tool and Windows self-contained executable smoke-tested.
+
+## Phase 2 backlog
+
+Phase 2 is intentionally not part of the completed application:
+
+- MCP stdio adapter over the same Core;
+- RTL/Arabic rendering and a dedicated template;
+- governed PDF export strategy;
+- DOCX semantic diff;
 - advanced captions and cross-references.
-
-## First agent tasks
-
-1. Create `feature/p0-renderer-spike` from `develop`.
-2. Obtain or create the anonymized representative template.
-3. Implement only the spike harness and fixtures.
-4. Record results in ADR-0001.
-5. Ask for an architecture decision if the spike fails.
-
-Agents must not start a custom renderer as a fallback inside the same task.

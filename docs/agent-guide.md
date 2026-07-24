@@ -16,23 +16,19 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 7. Run focused tests, then `eng/verify`.
 8. Update documentation/schema/ADR when a public contract changes.
 
-## First implementation task
+## Current product state
 
-The first coding task is P0, not production CLI structure:
-
-```text
-Prove Markdown -> branded DOCX behavior with DocxTemplater 2.8.3.
-```
-
-The evidence must cover styles, lists, tables, images, heading levels, TOC,
-headers, footers, text boxes, cover, final page, Open XML validation, and
-visual rendering.
+Phase 1 is complete. The six-command CLI, Core pipeline, DOCX adapter,
+reference template, schemas, tests, visual evidence, dotnet tool packaging,
+and self-contained release workflow are in place. Work should now be either a
+scoped defect/maintenance change or an explicitly selected Phase 2 item.
 
 ## Prohibited shortcuts
 
-- no one-off Python/Node DOCX generator;
-- no Office Interop or COM;
-- no custom Markdown-to-OOXML engine before ADR-0001 is superseded;
+- no one-off Python/Node DOCX generator in production;
+- no Office Interop or COM in production (Word automation is permitted only
+  for an explicit local visual-acceptance task);
+- no unbounded Markdown/HTML renderer beyond ADR-0005's Phase 1 subset;
 - no `--lenient` to make missing content disappear;
 - no remote images/raw HTML without an explicit product requirement;
 - no customer proposals in fixtures;
@@ -40,8 +36,6 @@ visual rendering.
 - no push or history rewrite without explicit user authorization.
 
 ## Agent-facing CLI contract
-
-Once implemented:
 
 ```text
 inspect
@@ -55,9 +49,9 @@ inspect
 Agents consume stdout JSON. Each failure is repaired from:
 
 - `errorCode`;
-- `errors[].path`;
-- `errors[].message`;
-- `errors[].hint`.
+- `diagnostics[].path`;
+- `diagnostics[].message`;
+- `diagnostics[].hint`.
 
 Do not scrape human stderr or infer placeholder names.
 
@@ -66,9 +60,8 @@ Do not scrape human stderr or infer placeholder names.
 Hook entrypoints live in `eng/hooks`. They intentionally call the product's
 `validate-model` command instead of reimplementing schema rules in shell.
 
-Do not activate a project lifecycle hook until `validate-model` is implemented
-and its exit-code/JSON tests pass; an active nonfunctional hook would block all
-agent work.
+Project lifecycle hooks may now call the implemented `validate-model` command.
+Keep wrappers thin so the CLI remains the single validation implementation.
 
 Suggested lifecycle:
 

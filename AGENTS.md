@@ -8,13 +8,14 @@ needed.
 
 1. Read `README.md`.
 2. Read `docs/technical-specification.md` and `docs/architecture.md`.
-3. Read `docs/implementation-plan.md` and work on the earliest uncompleted
-   acceptance slice unless the user or issue explicitly selects another task.
+3. Read `docs/implementation-plan.md`, then follow the user/issue scope. Phase
+   2 work requires an explicitly selected backlog item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-The repository is currently a compileable scaffold, not a finished document
-renderer. Do not claim that a planned CLI command works until an automated test
-proves it.
+Phase 1 is implemented and release-ready. Preserve the six-command CLI,
+model/report schemas, stable diagnostics, security defaults, template
+contract, and cross-platform packaging behavior. New product scope belongs to
+the Phase 2 backlog unless the user or issue explicitly selects it.
 
 ## Architecture boundaries
 
@@ -32,12 +33,15 @@ proves it.
 ## Product rules
 
 - Content lives in Markdown/JSON; design lives in the DOCX template.
-- Do not write a new Markdown-to-OOXML renderer before the P0 spike disproves
-  ADR-0001 and the ADR is explicitly superseded.
+- ADR-0001 is superseded by ADR-0005. Production keeps DocxTemplater only for
+  template binding/schema behavior and implements the approved, bounded
+  Markdown block renderer with Markdig and Open XML SDK.
+- Do not restore `DocxTemplater.Markdown`, `DocxTemplater.Images`, ImageSharp,
+  or another document engine without a new ADR and license review.
 - Treat `inspect`, JSON output, diagnostics, exit codes, and `hint` fields as
   public API.
-- A fixed corporate logo remains in the template. Image placeholders are for
-  variable assets such as a client logo or document figure.
+- A fixed corporate logo remains in the template. Variable content figures
+  normally arrive through Markdown.
 - Rendering is offline by default. Remote images and raw HTML remain disabled
   unless explicitly enabled by the caller.
 - Never weaken strict mode just to make a failing fixture pass.
@@ -54,9 +58,11 @@ dotnet build Akode.DocxGen.sln --configuration Release --no-restore
 dotnet test Akode.DocxGen.sln --configuration Release --no-build
 ```
 
-For package changes, regenerate and commit lock files. For template or rendering
-changes, run the relevant golden tests and inspect rendered pages according to
-`docs/template-authoring-guide.md`.
+For package changes, regenerate and commit lock files, review every new
+resolved package/version, and update `eng/package-license-allowlist.json`.
+Architecture and license gates run as part of the solution tests. For template
+or rendering changes, run the relevant golden tests and inspect rendered pages
+according to `docs/template-authoring-guide.md`.
 
 ## Coding standards
 

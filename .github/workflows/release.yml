@@ -1,0 +1,117 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tool-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Restore
+        run: dotnet restore Akode.DocxGen.sln --locked-mode
+
+      - name: Build
+        run: dotnet build Akode.DocxGen.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Akode.DocxGen.sln --configuration Release --no-build
+
+      - name: Pack dotnet tool
+        run: >
+          dotnet pack src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj
+          --configuration Release
+          --no-build
+          --output artifacts/packages
+
+      - name: Upload dotnet tool
+        uses: actions/upload-artifact@v4
+        with:
+          name: Akode.DocxGen-dotnet-tool
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+
+  single-file:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            executable: Akode.DocxGen.Cli.exe
+          - os: ubuntu-latest
+            rid: linux-x64
+            executable: Akode.DocxGen.Cli
+          - os: macos-latest
+            rid: osx-x64
+            executable: Akode.DocxGen.Cli
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Restore runtime
+        run: >
+          dotnet restore src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj
+          --runtime ${{ matrix.rid }}
+          --force-evaluate
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=false
+
+      - name: Publish single file
+        run: >
+          dotnet publish src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj
+          --configuration Release
+          --runtime ${{ matrix.rid }}
+          --self-contained true
+          --no-restore
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=false
+          -p:DebugSymbols=false
+          -p:DebugType=None
+          --output artifacts/publish/${{ matrix.rid }}
+
+      - name: Add notices
+        shell: pwsh
+        run: |
+          ./eng/generate-third-party-notices.ps1
+          Copy-Item LICENSE "artifacts/publish/${{ matrix.rid }}/LICENSE"
+          Copy-Item THIRD-PARTY-NOTICES.md "artifacts/publish/${{ matrix.rid }}/THIRD-PARTY-NOTICES.md"
+
+      - name: Write checksum
+        shell: pwsh
+        run: |
+          $directory = "artifacts/publish/${{ matrix.rid }}"
+          $binary = Join-Path $directory "${{ matrix.executable }}"
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $binary).Hash.ToLowerInvariant()
+          "$hash  ${{ matrix.executable }}" |
+            Set-Content -Encoding utf8 (Join-Path $directory "SHA256SUMS")
+
+      - name: Upload single-file executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Akode.DocxGen-${{ matrix.rid }}
+          path: artifacts/publish/${{ matrix.rid }}
+          if-no-files-found: error
