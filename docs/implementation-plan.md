@@ -5,6 +5,9 @@ not only source files.
 
 ## P0 — Rendering-engine spike
 
+Status: completed on 2026-07-24. ADR-0001 was rejected and superseded by
+ADR-0005. Evidence is in `docs/spikes/p0-renderer-spike.md`.
+
 Goal: prove or reject ADR-0001 before production architecture grows around it.
 
 ### Inputs
@@ -34,6 +37,11 @@ Goal: prove or reject ADR-0001 before production architecture grows around it.
 - spike code/fixtures retained under `spike/`;
 - limitations and workarounds documented;
 - no production renderer work begins before this decision.
+
+Exit result: complete. The spike retained DocxTemplater core for template
+binding, rejected its Markdown and Images extensions, and selected a bounded
+Markdig/Open XML body renderer. The real branded-template acceptance pass
+remains a P5 gate because no approved Akode template was supplied.
 
 ## P1 — Foundation
 
@@ -113,12 +121,10 @@ Exit: Core test coverage at least 90% for these components.
 - DOCX diff;
 - advanced captions and cross-references.
 
-## First agent tasks
+## Next agent tasks
 
-1. Create `feature/p0-renderer-spike` from `develop`.
-2. Obtain or create the anonymized representative template.
-3. Implement only the spike harness and fixtures.
-4. Record results in ADR-0001.
-5. Ask for an architecture decision if the spike fails.
-
-Agents must not start a custom renderer as a fallback inside the same task.
+1. Complete P1 diagnostic registry and completeness tests.
+2. Add architecture tests for project dependency rules.
+3. Add a resolved dependency-license gate.
+4. Complete cross-platform CI and locked-restore validation.
+5. Begin P2 only after the P1 acceptance slice is green.

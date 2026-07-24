@@ -16,23 +16,18 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 7. Run focused tests, then `eng/verify`.
 8. Update documentation/schema/ADR when a public contract changes.
 
-## First implementation task
+## Current implementation task
 
-The first coding task is P0, not production CLI structure:
-
-```text
-Prove Markdown -> branded DOCX behavior with DocxTemplater 2.8.3.
-```
-
-The evidence must cover styles, lists, tables, images, heading levels, TOC,
-headers, footers, text boxes, cover, final page, Open XML validation, and
-visual rendering.
+P0 is complete and ADR-0001 is superseded. The next work is P1 foundation:
+diagnostics, architecture tests, license enforcement, locked restore, and CI.
+Do not skip directly to CLI command handlers.
 
 ## Prohibited shortcuts
 
-- no one-off Python/Node DOCX generator;
-- no Office Interop or COM;
-- no custom Markdown-to-OOXML engine before ADR-0001 is superseded;
+- no one-off Python/Node DOCX generator in production;
+- no Office Interop or COM in production (Word automation is permitted only
+  for an explicit local visual-acceptance task);
+- no unbounded Markdown/HTML renderer beyond ADR-0005's Phase 1 subset;
 - no `--lenient` to make missing content disappear;
 - no remote images/raw HTML without an explicit product requirement;
 - no customer proposals in fixtures;
