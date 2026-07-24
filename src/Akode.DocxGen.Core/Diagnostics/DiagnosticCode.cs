@@ -1,6 +1,6 @@
 namespace Akode.DocxGen.Core.Diagnostics;
 
-/// <summary>Registry of stable diagnostics used in JSON output and tests.</summary>
+/// <summary>Stable diagnostic codes used in JSON output and compatibility tests.</summary>
 public static class DiagnosticCode
 {
     /// <summary>Template is not a valid OOXML package.</summary>

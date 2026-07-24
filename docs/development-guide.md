@@ -70,12 +70,17 @@ Update in the same change:
 
 ## Adding a diagnostic
 
-- use the correct category prefix;
-- add a stable constant;
-- add default message and actionable hint;
-- include a path where possible;
-- cover it with a test;
-- do not reuse a code for different behavior.
+1. Use the correct category prefix from `docs/diagnostics.md`.
+2. Add a stable constant to `DiagnosticCode`.
+3. Add exactly one `DiagnosticDescriptor` to `DiagnosticRegistry`.
+4. Supply a default message and concrete remediation hint.
+5. Create the runtime value through `DiagnosticRegistry.Create` or
+   `DiagnosticCollector.Add(code, ...)`.
+6. Include an exact JSON Pointer or document path when possible.
+7. Run the registry completeness tests and full verification.
+
+Never reuse a code for different behavior or construct ad-hoc diagnostics when
+a registered code exists.
 
 ## DOCX work
 
