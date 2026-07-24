@@ -57,9 +57,11 @@ dotnet build Akode.DocxGen.sln --configuration Release --no-restore
 dotnet test Akode.DocxGen.sln --configuration Release --no-build
 ```
 
-For package changes, regenerate and commit lock files. For template or rendering
-changes, run the relevant golden tests and inspect rendered pages according to
-`docs/template-authoring-guide.md`.
+For package changes, regenerate and commit lock files, review every new
+resolved package/version, and update `eng/package-license-allowlist.json`.
+Architecture and license gates run as part of the solution tests. For template
+or rendering changes, run the relevant golden tests and inspect rendered pages
+according to `docs/template-authoring-guide.md`.
 
 ## Coding standards
 
