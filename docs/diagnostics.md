@@ -36,6 +36,7 @@ Current areas:
 | `OUT` | generated document and field finalization |
 | `MRG` | source merge and precedence |
 | `RND` | renderer failures |
+| `EXT` | DOCX-to-Markdown extraction and semantic downgrades |
 | `IO` | file-system and stream operations |
 | `USG` | invalid CLI usage |
 | `INT` | unexpected internal product defects |

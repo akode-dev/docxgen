@@ -93,6 +93,18 @@ public static class DiagnosticCode
     /// <summary>The renderer failed unexpectedly for otherwise valid inputs.</summary>
     public const string RenderFailure = "E-RND-001";
 
+    /// <summary>An input DOCX cannot be opened for semantic extraction.</summary>
+    public const string ExtractionFailure = "E-EXT-001";
+
+    /// <summary>A Word construct was skipped or represented with reduced semantics.</summary>
+    public const string ExtractionFeatureDowngraded = "W-EXT-002";
+
+    /// <summary>A generated Word field was omitted from Markdown.</summary>
+    public const string ExtractionFieldOmitted = "W-EXT-003";
+
+    /// <summary>A table header was inferred for valid GFM output.</summary>
+    public const string ExtractionTableHeaderInferred = "W-EXT-004";
+
     /// <summary>An unexpected internal product failure occurred.</summary>
     public const string UnexpectedFailure = "E-INT-001";
 }

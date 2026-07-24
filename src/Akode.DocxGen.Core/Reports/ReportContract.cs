@@ -13,6 +13,7 @@ public static class ReportContract
         new[]
         {
             CommandName.Convert,
+            CommandName.Extract,
             CommandName.Inspect,
             CommandName.Render,
             CommandName.ScaffoldModel,
@@ -38,6 +39,9 @@ public static class CommandName
 
     /// <summary>The template-less conversion command.</summary>
     public const string Convert = "convert";
+
+    /// <summary>The DOCX-to-Markdown extraction command.</summary>
+    public const string Extract = "extract";
 
     /// <summary>The existing-document validation command.</summary>
     public const string Validate = "validate";

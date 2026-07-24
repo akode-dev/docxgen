@@ -11,12 +11,13 @@ using Akode.DocxGen.Core.Security;
 
 namespace Akode.DocxGen.Core.Pipeline;
 
-/// <summary>Coordinates all technology-neutral Phase 1 operations.</summary>
+/// <summary>Coordinates all technology-neutral document operations.</summary>
 public sealed class DocxGenPipeline
 {
     private readonly ITemplateInspector templateInspector;
     private readonly IDocumentRenderer documentRenderer;
     private readonly IMarkdownDocumentConverter markdownConverter;
+    private readonly IDocxMarkdownExtractor markdownExtractor;
     private readonly IOoxmlValidator ooxmlValidator;
     private readonly IReadOnlyList<IDocumentPostProcessor> postProcessors;
 
@@ -25,6 +26,7 @@ public sealed class DocxGenPipeline
         ITemplateInspector templateInspector,
         IDocumentRenderer documentRenderer,
         IMarkdownDocumentConverter markdownConverter,
+        IDocxMarkdownExtractor markdownExtractor,
         IOoxmlValidator ooxmlValidator,
         IEnumerable<IDocumentPostProcessor> postProcessors)
     {
@@ -34,6 +36,8 @@ public sealed class DocxGenPipeline
             documentRenderer ?? throw new ArgumentNullException(nameof(documentRenderer));
         this.markdownConverter =
             markdownConverter ?? throw new ArgumentNullException(nameof(markdownConverter));
+        this.markdownExtractor =
+            markdownExtractor ?? throw new ArgumentNullException(nameof(markdownExtractor));
         this.ooxmlValidator =
             ooxmlValidator ?? throw new ArgumentNullException(nameof(ooxmlValidator));
         ArgumentNullException.ThrowIfNull(postProcessors);
@@ -212,6 +216,12 @@ public sealed class DocxGenPipeline
         ConvertRequest request,
         CancellationToken cancellationToken = default) =>
         markdownConverter.ConvertAsync(request, cancellationToken);
+
+    /// <summary>Extracts semantic Markdown and embedded assets from a DOCX.</summary>
+    public Task<ExtractResult> ExtractAsync(
+        ExtractRequest request,
+        CancellationToken cancellationToken = default) =>
+        markdownExtractor.ExtractAsync(request, cancellationToken);
 
     /// <summary>Validates an existing DOCX package.</summary>
     public ValidateDocumentResult ValidateDocument(ValidateDocumentRequest request)

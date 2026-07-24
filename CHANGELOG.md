@@ -6,6 +6,15 @@ Versioning.
 
 ## [Unreleased]
 
+### Added
+
+- `extract` command and Core/adapter contracts for semantic DOCX-to-Markdown
+  conversion, including headings, inline formatting, links, native lists,
+  quote/code/caption styles, GFM tables, and deterministic embedded-image
+  export.
+- Stable extraction diagnostics, resource limits, typed JSON report data, and
+  report-contract `1.0` schema support for agent automation.
+
 ## [1.0.0] - 2026-07-24
 
 ### Added

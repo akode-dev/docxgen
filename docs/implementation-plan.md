@@ -97,7 +97,23 @@ Complete:
 
 ## Phase 2 backlog
 
-Phase 2 is intentionally not part of the completed application:
+### Selected slice — semantic DOCX extraction
+
+Implemented for the next minor release:
+
+- Core `IDocxMarkdownExtractor`, immutable request/result/assets/stats, and
+  pipeline orchestration;
+- `extract` CLI command with relative asset links, overwrite preflight,
+  machine-readable report data, and stable diagnostics;
+- Open XML main-body extraction for headings, paragraphs, inline formatting,
+  links, lists, quotes/code/captions, tables, horizontal rules, and images;
+- resource limits, invalid/macro-enabled package rejection, round-trip
+  integration tests, specification, and ADR.
+
+Exact Word layout, headers/footers, comments, footnotes, and tracked-change
+round trips remain explicitly outside this slice.
+
+### Remaining backlog
 
 - MCP stdio adapter over the same Core;
 - RTL/Arabic rendering and a dedicated template;

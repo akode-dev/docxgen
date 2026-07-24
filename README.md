@@ -1,16 +1,19 @@
 # Akode.DocxGen
 
 `Akode.DocxGen` is a cross-platform .NET 10 CLI that turns governed JSON and
-Markdown content into a polished Word document:
+Markdown content into a polished Word document and can extract a semantic
+Markdown draft from an existing DOCX:
 
 ```text
 DOCX template + model.json + Markdown/assets -> validated DOCX
+DOCX -> Markdown + embedded image assets
 ```
 
-Phase 1 is implemented. The tool supports template inspection, model
+Phase 1 is released. The tool supports template inspection, model
 scaffolding and validation, Markdown rendering, template-less conversion,
 Open XML validation, images, tables, collections, automatic TOC refresh, and
-optional document-version suffixes.
+optional document-version suffixes. The next minor release adds semantic
+DOCX-to-Markdown extraction.
 
 The core design rule is simple: content lives in Markdown/JSON; branding and
 page layout live in the Word template.
@@ -102,6 +105,22 @@ dotnet run --project src/Akode.DocxGen.Cli -- render `
 For `data.ds.Document.Version = "1.0"`, the last command writes
 `artifacts/Proposal-v1.0.docx`. The tool never increments the business version
 and never overwrites an existing file unless `--overwrite` is explicit.
+
+Extract an existing document for agent-friendly editing:
+
+```powershell
+dotnet run --project src/Akode.DocxGen.Cli -- extract `
+  --file artifacts/Proposal-v1.0.docx `
+  --out artifacts/Proposal-v1.0.md `
+  --json
+```
+
+Embedded images are written to `artifacts/Proposal-v1.0.assets/` by default.
+Extraction preserves document meaning rather than Word layout: headings,
+paragraphs, inline emphasis/code, links, lists, quotes, code blocks, tables,
+and embedded images are represented in portable Markdown. Headers, footers,
+cover positioning, floating layout, and generated fields such as a TOC are
+not round-tripped.
 
 ## Agent-friendly JSON
 
@@ -260,6 +279,7 @@ logos and designed artwork normally stay in the template. See
 | `validate-model` | Hook-friendly model/Markdown/assets preflight |
 | `render` | Final template-based DOCX |
 | `convert` | Standalone Markdown-to-DOCX draft, optionally using reference styles and TOC |
+| `extract` | Semantic DOCX-to-Markdown conversion with embedded image export |
 | `validate` | Open XML SDK validation of an existing DOCX |
 
 Every command is non-interactive. `--json` writes a versioned report to

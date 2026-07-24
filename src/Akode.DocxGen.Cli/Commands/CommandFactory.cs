@@ -1,6 +1,7 @@
 #pragma warning disable CA2007 // Command handlers run in a console process without a synchronization context.
 using System.CommandLine;
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Akode.DocxGen.Cli.Output;
@@ -578,6 +579,121 @@ internal static class CommandFactory
         return command;
     }
 
+    public static Command Extract(IServiceProvider services)
+    {
+        var file = RequiredFile("--file", null, "Input .docx path.");
+        var output = RequiredFile("--out", "-o", "Output Markdown path.");
+        var assetsDirectory = new Option<DirectoryInfo?>("--assets-dir")
+        {
+            Description =
+                "Directory for embedded images; defaults to <output-name>.assets.",
+        };
+        var overwrite = new Option<bool>("--overwrite");
+        var json = JsonOption();
+        var command = new Command(
+            "extract",
+            "Extract semantic Markdown and embedded images from a DOCX.")
+        {
+            file,
+            output,
+            assetsDirectory,
+            overwrite,
+            json,
+        };
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var useJson = parseResult.GetValue(json);
+            var timer = Stopwatch.StartNew();
+            try
+            {
+                var documentFile = parseResult.GetRequiredValue(file);
+                var outputFile = parseResult.GetRequiredValue(output);
+                var outputPath = Path.GetFullPath(outputFile.FullName);
+                var outputRoot = Path.GetDirectoryName(outputPath)
+                    ?? throw new IOException(
+                        $"Output '{outputPath}' has no parent directory.");
+                var explicitAssets = parseResult.GetValue(assetsDirectory);
+                var assetsPath = explicitAssets?.FullName
+                    ?? Path.Combine(
+                        outputRoot,
+                        $"{Path.GetFileNameWithoutExtension(outputPath)}.assets");
+                assetsPath = Path.GetFullPath(assetsPath);
+                var imagePrefix = Path.GetRelativePath(outputRoot, assetsPath)
+                    .Replace('\\', '/');
+                if (Path.IsPathRooted(imagePrefix))
+                {
+                    throw new ArgumentException(
+                        "--assets-dir must be on the same file-system root as --out.");
+                }
+
+                await using var documentStream = OpenRead(documentFile.FullName);
+                var pipeline = services.GetRequiredService<DocxGenPipeline>();
+                var result = await pipeline.ExtractAsync(
+                    new ExtractRequest(
+                        new InputArtifact(documentFile.FullName, documentStream),
+                        imagePrefix),
+                    cancellationToken).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                {
+                    return WriteFailure<ExtractReportData>(
+                        CommandName.Extract,
+                        ExitCode.RenderError,
+                        "DOCX extraction failed.",
+                        result.Diagnostics,
+                        useJson);
+                }
+
+                var overwriteFiles = parseResult.GetValue(overwrite);
+                var assetPaths = result.Assets
+                    .Select(asset => Path.Combine(assetsPath, asset.FileName))
+                    .ToArray();
+                EnsureExtractionOutputsAvailable(
+                    outputPath,
+                    assetsPath,
+                    assetPaths,
+                    overwriteFiles);
+                foreach (var pair in result.Assets.Zip(assetPaths))
+                {
+                    using var assetStream = new MemoryStream(
+                        pair.First.Content.ToArray(),
+                        writable: false);
+                    await AtomicFileWriter.WriteStreamAsync(
+                        pair.Second,
+                        assetStream,
+                        overwriteFiles,
+                        cancellationToken).ConfigureAwait(false);
+                }
+
+                await AtomicFileWriter.WriteTextAsync(
+                    outputPath,
+                    result.Markdown,
+                    overwriteFiles,
+                    cancellationToken).ConfigureAwait(false);
+                timer.Stop();
+                return WriteSuccess(
+                    CommandName.Extract,
+                    "DOCX extracted successfully.",
+                    new ExtractReportData(
+                        outputPath,
+                        Encoding.UTF8.GetByteCount(result.Markdown),
+                        result.Assets.Count == 0 ? null : assetsPath,
+                        assetPaths,
+                        timer.ElapsedMilliseconds,
+                        result.Stats),
+                    result.Diagnostics,
+                    useJson);
+            }
+            catch (Exception exception) when (IsHandled(exception))
+            {
+                return WriteException<ExtractReportData>(
+                    CommandName.Extract,
+                    exception,
+                    useJson);
+            }
+        });
+        return command;
+    }
+
     public static Command Validate(IServiceProvider services)
     {
         var file = RequiredFile("--file", null, "DOCX file to validate.");
@@ -708,6 +824,34 @@ internal static class CommandFactory
         }
 
         return markdown?.DirectoryName ?? Directory.GetCurrentDirectory();
+    }
+
+    private static void EnsureExtractionOutputsAvailable(
+        string output,
+        string assetsDirectory,
+        string[] assets,
+        bool overwrite)
+    {
+        if (assets.Length > 0 && File.Exists(assetsDirectory))
+        {
+            throw new IOException(
+                $"Assets directory '{assetsDirectory}' is an existing file.");
+        }
+
+        foreach (var path in assets.Prepend(output))
+        {
+            if (Directory.Exists(path))
+            {
+                throw new IOException(
+                    $"Output '{path}' is an existing directory.");
+            }
+
+            if (!overwrite && File.Exists(path))
+            {
+                throw new IOException(
+                    $"Output '{path}' already exists. Use --overwrite or choose another path.");
+            }
+        }
     }
 
     private static RenderOptions CreateRenderOptions(

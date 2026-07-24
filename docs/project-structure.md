@@ -23,6 +23,7 @@ src/
     Security/           containment, limits, local/remote asset resolution
   Akode.DocxGen.Docx/
     Conversion/         standalone Markdown-to-DOCX
+    Extraction/         semantic DOCX-to-Markdown and embedded assets
     Inspection/         package-wide template inspection
     PostProcessing/     fields, properties, leftover markers
     Rendering/          DocxTemplater binding and Open XML Markdown rendering
@@ -81,7 +82,7 @@ Core contains no Open XML or CLI implementation types. It owns:
 
 The adapter is the only production project that references DocxTemplater and
 Open XML SDK. It owns template discovery, binding, native Word elements,
-post-processing, conversion, and validation. The rejected
+post-processing, forward conversion, semantic extraction, and validation. The rejected
 `DocxTemplater.Markdown` dependency remains only in the retained spike.
 
 ### CLI

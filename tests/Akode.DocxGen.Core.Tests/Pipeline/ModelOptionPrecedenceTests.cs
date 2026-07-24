@@ -38,6 +38,7 @@ public sealed class ModelOptionPrecedenceTests
             new FakeInspector(),
             renderer,
             new UnusedConverter(),
+            new UnusedExtractor(),
             new UnusedValidator(),
             []);
         using var template = new MemoryStream([1, 2, 3], writable: false);
@@ -135,6 +136,14 @@ public sealed class ModelOptionPrecedenceTests
     {
         public Task<ConvertResult> ConvertAsync(
             ConvertRequest request,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+    }
+
+    private sealed class UnusedExtractor : IDocxMarkdownExtractor
+    {
+        public Task<ExtractResult> ExtractAsync(
+            ExtractRequest request,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
