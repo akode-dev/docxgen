@@ -115,3 +115,83 @@ jobs:
           name: Akode.DocxGen-${{ matrix.rid }}
           path: artifacts/publish/${{ matrix.rid }}
           if-no-files-found: error
+
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - tool-package
+      - single-file
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package release assets
+        shell: pwsh
+        run: |
+          $releaseDirectory = "release"
+          New-Item -ItemType Directory -Force -Path $releaseDirectory | Out-Null
+
+          Copy-Item `
+            "artifacts/Akode.DocxGen-dotnet-tool/*.nupkg" `
+            $releaseDirectory
+
+          $windowsDirectory = "artifacts/Akode.DocxGen-win-x64"
+          Compress-Archive `
+            -Path "$windowsDirectory/*" `
+            -DestinationPath "$releaseDirectory/Akode.DocxGen-win-x64.zip"
+
+          foreach ($runtimeIdentifier in @("linux-x64", "osx-x64")) {
+            $sourceDirectory = "artifacts/Akode.DocxGen-$runtimeIdentifier"
+            $executable = Join-Path $sourceDirectory "Akode.DocxGen.Cli"
+            chmod +x $executable
+            if ($LASTEXITCODE -ne 0) {
+              throw "Could not mark $executable as executable."
+            }
+
+            tar `
+              -czf "$releaseDirectory/Akode.DocxGen-$runtimeIdentifier.tar.gz" `
+              -C $sourceDirectory `
+              .
+            if ($LASTEXITCODE -ne 0) {
+              throw "Could not package $runtimeIdentifier."
+            }
+          }
+
+          Get-ChildItem -LiteralPath $releaseDirectory -File |
+            Sort-Object Name |
+            ForEach-Object {
+              $fileHash = Get-FileHash `
+                -Algorithm SHA256 `
+                -LiteralPath $_.FullName
+              $hash = $fileHash.Hash.ToLowerInvariant()
+              "$hash  $($_.Name)"
+            } |
+            Set-Content `
+              -Encoding utf8 `
+              -LiteralPath (Join-Path $releaseDirectory "SHA256SUMS")
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload \
+              "$GITHUB_REF_NAME" \
+              release/* \
+              --clobber \
+              --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create \
+              "$GITHUB_REF_NAME" \
+              release/* \
+              --generate-notes \
+              --title "Akode.DocxGen $GITHUB_REF_NAME" \
+              --verify-tag \
+              --repo "$GITHUB_REPOSITORY"
+          fi
