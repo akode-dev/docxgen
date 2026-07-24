@@ -35,6 +35,10 @@ Current areas:
 | `MD` | Markdown preprocessing and supported semantics |
 | `OUT` | generated document and field finalization |
 | `MRG` | source merge and precedence |
+| `RND` | renderer failures |
+| `IO` | file-system and stream operations |
+| `USG` | invalid CLI usage |
+| `INT` | unexpected internal product defects |
 
 Codes are never renumbered or reused for different behavior within a major
 version.

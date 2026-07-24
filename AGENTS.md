@@ -8,14 +8,14 @@ needed.
 
 1. Read `README.md`.
 2. Read `docs/technical-specification.md` and `docs/architecture.md`.
-3. Read `docs/implementation-plan.md` and work on the earliest uncompleted
-   acceptance slice unless the user or issue explicitly selects another task.
+3. Read `docs/implementation-plan.md`, then follow the user/issue scope. Phase
+   2 work requires an explicitly selected backlog item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-The repository is currently a compileable scaffold with completed P0 and P1
-acceptance slices, not a finished document renderer. Do not claim that a
-planned CLI command works until an automated test proves it. The next phase is
-P2 model and Markdown.
+Phase 1 is implemented and release-ready. Preserve the six-command CLI,
+model/report schemas, stable diagnostics, security defaults, template
+contract, and cross-platform packaging behavior. New product scope belongs to
+the Phase 2 backlog unless the user or issue explicitly selects it.
 
 ## Architecture boundaries
 
@@ -40,8 +40,8 @@ P2 model and Markdown.
   or another document engine without a new ADR and license review.
 - Treat `inspect`, JSON output, diagnostics, exit codes, and `hint` fields as
   public API.
-- A fixed corporate logo remains in the template. Image placeholders are for
-  variable assets such as a client logo or document figure.
+- A fixed corporate logo remains in the template. Variable content figures
+  normally arrive through Markdown.
 - Rendering is offline by default. Remote images and raw HTML remain disabled
   unless explicitly enabled by the caller.
 - Never weaken strict mode just to make a failing fixture pass.

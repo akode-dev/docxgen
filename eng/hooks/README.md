@@ -1,13 +1,10 @@
 # Agent hook entrypoints
 
-The wrappers in this folder are intentionally not activated yet. They call the
-future `validate-model` CLI command so that hook behavior and normal CLI
-behavior cannot drift.
+The wrappers call the implemented `validate-model` CLI command so hook
+behavior and normal CLI behavior cannot drift. They can be attached to an
+agent lifecycle or pre-commit workflow as needed.
 
-Activate project hooks only after `validate-model` has process-level tests for
-JSON output and exit codes.
-
-Example future call:
+Example call:
 
 ```powershell
 ./eng/hooks/validate-model.ps1 `

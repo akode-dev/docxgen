@@ -1,3 +1,5 @@
+using Akode.DocxGen.Core.Security;
+
 namespace Akode.DocxGen.Core.Pipeline;
 
 /// <summary>Options that influence model preprocessing and rendering.</summary>
@@ -20,4 +22,13 @@ public sealed record RenderOptions
 
     /// <summary>Gets whether Word should update fields when the document opens.</summary>
     public bool UpdateFieldsOnOpen { get; init; } = true;
+
+    /// <summary>Gets resource limits applied to model and asset inputs.</summary>
+    public Limits Limits { get; init; } = Limits.Default;
+
+    /// <summary>
+    /// Gets which values are explicit caller overrides rather than fallbacks.
+    /// </summary>
+    public RenderOptionOverrides Overrides { get; init; } =
+        RenderOptionOverrides.All;
 }

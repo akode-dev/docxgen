@@ -15,6 +15,9 @@ public sealed record RenderResult(
     IReadOnlyList<Diagnostic> Diagnostics,
     bool DryRun)
 {
+    /// <summary>Gets the optional business document version from the bound model.</summary>
+    public string? DocumentVersion { get; init; }
+
     /// <summary>Gets whether the pipeline completed without error diagnostics.</summary>
     public bool IsSuccess =>
         Diagnostics.All(diagnostic => diagnostic.Severity != DiagnosticSeverity.Error);

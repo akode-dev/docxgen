@@ -1,23 +1,42 @@
 # Changelog
 
-All notable changes to Akode.DocxGen will be documented here.
-
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and the project intends to use Semantic Versioning after the first public
-contract is released.
+All notable changes to Akode.DocxGen are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and Semantic
+Versioning.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-24
+
 ### Added
 
-- Repository and solution scaffold.
-- Agent instructions for Codex and Claude Code.
-- Initial CLI, model, template, architecture, and implementation contracts.
-- P0 rendering-engine evidence and hybrid renderer decision.
-- Stable diagnostics registry with completeness tests.
-- Architecture, locked dependency, and package-license gates.
-- Version 1.0 Core operation and machine-readable report contracts.
-- Draft 2020-12 model-envelope validation and immutable typed parsing for
-  `$md`, `$mdFile`, `$file`, and `$text`.
-- Deterministic section-anchored Markdown parsing, GFM table-to-collection
-  conversion, and `--set > model > Markdown` source precedence.
+- Cross-platform .NET 10 CLI commands: `inspect`, `scaffold-model`,
+  `validate-model`, `render`, `convert`, and `validate`.
+- Deterministic JSON model envelope with base and adjacent template schemas,
+  template identity/hash checks, recursive values, collections, and `$md`,
+  `$mdFile`, `$file`, and `$text` directives.
+- Section-anchored Markdown and table-to-collection conversion.
+- Bounded Markdig/Open XML renderer for headings, paragraphs, formatting,
+  links, native lists, tables, quotes, code, horizontal rules, and local/remote
+  images.
+- Strict/lenient binding, model/CLI option precedence, atomic output,
+  document properties, field refresh, leftover detection, OOXML validation,
+  and optional business-version filename suffixes.
+- Stable diagnostic codes, exit codes, and report-contract `1.0` JSON output
+  designed for coding agents and validation hooks.
+- Synthetic proposal template with cover, Document Control, revision loop,
+  TOC, Markdown body, closing page, adjacent schema, and runnable sample.
+- 80 automated tests plus Microsoft Word/PDF visual acceptance evidence.
+- Locked dependencies, reviewed permissive-license gate, third-party notices,
+  cross-platform CI, dotnet tool package, and self-contained single-file
+  release workflow for Windows, Linux, and macOS x64.
+
+### Security
+
+- Offline rendering by default.
+- Local asset root containment and resource limits.
+- Opt-in remote image downloads with timeout, size/media-type limits, redirects
+  disabled, and non-public address rejection.
+
+[Unreleased]: https://github.com/akode-dev/docxgen/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v1.0.0

@@ -32,8 +32,8 @@ Start Claude Code:
 claude
 ```
 
-Both agents should receive a bounded task tied to an implementation-plan
-acceptance slice.
+Both agents should receive a bounded maintenance task or an explicitly
+selected Phase 2 backlog item.
 
 ## Hook design
 
@@ -51,7 +51,7 @@ Hooks read the numeric `exitCode`, top-level `errorCode`/`hint`, and ordered
 `diagnostics`; they do not scrape stderr.
 
 Tracked wrappers under `eng/hooks` make this portable. Project-specific hook
-configuration is added only after the command works.
+configuration may invoke the implemented command.
 
 ### Codex
 

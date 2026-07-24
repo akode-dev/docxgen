@@ -1,13 +1,18 @@
+#pragma warning disable CA2007 // Console applications have no synchronization context.
 using System.CommandLine;
+using Akode.DocxGen.Cli;
+using Akode.DocxGen.Cli.Commands;
 
+using var services = CompositionRoot.Build();
 var root = new RootCommand(
-    "Akode.DocxGen repository scaffold. Rendering commands are not implemented yet.");
+    "Akode DocxGen — render polished DOCX documents from Markdown and Word templates.");
 
-root.Subcommands.Add(new Command("inspect", "Inspect a DOCX template contract."));
-root.Subcommands.Add(new Command("scaffold-model", "Create a model skeleton from a template."));
-root.Subcommands.Add(new Command("validate-model", "Validate model data before rendering."));
-root.Subcommands.Add(new Command("render", "Render a DOCX from a template and model."));
-root.Subcommands.Add(new Command("convert", "Convert Markdown using a reference style document."));
-root.Subcommands.Add(new Command("validate", "Validate a generated DOCX package."));
+root.Subcommands.Add(CommandFactory.Inspect(services));
+root.Subcommands.Add(CommandFactory.ScaffoldModel(services));
+root.Subcommands.Add(CommandFactory.ValidateModel(services));
+root.Subcommands.Add(CommandFactory.Render(services));
+root.Subcommands.Add(CommandFactory.Convert(services));
+root.Subcommands.Add(CommandFactory.Validate(services));
 
-return root.Parse(args).Invoke();
+return await root.Parse(args).InvokeAsync();
+#pragma warning restore CA2007

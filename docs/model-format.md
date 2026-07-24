@@ -26,7 +26,7 @@ visual/data contract. Neither is the business document version.
 
 ## Base reader contract
 
-`ModelJsonReader` now implements the first validation layer in Core:
+`ModelJsonReader` implements the first validation layer in Core:
 
 1. read the input as UTF-8, accepting an optional BOM;
 2. compute `sha256:<lowercase-hex>` over the exact source bytes;
@@ -46,8 +46,11 @@ strict mode enabled, heading offset `0`, raw HTML and remote images disabled,
 and Word field updates enabled.
 
 The base reader intentionally does not open `$mdFile` or `$file` paths.
-Path containment, limits, asset resolution, and the adjacent
-template-specific schema are subsequent P2 stages.
+The pipeline then applies path containment, resource limits, asset resolution,
+and the adjacent template-specific schema.
+
+Model options are defaults. An explicitly present CLI option wins; omitted CLI
+options preserve the model value.
 
 ## Recommended proposal model
 
@@ -69,27 +72,27 @@ template-specific schema are subsequent P2 stages.
       "Document": {
         "Title": "Customer Platform Proposal",
         "Description": "Technical and commercial proposal",
-        "ClientName": "Example Corporation",
-        "Date": "2026-07-24",
+        "Project": "Customer Platform Modernization",
+        "Client": "Example Corporation",
         "Version": "1.0",
         "Status": "Draft",
+        "Date": "2026-07-24",
+        "Classification": "INTERNAL",
         "Author": {
-          "FirstName": "Andrei",
-          "LastName": "Ivanov"
+          "FirstName": "Sample",
+          "LastName": "Author",
+          "Role": "Solution Architect",
+          "Email": "sample.author@example.test"
         }
       },
-      "DocumentControl": {
-        "Owner": "Akode",
-        "Classification": "Confidential",
-        "Revisions": [
-          {
-            "Version": "1.0",
-            "Date": "2026-07-24",
-            "Author": "Andrei Ivanov",
-            "Description": "Initial version"
-          }
-        ]
-      },
+      "Revisions": [
+        {
+          "Version": "1.0",
+          "Date": "2026-07-24",
+          "Author": "Sample Author",
+          "Description": "Initial version"
+        }
+      ],
       "Body": {
         "$mdFile": "proposal.md"
       }
@@ -123,7 +126,9 @@ Use only for short generated fragments. Files are preferred for long sections.
 { "$file": "assets/client-logo.png" }
 ```
 
-The template formatter decides how the binary value is used.
+Use it with a binary placeholder such as
+`{{ds.ClientLogo}:IMG(alt=Client logo)}`. Phase 1 supports the same image media
+types as Markdown images.
 
 ### `$text`
 

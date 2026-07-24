@@ -112,6 +112,17 @@ Fixed artwork stays in the template. Variable Markdown images are inline,
 aspect-preserving, and clamped to content width. Avoid floating text wrapping
 for content figures.
 
+For a variable standalone image, put `{{ds.ClientLogo}:IMG}` in an otherwise
+empty paragraph and bind it with:
+
+```json
+{ "$file": "assets/client-logo.png" }
+```
+
+Optional formatter argument `alt=...` supplies alternative text, for example
+`{{ds.ClientLogo}:IMG(alt=Client logo)}`. The image remains inline and is
+clamped to the available content width.
+
 ## Acceptance
 
 A template is accepted only after:

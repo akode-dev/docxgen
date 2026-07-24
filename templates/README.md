@@ -1,7 +1,9 @@
 # Templates
 
-Reference templates are not yet committed. The first template must be created
-or anonymized during P0 and reviewed for branding and confidentiality.
+`proposal.docx` is the synthetic, non-confidential Phase 1 reference template.
+It demonstrates the required package shape and is paired with
+`proposal.schema.json`. It is not an approved corporate brand master; replace
+it with the approved template only after the Word acceptance pass.
 
 Each production template is paired with a schema:
 

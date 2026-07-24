@@ -16,12 +16,12 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 7. Run focused tests, then `eng/verify`.
 8. Update documentation/schema/ADR when a public contract changes.
 
-## Current implementation task
+## Current product state
 
-P0 and P1 are complete and ADR-0001 is superseded. Diagnostics, Core operation
-and report contracts, architecture tests, license enforcement, locked restore,
-and cross-platform CI are in place. The next slice is P2 model parsing and
-Markdown preprocessing. Do not skip directly to CLI command handlers.
+Phase 1 is complete. The six-command CLI, Core pipeline, DOCX adapter,
+reference template, schemas, tests, visual evidence, dotnet tool packaging,
+and self-contained release workflow are in place. Work should now be either a
+scoped defect/maintenance change or an explicitly selected Phase 2 item.
 
 ## Prohibited shortcuts
 
@@ -36,8 +36,6 @@ Markdown preprocessing. Do not skip directly to CLI command handlers.
 - no push or history rewrite without explicit user authorization.
 
 ## Agent-facing CLI contract
-
-Once implemented:
 
 ```text
 inspect
@@ -62,9 +60,8 @@ Do not scrape human stderr or infer placeholder names.
 Hook entrypoints live in `eng/hooks`. They intentionally call the product's
 `validate-model` command instead of reimplementing schema rules in shell.
 
-Do not activate a project lifecycle hook until `validate-model` is implemented
-and its exit-code/JSON tests pass; an active nonfunctional hook would block all
-agent work.
+Project lifecycle hooks may now call the implemented `validate-model` command.
+Keep wrappers thin so the CLI remains the single validation implementation.
 
 Suggested lifecycle:
 

@@ -11,7 +11,7 @@ Do not generate ad-hoc Python, Node.js, or shell-based DOCX converters. The
 product goal is a deterministic .NET tool. Do not bypass failures with
 `--lenient`, `--allow-remote-images`, or `--allow-raw-html`.
 
-When the CLI is implemented, use its machine-readable workflow:
+Use the implemented machine-readable workflow:
 
 ```text
 inspect -> scaffold-model -> validate-model -> render --dry-run -> render
