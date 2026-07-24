@@ -296,6 +296,7 @@ The approved order is now:
 - [Project structure](docs/project-structure.md)
 - [Implementation plan](docs/implementation-plan.md)
 - [CLI contract](docs/cli-reference.md)
+- [Diagnostic contract](docs/diagnostics.md)
 - [Model format](docs/model-format.md)
 - [Template authoring](docs/template-authoring-guide.md)
 - [Development guide](docs/development-guide.md)

@@ -45,8 +45,10 @@ remains a P5 gate because no approved Akode template was supplied.
 
 ## P1 — Foundation
 
+Status: in progress.
+
 - complete Core request/result contracts;
-- base diagnostic registry and completeness tests;
+- [complete] base diagnostic registry and completeness tests;
 - architecture tests;
 - CI on Windows, Linux, and macOS;
 - locked restores and package-license gate;
