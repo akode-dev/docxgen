@@ -48,6 +48,15 @@ public static class DiagnosticCode
     /// <summary>A heading exceeded Word's supported heading levels.</summary>
     public const string HeadingLevelClamped = "W-MD-003";
 
+    /// <summary>A section anchor has invalid syntax or attributes.</summary>
+    public const string MarkdownInvalidSectionAnchor = "E-MD-004";
+
+    /// <summary>Markdown content before the first section anchor was ignored.</summary>
+    public const string MarkdownAnchorPreambleIgnored = "W-MD-005";
+
+    /// <summary>An anchored table cannot be converted to a model collection.</summary>
+    public const string MarkdownInvalidTableAnchor = "E-MD-006";
+
     /// <summary>A placeholder may be split across Word runs.</summary>
     public const string PlaceholderSplitAcrossRuns = "W-TPL-101";
 

@@ -17,7 +17,7 @@ src/
   Akode.DocxGen.Core/
     Abstractions/
     Diagnostics/
-    Markdown/                 planned
+    Markdown/
     Model/
     Pipeline/
     Reports/
@@ -92,7 +92,9 @@ Present:
 - `ModelDocument`, `TemplateReference`, and safe document options;
 - `ModelJsonReader` and `ModelJsonReadResult`;
 - immutable recursive values for JSON primitives, objects, collections, and
-  `$md`, `$mdFile`, `$file`, `$text` directives.
+  `$md`, `$mdFile`, `$file`, `$text` directives;
+- `ModelSourceMerger` and immutable merge results implementing
+  override-over-model-over-Markdown precedence.
 
 Planned:
 
@@ -100,12 +102,17 @@ Planned:
 - template contract reconciliation;
 - document-output naming model.
 
-### `Markdown` (planned)
+### `Markdown`
+
+Present:
+
+- `SectionAnchorParser` and immutable anchored-section results;
+- `AnchoredTableConverter` for `format=table columns=...`.
+
+Planned:
 
 - `MarkdownPipelineFactory`;
 - `MarkdownPreprocessor`;
-- `SectionAnchorParser`;
-- `MarkdownTableToCollection`;
 - image-reference resolver;
 - unsupported-feature downgrade visitor.
 
@@ -116,7 +123,7 @@ Present options and outcomes will be extended with:
 - immutable request/result pairs for inspect, scaffold, validate-model, render,
   convert, and existing-document validation (present);
 - `RenderPipeline` (planned);
-- source merge/reconciliation services;
+- source merge/reconciliation orchestration;
 - output-name resolution.
 
 ### `Reports`

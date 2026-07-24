@@ -84,6 +84,21 @@ public static class DiagnosticRegistry
             "A heading exceeded Word's supported heading levels.",
             "Reduce the source heading depth or choose a smaller heading offset."),
         new(
+            DiagnosticCode.MarkdownInvalidSectionAnchor,
+            DiagnosticSeverity.Error,
+            "A Markdown section anchor is invalid.",
+            "Use a standalone '<!-- docxgen:section Name key=value -->' marker with a valid case-sensitive name."),
+        new(
+            DiagnosticCode.MarkdownAnchorPreambleIgnored,
+            DiagnosticSeverity.Warning,
+            "Markdown content before the first section anchor was ignored.",
+            "Add a section anchor before the reported content or remove the unused preamble."),
+        new(
+            DiagnosticCode.MarkdownInvalidTableAnchor,
+            DiagnosticSeverity.Error,
+            "An anchored Markdown table cannot be converted to a model collection.",
+            "Use one valid GFM pipe table and provide a columns=Name,Role attribute list that matches its width."),
+        new(
             DiagnosticCode.PlaceholderSplitAcrossRuns,
             DiagnosticSeverity.Warning,
             "A template placeholder may be split across Word runs.",

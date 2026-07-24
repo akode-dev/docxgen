@@ -19,3 +19,5 @@ contract is released.
 - Version 1.0 Core operation and machine-readable report contracts.
 - Draft 2020-12 model-envelope validation and immutable typed parsing for
   `$md`, `$mdFile`, `$file`, and `$text`.
+- Deterministic section-anchored Markdown parsing, GFM table-to-collection
+  conversion, and `--set > model > Markdown` source precedence.

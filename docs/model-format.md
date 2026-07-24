@@ -142,6 +142,57 @@ objects may contain further arrays, objects, scalar values, or supported
 directives at any depth. Practical depth and aggregate-size limits are
 enforced later by the security layer, not by a fixed schema nesting level.
 
+## Section-anchored Markdown
+
+For a proposal that is easier to edit as one file, use standalone HTML
+comments to bind Markdown blocks to model paths:
+
+```markdown
+<!-- docxgen:section ExecutiveSummary -->
+
+Executive summary content.
+
+<!-- docxgen:section ds.Approach -->
+
+## Delivery approach
+
+<!-- docxgen:section Team format=table columns=Name,Role -->
+
+| Name | Role |
+|---|---|
+| Alexei | Solution Architect |
+
+<!-- docxgen:end -->
+```
+
+Unqualified names resolve below `ds`; dotted names are absolute. Names and
+result paths are case-sensitive. The marker keyword is case-insensitive.
+Content continues until the next section marker, `docxgen:end`, or EOF.
+
+The parser deliberately:
+
+- ignores marker-shaped text inside fenced code and inline code;
+- accepts UTF-8 BOM, CRLF, and trailing marker whitespace;
+- rejects duplicate and parent/child-overlapping paths instead of applying
+  last-writer-wins;
+- warns when nonblank content appears before the first marker;
+- preserves source order and normalizes returned blocks to LF.
+
+For `format=table`, `columns` supplies the object property names. The one GFM
+pipe table in the block becomes a collection of plain-text objects suitable
+for a template loop.
+
+Source precedence is deterministic:
+
+```text
+--set > model.json > anchored Markdown
+```
+
+JSON and Markdown are deep-merged, so model metadata can coexist with Markdown
+body sections. An explicit JSON value at the same leaf wins and produces
+`W-MRG-001`. `--set` values infer number, boolean, and null types; prefix with
+`@` to force a string such as `@0042`.
+
 ## Null and empty values
 
 - `null` never satisfies a required field;
