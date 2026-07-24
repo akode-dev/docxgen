@@ -18,10 +18,10 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 ## Current implementation task
 
-P0 is complete and ADR-0001 is superseded. P1 diagnostics, architecture tests,
-license enforcement, locked restore, and cross-platform CI definitions are in
-place. The next slice is the remaining Core request/result and JSON report
-contracts. Do not skip directly to CLI command handlers.
+P0 and P1 are complete and ADR-0001 is superseded. Diagnostics, Core operation
+and report contracts, architecture tests, license enforcement, locked restore,
+and cross-platform CI are in place. The next slice is P2 model parsing and
+Markdown preprocessing. Do not skip directly to CLI command handlers.
 
 ## Prohibited shortcuts
 
@@ -51,9 +51,9 @@ inspect
 Agents consume stdout JSON. Each failure is repaired from:
 
 - `errorCode`;
-- `errors[].path`;
-- `errors[].message`;
-- `errors[].hint`.
+- `diagnostics[].path`;
+- `diagnostics[].message`;
+- `diagnostics[].hint`.
 
 Do not scrape human stderr or infer placeholder names.
 

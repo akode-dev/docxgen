@@ -4,8 +4,11 @@ namespace Akode.DocxGen.Core.Model;
 
 /// <summary>Contract discovered from a DOCX template.</summary>
 public sealed record TemplateSchema(
+    string? TemplateId,
+    string? TemplateVersion,
     string TemplateHash,
     IReadOnlyList<TemplatePlaceholder> Placeholders,
+    IReadOnlyList<string> RequiredStyles,
     IReadOnlyList<Diagnostic> Diagnostics);
 
 /// <summary>A placeholder expected by a template.</summary>
@@ -13,5 +16,8 @@ public sealed record TemplatePlaceholder(
     string Path,
     ModelValueKind Kind,
     string? Formatter,
+    string? FormatterArguments,
     bool Required,
-    IReadOnlyList<string> Locations);
+    IReadOnlyList<string> Locations,
+    IReadOnlyList<string> ItemProperties,
+    string? UsedIn);

@@ -16,8 +16,9 @@ The target workflow is:
 > Project status: compileable scaffold with a completed P0 rendering-engine
 > spike. Production commands are not implemented yet. P0 rejected the bundled
 > Markdown/image extensions and selected the hybrid renderer in
-> [ADR-0005](docs/adr/0005-hybrid-rendering-engine.md). Development continues
-> with P1 foundation work in [the implementation plan](docs/implementation-plan.md).
+> [ADR-0005](docs/adr/0005-hybrid-rendering-engine.md). P1 foundation is
+> complete; development continues with P2 model and Markdown work in
+> [the implementation plan](docs/implementation-plan.md).
 
 ## Why this project exists
 
@@ -287,8 +288,8 @@ See the [P0 evidence report](docs/spikes/p0-renderer-spike.md).
 
 The approved order is now:
 
-1. P1 foundation, diagnostics, CI, and the license gate;
-2. P2 model parsing and a neutral Markdown block model;
+1. P1 foundation, diagnostics, CI, and the license gate (complete);
+2. P2 model parsing and a neutral Markdown block model (next);
 3. P3 hybrid DOCX adapter: DocxTemplater binding plus the bounded Markdig/Open
    XML body renderer selected in ADR-0005;
 4. CLI and reference-template slices.
@@ -300,6 +301,7 @@ The approved order is now:
 - [Project structure](docs/project-structure.md)
 - [Implementation plan](docs/implementation-plan.md)
 - [CLI contract](docs/cli-reference.md)
+- [Machine-readable report format](docs/report-format.md)
 - [Diagnostic contract](docs/diagnostics.md)
 - [Model format](docs/model-format.md)
 - [Template authoring](docs/template-authoring-guide.md)

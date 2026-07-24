@@ -20,6 +20,7 @@ src/
     Markdown/                 planned
     Model/
     Pipeline/
+    Reports/
     Security/                 planned
   Akode.DocxGen.Docx/
     Formatters/
@@ -110,12 +111,17 @@ Planned:
 
 Present options and outcomes will be extended with:
 
-- `RenderRequest`;
-- `RenderResult`;
-- `ValidateModelRequest`;
-- `RenderPipeline`;
+- immutable request/result pairs for inspect, scaffold, validate-model, render,
+  convert, and existing-document validation (present);
+- `RenderPipeline` (planned);
 - source merge/reconciliation services;
 - output-name resolution.
+
+### `Reports`
+
+Contains the shared `CommandReport<TData>` envelope, command-specific success
+data, and the stable JSON serializer. The corresponding Draft 2020-12 schema is
+`docs/schemas/docxgen-report-1.0.schema.json`.
 
 ### `Diagnostics`
 

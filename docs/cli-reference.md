@@ -95,20 +95,28 @@ docxgen validate --file <document.docx>
 
 ```json
 {
+  "reportVersion": "1.0",
+  "command": "validate-model",
   "ok": false,
   "exitCode": 4,
   "errorCode": "E-MDL-002",
-  "message": "The model does not satisfy the template schema.",
-  "errors": [
+  "message": "Model validation failed.",
+  "hint": "Update the reported value to satisfy the adjacent template schema.",
+  "diagnostics": [
     {
+      "code": "E-MDL-002",
+      "severity": "error",
       "path": "/data/ds/Document/Title",
-      "rule": "minLength",
       "message": "Document title must not be empty.",
       "hint": "Set data.ds.Document.Title to a non-empty string."
     }
   ]
 }
 ```
+
+Success and failure reports use the same versioned envelope. See the
+[machine-readable report format](report-format.md) and its normative JSON
+Schema.
 
 ## Versioned output
 

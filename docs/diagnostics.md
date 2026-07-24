@@ -7,6 +7,10 @@ Every emitted issue has:
 code + severity + message + hint + optional path
 ```
 
+With `--json`, diagnostics are emitted in the
+[versioned report envelope](report-format.md) defined by the
+[report schema](schemas/docxgen-report-1.0.schema.json).
+
 ## Code format
 
 ```text

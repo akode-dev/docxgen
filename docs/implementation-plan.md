@@ -45,14 +45,15 @@ remains a P5 gate because no approved Akode template was supplied.
 
 ## P1 — Foundation
 
-Status: in progress.
+Status: completed on 2026-07-24. The acceptance evidence is the Core contract
+test suite and the green Windows/Linux/macOS CI run for `develop`.
 
-- complete Core request/result contracts;
+- [complete] Core request/result contracts;
 - [complete] base diagnostic registry and completeness tests;
 - [complete] architecture tests;
 - [complete] CI definitions on Windows, Linux, and macOS;
 - [complete] locked restores and package-license gate;
-- JSON report schemas.
+- [complete] versioned JSON report schema and serialization tests.
 
 ## P2 — Model and Markdown
 
@@ -125,7 +126,8 @@ Exit: Core test coverage at least 90% for these components.
 
 ## Next agent tasks
 
-1. Complete Core request/result contracts.
-2. Complete and test the public JSON report schemas.
-3. Confirm the cross-platform CI run is green after the P1 gate merge.
-4. Begin P2 only after the remaining P1 acceptance slice is green.
+1. Implement base model schema validation and `ModelJsonReader`.
+2. Implement `$md`, `$mdFile`, `$file`, and `$text` directive parsing.
+3. Implement `SectionAnchorParser` and model/Markdown merge precedence.
+4. Add `PathGuard`, limits, and local asset resolution.
+5. Complete the `validate-model` Core service before activating hooks.

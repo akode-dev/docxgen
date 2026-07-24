@@ -39,6 +39,7 @@ Owns domain-level behavior:
 - merge precedence;
 - security and limits;
 - diagnostics;
+- operation request/result contracts and the versioned JSON report envelope;
 - render orchestration abstractions.
 
 Core has no knowledge of DOCX package types or command-line parsing.
@@ -127,7 +128,9 @@ code + severity + message + hint + optional path
 ```
 
 CLI maps the most severe category to a stable exit code. JSON output preserves
-all diagnostics in pipeline order.
+all diagnostics in pipeline order inside `CommandReport<TData>`. The CLI and
+future MCP adapter project the same Core result semantics; only the transport
+changes.
 
 ## Design constraints
 

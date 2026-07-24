@@ -1,0 +1,767 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akode.example/schemas/docxgen-report-1.0.schema.json",
+  "title": "Akode.DocxGen command report 1.0",
+  "description": "Versioned stdout envelope for all Phase 1 commands.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/inspectSuccess"
+    },
+    {
+      "$ref": "#/$defs/scaffoldModelSuccess"
+    },
+    {
+      "$ref": "#/$defs/validateModelSuccess"
+    },
+    {
+      "$ref": "#/$defs/renderSuccess"
+    },
+    {
+      "$ref": "#/$defs/convertSuccess"
+    },
+    {
+      "$ref": "#/$defs/validateSuccess"
+    },
+    {
+      "$ref": "#/$defs/failure"
+    }
+  ],
+  "$defs": {
+    "baseEnvelope": {
+      "type": "object",
+      "required": [
+        "reportVersion",
+        "command",
+        "ok",
+        "exitCode",
+        "message",
+        "diagnostics"
+      ],
+      "properties": {
+        "reportVersion": {
+          "const": "1.0"
+        },
+        "command": {
+          "enum": [
+            "inspect",
+            "scaffold-model",
+            "validate-model",
+            "render",
+            "convert",
+            "validate"
+          ]
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[EWI]-[A-Z]{2,3}-[0-9]{3}$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        },
+        "data": {}
+      }
+    },
+    "successEnvelope": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseEnvelope"
+        },
+        {
+          "type": "object",
+          "required": [
+            "data"
+          ],
+          "properties": {
+            "ok": {
+              "const": true
+            },
+            "exitCode": {
+              "const": 0
+            },
+            "errorCode": {
+              "type": "null"
+            },
+            "hint": {
+              "type": "null"
+            },
+            "diagnostics": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/nonErrorDiagnostic"
+              }
+            },
+            "data": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "failure": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseEnvelope"
+        },
+        {
+          "type": "object",
+          "required": [
+            "errorCode",
+            "hint"
+          ],
+          "properties": {
+            "ok": {
+              "const": false
+            },
+            "exitCode": {
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ]
+            },
+            "errorCode": {
+              "type": "string",
+              "pattern": "^E-[A-Z]{2,3}-[0-9]{3}$"
+            },
+            "hint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "diagnostics": {
+              "type": "array",
+              "minItems": 1,
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "severity": {
+                    "const": "error"
+                  }
+                },
+                "required": [
+                  "severity"
+                ]
+              }
+            },
+            "data": {
+              "type": "null"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "inspectSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "inspect"
+            },
+            "data": {
+              "$ref": "#/$defs/inspectData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "scaffoldModelSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "scaffold-model"
+            },
+            "data": {
+              "$ref": "#/$defs/scaffoldModelData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "validateModelSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "validate-model"
+            },
+            "data": {
+              "$ref": "#/$defs/validateModelData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "renderSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "render"
+            },
+            "data": {
+              "$ref": "#/$defs/renderData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "convertSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "convert"
+            },
+            "data": {
+              "$ref": "#/$defs/convertData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "validateSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "validate"
+            },
+            "data": {
+              "$ref": "#/$defs/validateData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "message",
+        "hint"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[EWI]-[A-Z]{2,3}-[0-9]{3}$"
+        },
+        "severity": {
+          "enum": [
+            "information",
+            "warning",
+            "error"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "nonErrorDiagnostic": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/diagnostic"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "severity": {
+              "enum": [
+                "information",
+                "warning"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "pathArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "markdownStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sections",
+        "headings",
+        "tables",
+        "images",
+        "codeBlocks"
+      ],
+      "properties": {
+        "sections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "headings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tables": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "images": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "codeBlocks": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "validationSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "isValid",
+        "errorCount",
+        "warningCount"
+      ],
+      "properties": {
+        "isValid": {
+          "type": "boolean"
+        },
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "placeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "kind",
+        "required",
+        "locations",
+        "itemProperties"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "markdown",
+            "binary",
+            "collection",
+            "structuredObject"
+          ]
+        },
+        "formatter": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "formatterArguments": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "locations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "itemProperties": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "usedIn": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "inspectData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template",
+        "templateHash",
+        "placeholders",
+        "requiredStyles",
+        "unsupportedForStaticAnalysis",
+        "durationMs"
+      ],
+      "properties": {
+        "template": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "templateVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "placeholders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/placeholder"
+          }
+        },
+        "requiredStyles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unsupportedForStaticAnalysis": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "scaffoldModelData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output",
+        "templateHash",
+        "markdownStubs",
+        "durationMs"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "markdownStubs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "validateModelData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "templateHash",
+        "modelHash",
+        "bound",
+        "unbound",
+        "markdownStats",
+        "durationMs"
+      ],
+      "properties": {
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "modelHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "bound": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "unbound": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "markdownStats": {
+          "$ref": "#/$defs/markdownStats"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "renderData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outputBytes",
+        "templateHash",
+        "durationMs",
+        "bound",
+        "unbound",
+        "markdownStats",
+        "dryRun"
+      ],
+      "properties": {
+        "output": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "modelHash": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bound": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "unbound": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "markdownStats": {
+          "$ref": "#/$defs/markdownStats"
+        },
+        "validation": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/validationSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dryRun": {
+          "type": "boolean"
+        },
+        "documentVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "dryRun": {
+                "const": true
+              }
+            },
+            "required": [
+              "dryRun"
+            ]
+          },
+          "then": {
+            "properties": {
+              "outputBytes": {
+                "const": 0
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "output"
+            ]
+          }
+        }
+      ]
+    },
+    "convertData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output",
+        "outputBytes",
+        "durationMs",
+        "markdownStats"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "markdownStats": {
+          "$ref": "#/$defs/markdownStats"
+        },
+        "validation": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/validationSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "validateData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "durationMs",
+        "validation"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "validation": {
+          "$ref": "#/$defs/validationSummary"
+        }
+      }
+    }
+  }
+}
