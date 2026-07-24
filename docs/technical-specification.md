@@ -6,7 +6,7 @@
 |---|---|
 | Product | Akode.DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Phase 1 implemented and release-ready |
+| Status | Phase 1 released; semantic DOCX extraction implemented for next minor release |
 | Primary users | Bid teams, developers, CI, coding agents |
 | Runtime model | Offline deterministic CLI |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -23,10 +23,12 @@ content in text files, but producing a polished corporate DOCX repeatedly
 causes agents to create one-off scripts, install dependencies, and manipulate
 OOXML inconsistently.
 
-Akode.DocxGen must provide one deterministic transformation:
+Akode.DocxGen provides deterministic forward generation and semantic reverse
+extraction:
 
 ```text
 (DOCX template, validated model, Markdown, local assets) -> DOCX
+DOCX -> Markdown + embedded image assets
 ```
 
 The tool does not generate business content and does not call an LLM.
@@ -87,6 +89,8 @@ offset.
 
 ### 5.2 Phase 2
 
+- semantic DOCX-to-Markdown extraction from the main document body (selected
+  and implemented);
 - MCP server over Core;
 - RTL/Arabic after a dedicated spike;
 - PDF delivery after implementation and license review;
@@ -97,7 +101,7 @@ offset.
 
 - LLM content generation;
 - Markdown editor or web UI;
-- DOCX-to-Markdown synchronization;
+- pixel-perfect or layout-preserving DOCX-to-Markdown synchronization;
 - tracked-change round-trip to Markdown;
 - Office Interop, COM automation, or headless Word;
 - arbitrary floating-object layout authored in Markdown;
@@ -225,7 +229,30 @@ preflight but does not write the final path.
 Creates an unbranded draft from Markdown and an optional style reference.
 Production proposals should use `render`.
 
-### 6.7 `validate`
+### 6.7 `extract`
+
+Extracts the main DOCX body into portable Markdown and exports embedded images:
+
+```text
+docxgen extract
+  --file <input.docx>
+  --out <output.md>
+  [--assets-dir <directory>]
+  [--overwrite]
+  [--json]
+```
+
+The default assets directory is `<output-name>.assets` beside the Markdown
+file. Paths embedded in Markdown are relative to the Markdown output.
+Extraction preserves supported document semantics, not Word layout. It
+includes paragraphs, Heading 1–6, inline formatting/code, links, hard line
+breaks, ordered/unordered nested lists, quote/code/caption styles, GFM tables,
+horizontal rules, and embedded images. Generated fields and unsupported Word
+constructs are omitted or downgraded with stable diagnostics. Headers,
+footers, comments, footnotes, and tracked deletions are outside the initial
+contract.
+
+### 6.8 `validate`
 
 Validates an existing DOCX using Open XML SDK and product-specific checks for
 leftover placeholders, broken relationships, and required package parts.
@@ -531,6 +558,11 @@ Phase 1 is accepted when:
 11. The license gate passes.
 12. A fresh Codex and Claude Code session can follow repository instructions,
     run the intended workflow, and avoid ad-hoc document scripts.
+
+The selected Phase 2 extraction slice is accepted when a supported generated
+DOCX can be extracted into Markdown with headings, inline formatting, links,
+lists, quotes, tables, and deterministic image assets; unsupported fields
+produce stable warnings; and the result can be passed back to `convert`.
 
 ## 17. Delivery and branches
 

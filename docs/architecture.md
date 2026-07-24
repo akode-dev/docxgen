@@ -10,6 +10,8 @@ flowchart LR
     T --> CLI
     CLI --> O["Generated DOCX"]
     O --> Word["Microsoft Word finalization"]
+    Existing["Existing DOCX"] --> CLI
+    CLI --> Extracted["Semantic Markdown and image assets"]
 ```
 
 The author owns content and metadata. The template designer owns branded
@@ -53,6 +55,7 @@ Owns the document technology adapter:
 - template package inspection;
 - ordered Open XML post-processing;
 - Open XML validation;
+- semantic main-body extraction and embedded-image export;
 - normalized golden-test helpers.
 
 ### CLI
@@ -92,6 +95,22 @@ flowchart TD
 
 Each stage returns diagnostics instead of writing to the console. Strict mode
 stops before rendering when required data is missing or of the wrong kind.
+
+The reverse pipeline is deliberately separate:
+
+```mermaid
+flowchart LR
+    A["Open macro-free DOCX"] --> B["Read main body, styles, and numbering"]
+    B --> C["Map supported Word semantics to Markdown"]
+    C --> D["Extract embedded image parts with deterministic names"]
+    D --> E["Preflight output paths"]
+    E --> F["Write assets, Markdown, and typed report"]
+```
+
+It does not depend on template placeholders and does not attempt to reproduce
+page geometry, headers, footers, floating layout, comments, or tracked-change
+history. Those constructs are either outside the initial contract or reported
+as semantic downgrades.
 
 ## Template and schema relationship
 

@@ -1,6 +1,6 @@
 # CLI reference
 
-Phase 1 exposes six non-interactive commands. Use `docxgen <command> --help`
+DocxGen exposes seven non-interactive commands. Use `docxgen <command> --help`
 for the installed executable or:
 
 ```powershell
@@ -123,6 +123,32 @@ docxgen convert
 
 When `--style-reference` is absent, DocxGen creates a valid default Word style
 set. With `--toc`, a real Word TOC field is inserted and marked for refresh.
+
+## `extract`
+
+Extracts the semantic main-document body and embedded images:
+
+```text
+docxgen extract
+  --file <input.docx>
+  -o|--out <output.md>
+  [--assets-dir <directory>]
+  [--overwrite]
+  [--json]
+```
+
+When `--assets-dir` is absent, assets are written to
+`<output-name>.assets/` next to the Markdown file. Image links are relative
+to `--out`; an explicit assets directory must be on the same file-system root.
+All output paths are checked before the first write.
+
+Extraction is semantic and best-effort, not a Word-layout round trip. It
+supports paragraphs, Heading 1–6, bold, italic, strikethrough, inline code,
+links, hard line breaks, ordered/unordered nested lists, quote/code/caption
+styles, GFM tables, horizontal rules, and embedded images. It reads the main
+body only. Headers, footers, comments, footnotes, tracked deletions, floating
+layout, and generated fields such as TOC results are omitted or downgraded
+with stable `EXT` diagnostics.
 
 ## `validate`
 

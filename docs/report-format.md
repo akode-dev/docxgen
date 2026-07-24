@@ -1,6 +1,6 @@
 # Machine-readable report format
 
-Every Phase 1 command writes the same versioned envelope to stdout when
+Every command writes the same versioned envelope to stdout when
 `--json` is present. Human logs remain on stderr.
 
 The normative Draft 2020-12 schema is
@@ -11,7 +11,7 @@ The normative Draft 2020-12 schema is
 | Field | Meaning |
 |---|---|
 | `reportVersion` | JSON contract version, currently `1.0` |
-| `command` | `inspect`, `scaffold-model`, `validate-model`, `render`, `convert`, or `validate` |
+| `command` | `inspect`, `scaffold-model`, `validate-model`, `render`, `convert`, `extract`, or `validate` |
 | `ok` | Whether the operation succeeded |
 | `exitCode` | Numeric stable process exit code `0` through `7` |
 | `errorCode` | Primary diagnostic code; present only on failure |
@@ -73,6 +73,11 @@ logs.
 
 For `render --dry-run`, `data.dryRun` is true, `outputBytes` is zero, and no
 output path is required.
+
+Successful `extract` data contains `output`, `outputBytes`,
+`assetsDirectory`, the absolute `assets` path array, `durationMs`, and
+semantic `stats` counts for paragraphs, headings, list items, tables, and
+image occurrences.
 
 ## Failure example
 

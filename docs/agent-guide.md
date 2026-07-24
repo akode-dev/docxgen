@@ -18,7 +18,7 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 ## Current product state
 
-Phase 1 is complete. The six-command CLI, Core pipeline, DOCX adapter,
+Phase 1 is complete. The seven-command CLI, Core pipeline, DOCX adapter,
 reference template, schemas, tests, visual evidence, dotnet tool packaging,
 and self-contained release workflow are in place. Work should now be either a
 scoped defect/maintenance change or an explicitly selected Phase 2 item.
@@ -54,6 +54,11 @@ Agents consume stdout JSON. Each failure is repaired from:
 - `diagnostics[].hint`.
 
 Do not scrape human stderr or infer placeholder names.
+
+For reverse conversion, agents call `extract --file ... --out ... --json`,
+review warning diagnostics, and edit the resulting Markdown plus its adjacent
+assets directory. They must retain the source DOCX when exact Word layout,
+headers/footers, comments, or tracked changes matter.
 
 ## Hooks
 

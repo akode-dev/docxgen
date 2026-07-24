@@ -159,6 +159,26 @@ public static class DiagnosticRegistry
             "The document renderer failed.",
             "Inspect the template and model, then retry with valid supported content."),
         new(
+            DiagnosticCode.ExtractionFailure,
+            DiagnosticSeverity.Error,
+            "The DOCX document could not be extracted.",
+            "Use a valid macro-free .docx file that opens without repair in Microsoft Word."),
+        new(
+            DiagnosticCode.ExtractionFeatureDowngraded,
+            DiagnosticSeverity.Warning,
+            "A Word construct was skipped or represented with reduced Markdown semantics.",
+            "Review the reported Markdown location and preserve the original DOCX when exact Word layout matters."),
+        new(
+            DiagnosticCode.ExtractionFieldOmitted,
+            DiagnosticSeverity.Warning,
+            "A generated Word field was omitted from the extracted Markdown.",
+            "Regenerate fields such as the table of contents from Markdown headings when producing a new DOCX."),
+        new(
+            DiagnosticCode.ExtractionTableHeaderInferred,
+            DiagnosticSeverity.Warning,
+            "The first table row was inferred as a Markdown header.",
+            "Mark the first row as a header in Word when that distinction must be explicit."),
+        new(
             DiagnosticCode.UnexpectedFailure,
             DiagnosticSeverity.Error,
             "An unexpected internal product failure occurred.",
