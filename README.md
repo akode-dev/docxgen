@@ -13,10 +13,11 @@ The target workflow is:
 (template.docx + model.json + proposal.md) -> docxgen -> proposal.docx
 ```
 
-> Project status: repository scaffold and technical contract. The solution
-> builds, but rendering commands are not implemented yet. Development must
-> begin with the P0 rendering-engine spike described in
-> [the implementation plan](docs/implementation-plan.md).
+> Project status: compileable scaffold with a completed P0 rendering-engine
+> spike. Production commands are not implemented yet. P0 rejected the bundled
+> Markdown/image extensions and selected the hybrid renderer in
+> [ADR-0005](docs/adr/0005-hybrid-rendering-engine.md). Development continues
+> with P1 foundation work in [the implementation plan](docs/implementation-plan.md).
 
 ## Why this project exists
 
@@ -189,7 +190,7 @@ is present, and returns the final path in its JSON report.
 Akode.DocxGen.sln
 src/
   Akode.DocxGen.Core/   contracts, model, Markdown, diagnostics, security
-  Akode.DocxGen.Docx/   DocxTemplater and Open XML adapter
+  Akode.DocxGen.Docx/   template binding and Open XML rendering adapter
   Akode.DocxGen.Cli/    command-line host
   Akode.DocxGen.Mcp/    Phase 2 MCP adapter
 tests/
@@ -275,15 +276,18 @@ See [branching and releases](docs/branching-and-release.md).
 
 ## Delivery order
 
-The first implementation is deliberately a risk-reduction spike:
+The P0 risk-reduction spike is complete. It proved template schema discovery,
+data binding, collections, fields, sections, and Open XML image insertion, but
+rejected `DocxTemplater.Markdown` and `DocxTemplater.Images` for production.
+See the [P0 evidence report](docs/spikes/p0-renderer-spike.md).
 
-1. prove Markdown rendering against a real branded template;
-2. verify template styles, numbering, images, TOC, headers, footers, and text
-   boxes;
-3. decide whether DocxTemplater remains the rendering engine;
-4. only then implement the production Core, adapters, and CLI.
+The approved order is now:
 
-Do not begin by writing a custom Markdown-to-OOXML renderer.
+1. P1 foundation, diagnostics, CI, and the license gate;
+2. P2 model parsing and a neutral Markdown block model;
+3. P3 hybrid DOCX adapter: DocxTemplater binding plus the bounded Markdig/Open
+   XML body renderer selected in ADR-0005;
+4. CLI and reference-template slices.
 
 ## Documentation
 

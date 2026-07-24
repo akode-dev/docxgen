@@ -1,6 +1,6 @@
 # ADR-0001: Rendering engine
 
-- Status: Proposed; P0 spike required
+- Status: Superseded by ADR-0005
 - Date: 2026-07-24
 
 ## Context
@@ -36,3 +36,21 @@ branded template, including:
 Production renderer work waits for P0. If P0 fails, create a superseding ADR
 that evaluates a different engine or a bounded custom renderer and re-estimates
 the adapter phase.
+
+## P0 outcome
+
+The retained spike proved template schema extraction, scalar/object binding,
+collection row expansion, fields, sections, headers, footers, VML text-box
+replacement, and Open XML validation.
+
+The proposed decision was rejected because:
+
+- the Markdown extension omitted inline and fenced code content;
+- links were emitted as text with no `w:hyperlink`;
+- block quotes did not use the template `Quote` style;
+- soft source-line breaks became hard Word breaks;
+- nested ordered numbering had visible spacing defects;
+- the Images extension introduced an unapproved ImageSharp license.
+
+See `docs/spikes/p0-renderer-spike.md` for evidence and ADR-0005 for the
+replacement decision.

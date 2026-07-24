@@ -23,6 +23,7 @@ src/
     Security/                 planned
   Akode.DocxGen.Docx/
     Formatters/
+    Markdown/                 planned bounded block renderer
     PostProcessing/
   Akode.DocxGen.Cli/
     Commands/
@@ -133,6 +134,9 @@ Planned implementation files:
 
 - `DocxTemplaterRenderer`;
 - `DocxTemplaterInspector`;
+- `MarkdownSlotFormatter`;
+- Markdown block renderers for paragraphs, headings, lists, tables, quotes,
+  code, links, and inline images;
 - `OpenXmlValidatorAdapter`;
 - formatter registration;
 - `UpdateFieldsPostProcessor`;
@@ -144,7 +148,8 @@ Planned implementation files:
 - `DocxNormalizer` for tests.
 
 This project is the only production project allowed to depend on
-DocxTemplater or Open XML SDK.
+DocxTemplater or Open XML SDK. It must not reference the rejected
+`DocxTemplater.Markdown` or `DocxTemplater.Images` extensions.
 
 ## `Akode.DocxGen.Cli`
 

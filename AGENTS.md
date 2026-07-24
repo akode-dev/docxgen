@@ -12,9 +12,9 @@ needed.
    acceptance slice unless the user or issue explicitly selects another task.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-The repository is currently a compileable scaffold, not a finished document
-renderer. Do not claim that a planned CLI command works until an automated test
-proves it.
+The repository is currently a compileable scaffold with a completed P0 spike,
+not a finished document renderer. Do not claim that a planned CLI command works
+until an automated test proves it. The next phase is P1 foundation.
 
 ## Architecture boundaries
 
@@ -32,8 +32,11 @@ proves it.
 ## Product rules
 
 - Content lives in Markdown/JSON; design lives in the DOCX template.
-- Do not write a new Markdown-to-OOXML renderer before the P0 spike disproves
-  ADR-0001 and the ADR is explicitly superseded.
+- ADR-0001 is superseded by ADR-0005. Production keeps DocxTemplater only for
+  template binding/schema behavior and implements the approved, bounded
+  Markdown block renderer with Markdig and Open XML SDK.
+- Do not restore `DocxTemplater.Markdown`, `DocxTemplater.Images`, ImageSharp,
+  or another document engine without a new ADR and license review.
 - Treat `inspect`, JSON output, diagnostics, exit codes, and `hint` fields as
   public API.
 - A fixed corporate logo remains in the template. Image placeholders are for

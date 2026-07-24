@@ -151,8 +151,14 @@ x86/
 ### Generated document previews and test artifacts
 *.pdf
 *.docx
+!src/Akode.DocxGen.Docx/
+!src/Akode.DocxGen.Docx/*.csproj
+!src/Akode.DocxGen.Docx/*.json
+!src/Akode.DocxGen.Docx/**/*.cs
+!src/Akode.DocxGen.Docx/**/*.md
 !templates/**/*.docx
 !samples/**/*.docx
 !tests/TestAssets/**/*.docx
+!spike/**/assets/*.docx
 coverage/
 TestResults/
