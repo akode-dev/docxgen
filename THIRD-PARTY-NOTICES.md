@@ -10,6 +10,7 @@ when either side changes without the other.
 | DocxTemplater | 2.8.3 | MIT | production |
 | DocxTemplater.Markdown | 2.8.3 | MIT | P0 spike only |
 | DocumentFormat.OpenXml | 3.5.1 | MIT | production |
+| JsonSchema.Net | 8.0.5 | MIT | production |
 | Markdig | 1.3.2 | BSD-2-Clause | production |
 | System.CommandLine | 2.0.10 | MIT | production |
 | Microsoft.Extensions.* | 10.0.0 | MIT | production |
@@ -29,3 +30,7 @@ Six Labors Split License, which is outside this repository's allow-list.
 
 `DocxTemplater.Markdown` remains only in the retained P0 evidence project. It
 is not referenced by a production project after ADR-0005.
+
+JsonSchema.Net is intentionally pinned to 8.0.5, the last reviewed MIT-only
+NuGet binary release before the 9.x maintenance-fee agreement. Version 9 and
+later remain outside this repository's allow-list; see ADR-0006.

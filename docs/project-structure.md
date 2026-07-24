@@ -88,14 +88,16 @@ Present:
 - `TemplateSchema` and `TemplatePlaceholder`;
 - `BoundModel` and `MarkdownStats`;
 - asset and validation result contracts;
-- `ModelValueKind`.
+- `ModelValueKind`;
+- `ModelDocument`, `TemplateReference`, and safe document options;
+- `ModelJsonReader` and `ModelJsonReadResult`;
+- immutable recursive values for JSON primitives, objects, collections, and
+  `$md`, `$mdFile`, `$file`, `$text` directives.
 
 Planned:
 
-- `ModelJsonReader`;
 - `ModelSchemaValidator`;
-- directive converters for `$md`, `$mdFile`, `$file`, `$text`;
-- template identity and contract metadata;
+- template contract reconciliation;
 - document-output naming model.
 
 ### `Markdown` (planned)

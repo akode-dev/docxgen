@@ -34,6 +34,9 @@ allow-list are the machine-checked sources.
 - `DocxTemplater.Markdown` is allowed only in the retained P0 spike lock file.
 - `DocxTemplater.Images` and `SixLabors.ImageSharp` are forbidden throughout
   the resolved graph.
+- `JsonSchema.Net` is pinned to the reviewed MIT-only 8.0.5 binary release;
+  version 9 and later require a new ADR and license review because their NuGet
+  binaries carry an additional maintenance-fee agreement.
 - DocxTemplater and Open XML SDK production references are confined to
   `Akode.DocxGen.Docx`.
 

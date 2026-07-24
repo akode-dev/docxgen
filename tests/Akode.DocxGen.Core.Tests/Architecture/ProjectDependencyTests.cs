@@ -28,7 +28,7 @@ public sealed class ProjectDependencyTests
             projects,
             "Akode.DocxGen.Core",
             projectReferences: [],
-            packageReferences: ["Markdig"]);
+            packageReferences: ["JsonSchema.Net", "Markdig"]);
         AssertProject(
             projects,
             "Akode.DocxGen.Docx",

@@ -17,3 +17,5 @@ contract is released.
 - Stable diagnostics registry with completeness tests.
 - Architecture, locked dependency, and package-license gates.
 - Version 1.0 Core operation and machine-readable report contracts.
+- Draft 2020-12 model-envelope validation and immutable typed parsing for
+  `$md`, `$mdFile`, `$file`, and `$text`.

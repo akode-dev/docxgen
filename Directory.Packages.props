@@ -10,6 +10,12 @@
     <PackageVersion Include="Markdig" Version="1.3.2" />
   </ItemGroup>
 
+  <ItemGroup Label="JSON contracts">
+    <!-- 8.0.5 is the last reviewed MIT-only binary release. Version 9+
+         carries an unapproved binary maintenance-fee agreement. See ADR-0006. -->
+    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
+  </ItemGroup>
+
   <ItemGroup Label="Retained P0 spike">
     <PackageVersion Include="DocxTemplater.Markdown" Version="2.8.3" />
   </ItemGroup>
