@@ -18,7 +18,9 @@ The target workflow is:
 > Markdown/image extensions and selected the hybrid renderer in
 > [ADR-0005](docs/adr/0005-hybrid-rendering-engine.md). P1 foundation is
 > complete; P2 now has a validated recursive model-envelope reader and
-> continues with Markdown preprocessing and secure asset resolution in
+> deterministic section anchors, table-to-collection conversion, and source
+> precedence. Work continues with secure asset resolution and Markdown AST
+> preprocessing in
 > [the implementation plan](docs/implementation-plan.md).
 
 ## Why this project exists

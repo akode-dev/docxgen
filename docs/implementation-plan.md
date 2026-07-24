@@ -57,18 +57,20 @@ test suite and the green Windows/Linux/macOS CI run for `develop`.
 
 ## P2 — Model and Markdown
 
-Status: in progress. The model-envelope slice was completed on 2026-07-24.
+Status: in progress. The model-envelope and anchored-Markdown merge slices
+were completed on 2026-07-24.
 
 - [complete] base model schema validation;
 - template-specific schema reconciliation;
 - [complete] `ModelJsonReader`;
 - [complete] `$md`, `$mdFile`, `$file`, `$text` parsing;
-- `SectionAnchorParser`;
-- table-to-collection anchors;
+- [complete] comment-style `SectionAnchorParser`;
+- [complete] table-to-collection anchors;
+- heading-style anchor alternative;
 - AST heading offset;
 - raw HTML and remote image policy;
 - `PathGuard` and limits;
-- model merge precedence;
+- [complete] model merge precedence;
 - `validate-model` Core service.
 
 Exit: Core test coverage at least 90% for these components.
@@ -128,7 +130,7 @@ Exit: Core test coverage at least 90% for these components.
 
 ## Next agent tasks
 
-1. Implement `SectionAnchorParser` and model/Markdown merge precedence.
-2. Add `PathGuard`, limits, and local asset resolution.
-3. Reconcile the base model with the adjacent template-specific schema.
+1. Add `PathGuard`, limits, and local asset resolution.
+2. Reconcile the base model with the adjacent template-specific schema.
+3. Implement Markdown AST heading offset and raw HTML/remote image policy.
 4. Complete the `validate-model` Core service before activating hooks.
