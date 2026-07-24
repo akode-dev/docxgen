@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akode.example/schemas/proposal-template-1.0.schema.json",
+  "title": "Akode proposal template contract 1.0",
+  "x-docxgen-templateId": "akode-proposal",
+  "x-docxgen-templateVersion": "1.0.0",
+  "x-docxgen-templateHash": "replace-after-reference-template-is-created",
+  "allOf": [
+    {
+      "$ref": "./docxgen-model-1.0.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "template": {
+          "properties": {
+            "id": {
+              "const": "akode-proposal"
+            },
+            "version": {
+              "const": "1.0.0"
+            }
+          }
+        },
+        "data": {
+          "required": [
+            "ds"
+          ],
+          "properties": {
+            "ds": {
+              "type": "object",
+              "required": [
+                "Document",
+                "Body"
+              ],
+              "properties": {
+                "Document": {
+                  "$ref": "#/$defs/document"
+                },
+                "DocumentControl": {
+                  "$ref": "#/$defs/documentControl"
+                },
+                "Body": {
+                  "$ref": "#/$defs/markdownFile"
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document": {
+      "type": "object",
+      "required": [
+        "Title",
+        "Description",
+        "ClientName",
+        "Date",
+        "Version",
+        "Status",
+        "Author"
+      ],
+      "properties": {
+        "Title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "ClientName": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "Version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^v?[0-9]+(?:\\.[0-9A-Za-z-]+)*$"
+        },
+        "Status": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Author": {
+          "type": "object",
+          "required": [
+            "FirstName",
+            "LastName"
+          ],
+          "properties": {
+            "FirstName": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "LastName": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "documentControl": {
+      "type": "object",
+      "required": [
+        "Owner",
+        "Classification",
+        "Revisions"
+      ],
+      "properties": {
+        "Owner": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Classification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "Revisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "Version",
+              "Date",
+              "Author",
+              "Description"
+            ],
+            "properties": {
+              "Version": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "Date": {
+                "type": "string",
+                "format": "date"
+              },
+              "Author": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "Description": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "markdownFile": {
+      "type": "object",
+      "required": [
+        "$mdFile"
+      ],
+      "properties": {
+        "$mdFile": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "../docs/schemas/proposal-template-1.0.schema.json",
+  "modelVersion": "1.0",
+  "template": {
+    "id": "akode-proposal",
+    "version": "1.0.0"
+  },
+  "options": {
+    "culture": "en-US",
+    "strict": true,
+    "headingOffset": 0
+  },
+  "data": {
+    "ds": {
+      "Document": {
+        "Title": "Customer Platform Proposal",
+        "Description": "Synthetic sample for Akode.DocxGen development",
+        "ClientName": "Example Corporation",
+        "Date": "2026-07-24",
+        "Version": "1.0",
+        "Status": "Draft",
+        "Author": {
+          "FirstName": "Sample",
+          "LastName": "Author"
+        }
+      },
+      "DocumentControl": {
+        "Owner": "Akode",
+        "Classification": "Internal",
+        "Revisions": [
+          {
+            "Version": "1.0",
+            "Date": "2026-07-24",
+            "Author": "Sample Author",
+            "Description": "Initial synthetic sample"
+          }
+        ]
+      },
+      "Body": {
+        "$mdFile": "proposal.md"
+      }
+    }
+  }
+}

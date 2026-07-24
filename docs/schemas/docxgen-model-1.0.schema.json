@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akode.example/schemas/docxgen-model-1.0.schema.json",
+  "title": "Akode.DocxGen model 1.0",
+  "type": "object",
+  "required": [
+    "modelVersion",
+    "template",
+    "data"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "modelVersion": {
+      "const": "1.0"
+    },
+    "template": {
+      "type": "object",
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "culture": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "strict": {
+          "type": "boolean"
+        },
+        "headingOffset": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "allowRawHtml": {
+          "type": "boolean"
+        },
+        "allowRemoteImages": {
+          "type": "boolean"
+        },
+        "updateFieldsOnOpen": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/modelValue"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "modelValue": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/modelValue"
+          }
+        },
+        {
+          "$ref": "#/$defs/markdownValue"
+        },
+        {
+          "$ref": "#/$defs/markdownFileValue"
+        },
+        {
+          "$ref": "#/$defs/fileValue"
+        },
+        {
+          "$ref": "#/$defs/textValue"
+        },
+        {
+          "$ref": "#/$defs/modelObject"
+        }
+      ]
+    },
+    "markdownValue": {
+      "type": "object",
+      "required": [
+        "$md"
+      ],
+      "properties": {
+        "$md": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "markdownFileValue": {
+      "type": "object",
+      "required": [
+        "$mdFile"
+      ],
+      "properties": {
+        "$mdFile": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "fileValue": {
+      "type": "object",
+      "required": [
+        "$file"
+      ],
+      "properties": {
+        "$file": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "textValue": {
+      "type": "object",
+      "required": [
+        "$text"
+      ],
+      "properties": {
+        "$text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "modelObject": {
+      "type": "object",
+      "propertyNames": {
+        "not": {
+          "pattern": "^\\$"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/modelValue"
+      }
+    }
+  }
+}

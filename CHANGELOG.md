@@ -1,0 +1,15 @@
+# Changelog
+
+All notable changes to Akode.DocxGen will be documented here.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and the project intends to use Semantic Versioning after the first public
+contract is released.
+
+## [Unreleased]
+
+### Added
+
+- Repository and solution scaffold.
+- Agent instructions for Codex and Claude Code.
+- Initial CLI, model, template, architecture, and implementation contracts.

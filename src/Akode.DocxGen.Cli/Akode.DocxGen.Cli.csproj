@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>docxgen</ToolCommandName>
+    <PackageId>Akode.DocxGen.Cli</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Akode.DocxGen.Core\Akode.DocxGen.Core.csproj" />
+    <ProjectReference Include="..\Akode.DocxGen.Docx\Akode.DocxGen.Docx.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+</Project>

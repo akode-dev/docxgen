@@ -23,6 +23,8 @@ artifacts/
 
 # Publish output
 publish/
+out/
+*.tmp-*
 
 ### Python
 # Byte-compiled files
@@ -41,6 +43,8 @@ dist/
 
 # dotenv environment variable files
 .env
+.env.*
+!.env.example
 
 # Virtual environments
 .venv
@@ -139,3 +143,16 @@ x86/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+### Repository-local agent state
+.claude/settings.local.json
+.codex/*.local.*
+
+### Generated document previews and test artifacts
+*.pdf
+*.docx
+!templates/**/*.docx
+!samples/**/*.docx
+!tests/TestAssets/**/*.docx
+coverage/
+TestResults/
