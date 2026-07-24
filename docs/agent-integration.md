@@ -46,6 +46,10 @@ docxgen validate-model --template ... --model ... --assets-dir ... --json
 It must use the CLI exit code and JSON result. It must not implement a second
 JSON validator in shell.
 
+The JSON result follows the [machine-readable report format](report-format.md).
+Hooks read the numeric `exitCode`, top-level `errorCode`/`hint`, and ordered
+`diagnostics`; they do not scrape stderr.
+
 Tracked wrappers under `eng/hooks` make this portable. Project-specific hook
 configuration is added only after the command works.
 

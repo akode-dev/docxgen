@@ -6,7 +6,7 @@
 |---|---|
 | Product | Akode.DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Implementation-ready scaffold; P0 complete, P1 next |
+| Status | Implementation scaffold; P0-P1 complete, P2 next |
 | Primary users | Bid teams, developers, CI, coding agents |
 | Runtime model | Offline deterministic CLI |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -283,6 +283,42 @@ collection item shapes, and template metadata. It includes an
 
 Requiredness cannot be inferred reliably from placeholder text alone, so the
 schema is maintained alongside the template and checked against it.
+
+### 8.4 Machine-readable command reports
+
+Every `--json` response uses report contract `1.0` and the same top-level
+envelope:
+
+```json
+{
+  "reportVersion": "1.0",
+  "command": "validate-model",
+  "ok": false,
+  "exitCode": 4,
+  "errorCode": "E-MDL-002",
+  "message": "Model validation failed.",
+  "hint": "Update the reported value to satisfy the adjacent template schema.",
+  "diagnostics": [
+    {
+      "code": "E-MDL-002",
+      "severity": "error",
+      "message": "The model violates the schema.",
+      "hint": "Update the reported value to satisfy the adjacent template schema.",
+      "path": "/data/ds/Document/Title"
+    }
+  ]
+}
+```
+
+`exitCode` is numeric. Diagnostic severities and model value kinds are
+lower-camel-case strings. Successful reports have exit code `0`, omit
+`errorCode` and `hint`, contain no error diagnostics, and include typed
+command-specific `data`. Failed reports have a non-zero exit code, promote the
+first error diagnostic to `errorCode` and `hint`, and omit `data`.
+
+The normative schema is
+`docs/schemas/docxgen-report-1.0.schema.json`. Breaking field changes require a
+new report major version; additive optional data may remain within `1.x`.
 
 ## 9. Markdown contract
 

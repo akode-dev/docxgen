@@ -89,6 +89,20 @@ Update in the same change:
 Never reuse a code for different behavior or construct ad-hoc diagnostics when
 a registered code exists.
 
+## Changing machine-readable reports
+
+Treat `--json` as a public API. In the same change:
+
+1. update the relevant data record under `Akode.DocxGen.Core/Reports`;
+2. preserve the common `CommandReport<TData>` envelope invariants;
+3. update `docs/schemas/docxgen-report-1.0.schema.json`;
+4. update `docs/report-format.md` and affected CLI examples;
+5. add serialization and schema-reference tests;
+6. use a new report major version for breaking field changes.
+
+Do not write a separate JSON shape in a CLI handler or omit the remediation
+`hint` from a failed report.
+
 ## DOCX work
 
 Do not inspect layout only through XML. Render representative DOCX output to

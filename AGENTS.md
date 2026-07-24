@@ -12,9 +12,10 @@ needed.
    acceptance slice unless the user or issue explicitly selects another task.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-The repository is currently a compileable scaffold with a completed P0 spike,
-not a finished document renderer. Do not claim that a planned CLI command works
-until an automated test proves it. The next phase is P1 foundation.
+The repository is currently a compileable scaffold with completed P0 and P1
+acceptance slices, not a finished document renderer. Do not claim that a
+planned CLI command works until an automated test proves it. The next phase is
+P2 model and Markdown.
 
 ## Architecture boundaries
 
