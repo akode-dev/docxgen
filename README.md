@@ -1,137 +1,167 @@
 # Akode.DocxGen
 
-`Akode.DocxGen` is a planned cross-platform .NET CLI for deterministic
-generation of polished Word documents from:
-
-1. a versioned DOCX template;
-2. a validated JSON model;
-3. one Markdown body or a set of anchored Markdown sections.
-
-The target workflow is:
+`Akode.DocxGen` is a cross-platform .NET 10 CLI that turns governed JSON and
+Markdown content into a polished Word document:
 
 ```text
-(template.docx + model.json + proposal.md) -> docxgen -> proposal.docx
+DOCX template + model.json + Markdown/assets -> validated DOCX
 ```
 
-> Project status: compileable scaffold with a completed P0 rendering-engine
-> spike. Production commands are not implemented yet. P0 rejected the bundled
-> Markdown/image extensions and selected the hybrid renderer in
-> [ADR-0005](docs/adr/0005-hybrid-rendering-engine.md). P1 foundation is
-> complete; P2 now has a validated recursive model-envelope reader and
-> deterministic section anchors, table-to-collection conversion, and source
-> precedence. Work continues with secure asset resolution and Markdown AST
-> preprocessing in
-> [the implementation plan](docs/implementation-plan.md).
+Phase 1 is implemented. The tool supports template inspection, model
+scaffolding and validation, Markdown rendering, template-less conversion,
+Open XML validation, images, tables, collections, automatic TOC refresh, and
+optional document-version suffixes.
 
-## Why this project exists
+The core design rule is simple: content lives in Markdown/JSON; branding and
+page layout live in the Word template.
 
-The document content should remain easy for people and AI agents to edit,
-review, diff, and version. Markdown and JSON are good at that. Word remains the
-right place for corporate branding, page sections, cover design, headers,
-footers, a table of contents, and the final branded page.
+## Inspect versus render
 
-The invariant is:
+| Command | Purpose | Writes a DOCX |
+|---|---|---:|
+| `inspect` | Reads the template contract: placeholder paths, kinds, loops, required styles, template ID/version/hash | No |
+| `render` | Validates inputs, binds JSON/Markdown, expands loops and Markdown, preserves template pages, post-processes fields/properties, and optionally validates OOXML | Yes |
 
-> Content lives in Markdown and JSON. Presentation lives in the DOCX template.
+An AI agent should call `inspect` before authoring a model. It should never
+guess placeholder names.
 
-The tool must replace one-off Python/Node document scripts with a stable,
-auditable command that works the same way locally, in CI, in Codex, and in
-Claude Code.
+## Document topology
 
-## Document composition
+A normal governed template contains:
 
-A normal proposal template is expected to contain:
+1. a cover page with fixed artwork/logo and scalar placeholders;
+2. an optional Document Control page and revision-history loop;
+3. a real Word table of contents;
+4. one or more Markdown body slots;
+5. a preserved closing page.
 
-1. a cover page with scalar placeholders;
-2. an optional Document Control page;
-3. a real Word TOC field;
-4. a standalone `{{ds.Body}:MD}` paragraph;
-5. a section break and final branded page.
+The number of chapters and paragraphs is not encoded in JSON. Long-form
+content is ordinary Markdown; headings naturally create as many chapters and
+subchapters as needed. The body expands across pages while the template keeps
+its cover, section geometry, headers, footers, TOC, and final page.
 
-The body marker expands to any number of headings, paragraphs, lists, tables,
-links, and figures. The final page moves automatically and remains last.
+The included `templates/proposal.docx` is a synthetic, non-confidential
+reference template. An official corporate template can replace it after the
+same inspect/schema/Word acceptance gate.
 
-Example cover placeholders:
+## Quick start
 
-```text
-{{ds.Document.Title}}
-{{ds.Document.Description}}
-{{ds.Document.Author.FirstName}} {{ds.Document.Author.LastName}}
-{{ds.Document.ClientName}}
-{{ds.Document.Date}}
-{{ds.Document.Version}}
-```
+Prerequisites:
 
-A fixed Akode logo belongs in the DOCX template. An image placeholder is
-needed only for a variable asset, such as a client logo:
+- .NET SDK selected by `global.json`;
+- Git;
+- Microsoft Word only for the final human field refresh/acceptance step.
 
-```text
-{{ds.ClientLogo}:img}
-```
-
-## `inspect` versus `render`
-
-`inspect` reads a template and returns its contract. It does not create a
-document:
+Verify the repository:
 
 ```powershell
-docxgen inspect --template templates/proposal.docx --json
+./eng/verify.ps1
 ```
 
-The result describes template identity and hash, placeholders, kinds, required
-styles, locations, and warnings such as split Word runs.
-
-`render` executes the document pipeline:
+Inspect the reference template:
 
 ```powershell
-docxgen render `
+dotnet run --project src/Akode.DocxGen.Cli -- inspect `
   --template templates/proposal.docx `
-  --model model.json `
-  --assets-dir . `
-  --heading-offset 0 `
-  --out out/Proposal.docx `
-  --validate `
   --json
 ```
 
-Rendering loads and validates the model, resolves Markdown and local assets,
-reconciles them with the template contract, creates DOCX content, applies
-post-processors, optionally validates OOXML, and writes the output atomically.
+Generate an editable model:
 
-All commands above describe the planned public contract. They become supported
-only when the corresponding acceptance tests are green.
+```powershell
+dotnet run --project src/Akode.DocxGen.Cli -- scaffold-model `
+  --template templates/proposal.docx `
+  --out artifacts/model.json `
+  --with-markdown-stubs
+```
 
-## Model and schema
+Validate before rendering:
 
-The JSON model separates document metadata from long-form content:
+```powershell
+dotnet run --project src/Akode.DocxGen.Cli -- validate-model `
+  --template templates/proposal.docx `
+  --model samples/model.json `
+  --assets-dir samples `
+  --json
+```
+
+Render and validate:
+
+```powershell
+dotnet run --project src/Akode.DocxGen.Cli -- render `
+  --template templates/proposal.docx `
+  --model samples/model.json `
+  --assets-dir samples `
+  --out artifacts/Proposal.docx `
+  --append-document-version `
+  --validate `
+  --overwrite `
+  --json
+```
+
+For `data.ds.Document.Version = "1.0"`, the last command writes
+`artifacts/Proposal-v1.0.docx`. The tool never increments the business version
+and never overwrites an existing file unless `--overwrite` is explicit.
+
+## Agent-friendly JSON
+
+The base schema is
+`docs/schemas/docxgen-model-1.0.schema.json`. Each governed template adds an
+adjacent schema, for example:
+
+```text
+templates/proposal.docx
+templates/proposal.schema.json
+```
+
+The adjacent schema owns the exact required fields, collection shapes,
+template identity, and template hash. This makes a validation hook deterministic
+and gives the agent exact JSON Pointer paths and actionable hints.
+
+A shortened model looks like this:
 
 ```json
 {
-  "$schema": "./docs/schemas/docxgen-model-1.0.schema.json",
+  "$schema": "../docs/schemas/docxgen-model-1.0.schema.json",
   "modelVersion": "1.0",
   "template": {
-    "id": "akode-proposal",
+    "id": "akode-proposal-reference",
     "version": "1.0.0"
   },
   "options": {
     "culture": "en-US",
     "strict": true,
-    "headingOffset": 0
+    "headingOffset": 0,
+    "allowRawHtml": false,
+    "allowRemoteImages": false,
+    "updateFieldsOnOpen": true
   },
   "data": {
     "ds": {
       "Document": {
         "Title": "Customer Platform Proposal",
         "Description": "Technical and commercial proposal",
-        "ClientName": "Example Corporation",
-        "Date": "2026-07-24",
+        "Project": "Customer Platform Modernization",
+        "Client": "Example Corporation",
         "Version": "1.0",
         "Status": "Draft",
+        "Date": "2026-07-24",
+        "Classification": "INTERNAL",
         "Author": {
-          "FirstName": "Andrei",
-          "LastName": "Ivanov"
+          "FirstName": "Sample",
+          "LastName": "Author",
+          "Role": "Solution Architect",
+          "Email": "sample.author@example.test"
         }
       },
+      "Revisions": [
+        {
+          "Version": "1.0",
+          "Date": "2026-07-24",
+          "Author": "Sample Author",
+          "Description": "Initial version"
+        }
+      ],
       "Body": {
         "$mdFile": "proposal.md"
       }
@@ -140,183 +170,148 @@ The JSON model separates document metadata from long-form content:
 }
 ```
 
-Two validation layers are required:
+Supported value directives:
 
-- the base DocxGen schema validates the envelope and directives such as
-  `$mdFile`, `$file`, `$md`, and `$text`;
-- a template-specific schema validates required fields, types, constraints,
-  and collections for one template.
+- `{ "$md": "# Inline Markdown" }`;
+- `{ "$mdFile": "sections/approach.md" }`;
+- `{ "$file": "assets/client-logo.png" }`;
+- `{ "$text": "*literal, not Markdown*" }`.
 
-The planned hook-friendly command is:
-
-```powershell
-docxgen validate-model `
-  --template templates/proposal.docx `
-  --model model.json `
-  --assets-dir . `
-  --json
-```
-
-It must return stable JSON paths, diagnostic codes, and actionable hints.
-`render --dry-run` performs the complete preflight without writing a DOCX.
-
-See [the model format](docs/model-format.md) and
-[agent integration](docs/agent-integration.md).
-
-## Versioned output names
-
-Document version, template version, schema version, and tool version are
-separate values. Only the document version belongs in the generated filename.
-
-The planned convenience flag is:
-
-```powershell
-docxgen render `
-  --template templates/proposal.docx `
-  --model model.json `
-  --out out/Proposal.docx `
-  --append-document-version
-```
-
-For `data.ds.Document.Version = "3.0"`, the resolved output is:
+Model options act as defaults. An explicitly supplied CLI option wins. Content
+source precedence is:
 
 ```text
-out/Proposal-v3.0.docx
+--set override > model.json > section-anchored Markdown
 ```
 
-The tool never auto-increments a version. It normalizes a leading `v`,
-sanitizes invalid filename characters, refuses collisions unless `--overwrite`
-is present, and returns the final path in its JSON report.
+## Markdown and images
 
-## Solution structure
+The Phase 1 renderer supports:
+
+- Heading 1 through Heading 6 with an optional offset;
+- paragraphs, bold, italic, strikethrough, inline code, and links;
+- ordered, unordered, and nested lists using native Word numbering;
+- fenced code blocks and block quotes;
+- GFM pipe tables with explicit Word table geometry;
+- horizontal rules;
+- local PNG, JPEG, GIF, BMP, and SVG images with alt text and aspect-ratio
+  preservation.
+
+Local images resolve below `--assets-dir` and cannot escape it:
+
+```markdown
+## Architecture
+
+![Document generation pipeline](architecture.svg "System flow")
+```
+
+Rendering is offline by default. `--allow-remote-images` is an explicit
+opt-in: downloads have a 30-second timeout, size/media-type limits, no
+redirects, and reject hosts resolving to private, loopback, link-local, or
+multicast addresses. Local assets remain preferable for reproducible builds.
+
+Raw HTML is removed by default. `--allow-raw-html` preserves it as reviewed
+text; it is not interpreted as arbitrary OOXML.
+
+## Section-anchored Markdown
+
+An agent may maintain one large Markdown file and map sections to template
+paths:
+
+```markdown
+<!-- docxgen:section ExecutiveSummary -->
+
+# Executive Summary
+
+Content...
+
+<!-- docxgen:section ds.Approach -->
+
+# Approach
+
+More content...
+```
+
+Unqualified names resolve below `ds`. The parser ignores marker-shaped text
+inside code, rejects duplicate/overlapping paths, and supports a
+`format=table columns=...` anchor for model collections.
+
+## Template placeholders
+
+Examples:
 
 ```text
-Akode.DocxGen.sln
-src/
-  Akode.DocxGen.Core/   contracts, model, Markdown, diagnostics, security
-  Akode.DocxGen.Docx/   template binding and Open XML rendering adapter
-  Akode.DocxGen.Cli/    command-line host
-  Akode.DocxGen.Mcp/    Phase 2 MCP adapter
-tests/
-  Akode.DocxGen.Core.Tests/
-  Akode.DocxGen.Docx.Tests/
-  Akode.DocxGen.Cli.Tests/
-  TestAssets/
-docs/
-samples/
-templates/
-eng/
+{{ds.Document.Title}}
+{{ds.Body}:MD}
+{{ds.ClientLogo}:IMG(alt=Client logo)}
+{{#ds.Revisions}} ... {{/ds.Revisions}}
 ```
 
-The complete file-by-file map is in
-[project structure](docs/project-structure.md). Architectural boundaries are
-in [architecture](docs/architecture.md), and the complete requirements are in
-[the technical specification](docs/technical-specification.md).
+A block Markdown placeholder must occupy an otherwise empty paragraph. Fixed
+logos and designed artwork normally stay in the template. See
+[template authoring](docs/template-authoring-guide.md).
 
-## Build the scaffold
+## Commands
 
-Prerequisites:
+| Command | Result |
+|---|---|
+| `inspect` | Template contract, diagnostics, identity, hash, and styles |
+| `scaffold-model` | `model.json` plus optional Markdown stubs |
+| `validate-model` | Hook-friendly model/Markdown/assets preflight |
+| `render` | Final template-based DOCX |
+| `convert` | Standalone Markdown-to-DOCX draft, optionally using reference styles and TOC |
+| `validate` | Open XML SDK validation of an existing DOCX |
 
-- .NET SDK 10.0.100 or a compatible 10.0 feature band;
-- Git;
-- Microsoft Word 2021/365 for final template acceptance;
-- LibreOffice only for optional headless visual regression checks.
+Every command is non-interactive. `--json` writes a versioned report to
+stdout; human output uses stderr. Exit codes and diagnostic codes are stable.
+See the [CLI reference](docs/cli-reference.md) and
+[report contract](docs/report-format.md).
 
-Windows:
+## Install and release artifacts
+
+Create and install the local dotnet tool:
 
 ```powershell
-./eng/verify.ps1
+dotnet pack src/Akode.DocxGen.Cli `
+  --configuration Release `
+  --output artifacts/packages
+
+dotnet tool install Akode.DocxGen.Cli `
+  --tool-path artifacts/tools `
+  --add-source artifacts/packages `
+  --version 1.0.0
+
+artifacts/tools/docxgen --help
 ```
 
-Linux/macOS:
+`.github/workflows/release.yml` creates the dotnet tool and self-contained
+single-file executables for `win-x64`, `linux-x64`, and `osx-x64`. It runs only
+for an explicit workflow dispatch or a `v*` tag. See
+[operations and upgrades](docs/operations-and-upgrade.md).
 
-```bash
-./eng/verify.sh
-```
+## Development and agents
 
-Equivalent commands:
+- Codex reads [`AGENTS.md`](AGENTS.md).
+- Claude Code reads [`CLAUDE.md`](CLAUDE.md), which imports the shared rules.
+- Hooks live under `eng/hooks` and call `validate-model`; they do not duplicate
+  validation logic.
+- `main` is stable; `develop` is integration; short-lived work branches are
+  created from `develop`.
 
-```powershell
-dotnet restore Akode.DocxGen.sln
-dotnet build Akode.DocxGen.sln --configuration Release --no-restore
-dotnet test Akode.DocxGen.sln --configuration Release --no-build
-```
-
-The test step also enforces production project boundaries and compares every
-resolved package/version in the committed lock files with the reviewed
-[package-license allow-list](docs/package-license-policy.md).
-
-## Working with coding agents
-
-Codex uses the root [`AGENTS.md`](AGENTS.md). Claude Code uses
-[`CLAUDE.md`](CLAUDE.md), which imports the shared rules and agent guide.
-
-Codex CLI:
-
-```powershell
-codex
-```
-
-Claude Code:
-
-```powershell
-claude
-```
-
-For hosted execution, configure the repository environment in the selected
-service and use the same restore/build/test commands. Do not commit credentials
-or provider-specific tokens. See [Codex and cloud execution](docs/codex-cloud.md)
-and [the agent guide](docs/agent-guide.md).
-
-## Branches
-
-- `main`: stable, protected, releasable state;
-- `develop`: integration for accepted feature branches;
-- `feature/<name>` and `fix/<name>`: short-lived branches created from
-  `develop`;
-- `release/<version>` and `hotfix/<name>`: added only when releases begin.
-
-Pull requests target `develop` during implementation. Release pull requests
-merge `develop` into `main`, tag the released commit, and merge any release
-fixes back to `develop`.
-
-See [branching and releases](docs/branching-and-release.md).
-
-## Delivery order
-
-The P0 risk-reduction spike is complete. It proved template schema discovery,
-data binding, collections, fields, sections, and Open XML image insertion, but
-rejected `DocxTemplater.Markdown` and `DocxTemplater.Images` for production.
-See the [P0 evidence report](docs/spikes/p0-renderer-spike.md).
-
-The approved order is now:
-
-1. P1 foundation, diagnostics, CI, and the license gate (complete);
-2. P2 validated model parsing (base slice complete) and a neutral Markdown
-   block model (in progress);
-3. P3 hybrid DOCX adapter: DocxTemplater binding plus the bounded Markdig/Open
-   XML body renderer selected in ADR-0005;
-4. CLI and reference-template slices.
-
-## Documentation
+Useful documents:
 
 - [Technical specification](docs/technical-specification.md)
 - [Architecture](docs/architecture.md)
-- [Project structure](docs/project-structure.md)
-- [Implementation plan](docs/implementation-plan.md)
-- [CLI contract](docs/cli-reference.md)
-- [Machine-readable report format](docs/report-format.md)
-- [Diagnostic contract](docs/diagnostics.md)
 - [Model format](docs/model-format.md)
 - [Template authoring](docs/template-authoring-guide.md)
-- [Development guide](docs/development-guide.md)
-- [Package-license policy](docs/package-license-policy.md)
-- [Agent integration](docs/agent-integration.md)
-- [Codex and cloud execution](docs/codex-cloud.md)
-- [Branching and releases](docs/branching-and-release.md)
-- [Architecture decisions](docs/adr/README.md)
+- [Agent guide](docs/agent-guide.md)
+- [Project structure](docs/project-structure.md)
+- [Branching and release](docs/branching-and-release.md)
+- [Implementation record](docs/implementation-plan.md)
 
 ## License
 
-Akode.DocxGen is licensed under the [MIT License](LICENSE). Dependencies must
-use only MIT, BSD-2-Clause, BSD-3-Clause, or Apache-2.0 licenses.
+Akode.DocxGen is MIT licensed. NuGet dependencies are locked and checked
+against the reviewed permissive-license inventory in
+`eng/package-license-allowlist.json` and
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).

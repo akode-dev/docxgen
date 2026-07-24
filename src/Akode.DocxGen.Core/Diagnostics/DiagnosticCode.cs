@@ -36,8 +36,17 @@ public static class DiagnosticCode
     /// <summary>An asset exceeds configured limits.</summary>
     public const string AssetTooLarge = "E-SEC-002";
 
+    /// <summary>A referenced local asset does not exist.</summary>
+    public const string AssetNotFound = "E-SEC-003";
+
     /// <summary>A remote image was blocked by default security policy.</summary>
     public const string RemoteImageBlocked = "W-SEC-003";
+
+    /// <summary>An explicitly allowed remote image could not be downloaded safely.</summary>
+    public const string RemoteImageDownloadFailed = "E-SEC-004";
+
+    /// <summary>An optional template placeholder was not bound in lenient mode.</summary>
+    public const string OptionalPlaceholderUnbound = "W-MDL-007";
 
     /// <summary>Raw HTML was removed from Markdown.</summary>
     public const string RawHtmlStripped = "W-MD-001";
@@ -68,4 +77,22 @@ public static class DiagnosticCode
 
     /// <summary>An explicit model value overrides anchored Markdown.</summary>
     public const string ModelOverridesMarkdown = "W-MRG-001";
+
+    /// <summary>The requested template identity does not match the inspected template.</summary>
+    public const string TemplateIdentityMismatch = "E-TPL-004";
+
+    /// <summary>A generated document failed Open XML validation.</summary>
+    public const string OutputInvalidOoxml = "E-OUT-003";
+
+    /// <summary>An input or output file could not be read or written.</summary>
+    public const string IoFailure = "E-IO-001";
+
+    /// <summary>Command-line arguments are invalid or contradictory.</summary>
+    public const string InvalidUsage = "E-USG-001";
+
+    /// <summary>The renderer failed unexpectedly for otherwise valid inputs.</summary>
+    public const string RenderFailure = "E-RND-001";
+
+    /// <summary>An unexpected internal product failure occurred.</summary>
+    public const string UnexpectedFailure = "E-INT-001";
 }

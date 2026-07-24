@@ -11,7 +11,7 @@
 
 ### `develop`
 
-- integration branch for Phase 1 development;
+- integration branch for ongoing development;
 - receives reviewed feature/fix pull requests;
 - must remain buildable.
 
@@ -42,22 +42,10 @@ Feature PRs target `develop`. They include:
 6. Tag `v<version>`.
 7. Merge release fixes back into `develop`.
 
-## Initial remote migration
+The GitHub CI workflow runs for pull requests into `develop` or `main`, and
+for pushes to `main`. This avoids paying for a duplicate matrix run when a
+locally verified integration commit is pushed to `develop` and then released
+to `main`.
 
-The remote currently has `master`. The prepared local model uses `main` and
-`develop`. When ready to publish:
-
-```powershell
-git push -u origin main
-git push -u origin develop
-```
-
-Then change the default branch to `main` in GitHub, configure branch
-protection, and only after verifying the new default consider deleting the
-remote `master` branch:
-
-```powershell
-git push origin --delete master
-```
-
-Deleting `master` is intentionally not part of repository scaffolding.
+The release workflow runs only for manual dispatch or a `v*` tag. Creating a
+tag is therefore an explicit release and compute-cost decision.

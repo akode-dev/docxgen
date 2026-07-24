@@ -64,10 +64,25 @@ public static class DiagnosticRegistry
             "An asset exceeds the configured size limit.",
             "Reduce the asset size or raise the explicit limit after reviewing resource and security impact."),
         new(
+            DiagnosticCode.AssetNotFound,
+            DiagnosticSeverity.Error,
+            "A referenced local asset does not exist.",
+            "Create the referenced file below the assets directory or correct its relative path."),
+        new(
             DiagnosticCode.RemoteImageBlocked,
             DiagnosticSeverity.Warning,
             "A remote image was blocked by the default offline policy.",
             "Download the image into the approved assets directory or explicitly enable remote images."),
+        new(
+            DiagnosticCode.RemoteImageDownloadFailed,
+            DiagnosticSeverity.Error,
+            "An explicitly allowed remote image could not be downloaded safely.",
+            "Use a reachable public HTTP(S) image within the configured size and media-type limits, or store it locally."),
+        new(
+            DiagnosticCode.OptionalPlaceholderUnbound,
+            DiagnosticSeverity.Warning,
+            "An optional template placeholder was not bound in lenient mode.",
+            "Provide the optional value or confirm that removing its template content is intended."),
         new(
             DiagnosticCode.RawHtmlStripped,
             DiagnosticSeverity.Warning,
@@ -118,6 +133,36 @@ public static class DiagnosticRegistry
             DiagnosticSeverity.Warning,
             "An explicit model value overrides anchored Markdown.",
             "Remove one source or confirm that model-over-Markdown precedence is intended."),
+        new(
+            DiagnosticCode.TemplateIdentityMismatch,
+            DiagnosticSeverity.Error,
+            "The model template identity does not match the DOCX template contract.",
+            "Use the model generated for this template, or update its template id and version deliberately."),
+        new(
+            DiagnosticCode.OutputInvalidOoxml,
+            DiagnosticSeverity.Error,
+            "The generated document is not valid Open XML.",
+            "Review the reported package path and correct the template or rendered Markdown construct."),
+        new(
+            DiagnosticCode.IoFailure,
+            DiagnosticSeverity.Error,
+            "A required file-system operation failed.",
+            "Check that the path exists, is writable, and is not locked by another process."),
+        new(
+            DiagnosticCode.InvalidUsage,
+            DiagnosticSeverity.Error,
+            "Command-line arguments are invalid or contradictory.",
+            "Review the command help, correct the reported option, and retry."),
+        new(
+            DiagnosticCode.RenderFailure,
+            DiagnosticSeverity.Error,
+            "The document renderer failed.",
+            "Inspect the template and model, then retry with valid supported content."),
+        new(
+            DiagnosticCode.UnexpectedFailure,
+            DiagnosticSeverity.Error,
+            "An unexpected internal product failure occurred.",
+            "Retry with DOCXGEN_DEBUG=1 and attach the machine-readable report to a defect."),
     ];
 
     private static readonly IReadOnlyList<DiagnosticDescriptor> readOnlyDescriptors =

@@ -15,6 +15,8 @@ It contains no customer information.
 
 The solution separates the model and Markdown pipeline from the DOCX adapter.
 
+![Document generation pipeline](architecture.svg "Document generation pipeline")
+
 ## Delivery Plan
 
 1. Prove the rendering engine.

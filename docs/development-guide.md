@@ -108,3 +108,30 @@ Do not write a separate JSON shape in a CLI handler or omit the remediation
 Do not inspect layout only through XML. Render representative DOCX output to
 pages and inspect every page. Also run structural checks because visual export
 does not validate every package relationship or field.
+
+## Packaging
+
+Create the dotnet tool:
+
+```powershell
+dotnet pack src/Akode.DocxGen.Cli `
+  --configuration Release `
+  --no-build `
+  --output artifacts/packages
+```
+
+Create one self-contained executable:
+
+```powershell
+dotnet publish src/Akode.DocxGen.Cli `
+  --configuration Release `
+  --runtime win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:PublishTrimmed=false `
+  --output artifacts/publish/win-x64
+```
+
+Approved release RIDs are `win-x64`, `linux-x64`, and `osx-x64`. The SDK
+resolves its RID-specific runtime and single-file build tasks during the
+explicit release job; application NuGet dependencies remain locked.

@@ -6,7 +6,7 @@
 |---|---|
 | Product | Akode.DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Implementation scaffold; P0-P1 complete, P2 next |
+| Status | Phase 1 implemented and release-ready |
 | Primary users | Bid teams, developers, CI, coding agents |
 | Runtime model | Offline deterministic CLI |
 | License policy | MIT/BSD/Apache-2.0 only |

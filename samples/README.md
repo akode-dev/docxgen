@@ -1,7 +1,7 @@
 # Samples
 
-This folder contains synthetic authoring inputs. A reference DOCX template will
-be added only after the P0 spike and branding review.
+This folder contains synthetic authoring inputs for the committed reference
+template. `architecture.svg` demonstrates bounded local-image insertion.
 
 Planned execution:
 
