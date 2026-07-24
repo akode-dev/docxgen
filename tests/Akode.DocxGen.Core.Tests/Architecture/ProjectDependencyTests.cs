@@ -141,6 +141,22 @@ public sealed class ProjectDependencyTests
         offenders.ShouldBeEmpty();
     }
 
+    [Theory]
+    [InlineData(
+        @"..\Akode.DocxGen.Core\Akode.DocxGen.Core.csproj",
+        "Akode.DocxGen.Core")]
+    [InlineData(
+        "../Akode.DocxGen.Core/Akode.DocxGen.Core.csproj",
+        "Akode.DocxGen.Core")]
+    public void ProjectReferenceNamesAreSeparatorIndependent(
+        string reference,
+        string expectedName)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        ArgumentNullException.ThrowIfNull(expectedName);
+        ProjectNameFromReference(reference).ShouldBe(expectedName);
+    }
+
     private static void AssertProject(
         IReadOnlyDictionary<string, ProjectModel> projects,
         string name,
@@ -166,9 +182,7 @@ public sealed class ProjectDependencyTests
         var projectReferences = document
             .Descendants("ProjectReference")
             .Select(element => RequiredInclude(element, path))
-            .Select(reference => Path.GetFileNameWithoutExtension(reference)
-                ?? throw new InvalidOperationException(
-                    $"Could not resolve a project name from '{reference}'."))
+            .Select(ProjectNameFromReference)
             .Order(StringComparer.Ordinal)
             .ToArray();
         var packageElements = document.Descendants("PackageReference").ToArray();
@@ -209,6 +223,14 @@ public sealed class ProjectDependencyTests
         element.Attribute("Include")?.Value
         ?? throw new InvalidOperationException(
             $"{RepositoryLayout.RelativePath(path)} contains an item without Include.");
+
+    private static string ProjectNameFromReference(string reference)
+    {
+        var normalizedReference = reference.Replace('\\', '/');
+        return Path.GetFileNameWithoutExtension(normalizedReference)
+            ?? throw new InvalidOperationException(
+                $"Could not resolve a project name from '{reference}'.");
+    }
 
     private sealed record ProjectModel(
         string Name,
