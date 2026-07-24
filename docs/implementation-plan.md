@@ -57,10 +57,12 @@ test suite and the green Windows/Linux/macOS CI run for `develop`.
 
 ## P2 — Model and Markdown
 
-- base model schema validation;
+Status: in progress. The model-envelope slice was completed on 2026-07-24.
+
+- [complete] base model schema validation;
 - template-specific schema reconciliation;
-- `ModelJsonReader`;
-- `$md`, `$mdFile`, `$file`, `$text`;
+- [complete] `ModelJsonReader`;
+- [complete] `$md`, `$mdFile`, `$file`, `$text` parsing;
 - `SectionAnchorParser`;
 - table-to-collection anchors;
 - AST heading offset;
@@ -126,8 +128,7 @@ Exit: Core test coverage at least 90% for these components.
 
 ## Next agent tasks
 
-1. Implement base model schema validation and `ModelJsonReader`.
-2. Implement `$md`, `$mdFile`, `$file`, and `$text` directive parsing.
-3. Implement `SectionAnchorParser` and model/Markdown merge precedence.
-4. Add `PathGuard`, limits, and local asset resolution.
-5. Complete the `validate-model` Core service before activating hooks.
+1. Implement `SectionAnchorParser` and model/Markdown merge precedence.
+2. Add `PathGuard`, limits, and local asset resolution.
+3. Reconcile the base model with the adjacent template-specific schema.
+4. Complete the `validate-model` Core service before activating hooks.
