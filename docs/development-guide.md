@@ -34,8 +34,15 @@ Before adding a dependency:
 2. verify current package and transitive licenses;
 3. reject GPL, AGPL, LGPL, and proprietary licenses;
 4. record the decision and update notices;
-5. regenerate lock files;
-6. run the full build and tests.
+5. regenerate every affected `packages.lock.json`;
+6. add every new exact package/version and reviewed SPDX expression to
+   `eng/package-license-allowlist.json`;
+7. run the full build and tests.
+
+The license gate is offline and exact: it compares the union of all resolved
+non-project dependencies in lock files with the allow-list. A package add,
+remove, or version change therefore requires an explicit inventory update.
+See `docs/package-license-policy.md`.
 
 ## Build policy
 

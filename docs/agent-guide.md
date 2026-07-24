@@ -18,9 +18,10 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 ## Current implementation task
 
-P0 is complete and ADR-0001 is superseded. The next work is P1 foundation:
-diagnostics, architecture tests, license enforcement, locked restore, and CI.
-Do not skip directly to CLI command handlers.
+P0 is complete and ADR-0001 is superseded. P1 diagnostics, architecture tests,
+license enforcement, locked restore, and cross-platform CI definitions are in
+place. The next slice is the remaining Core request/result and JSON report
+contracts. Do not skip directly to CLI command handlers.
 
 ## Prohibited shortcuts
 

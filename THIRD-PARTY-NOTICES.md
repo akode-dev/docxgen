@@ -1,7 +1,9 @@
 # Third-party notices
 
-This file is an initial inventory and must be regenerated from the resolved
-dependency graph in CI before the first binary release.
+The committed `packages.lock.json` files define the resolved dependency graph.
+`eng/package-license-allowlist.json` records the reviewed license expression
+for every exact package/version in that graph. The solution test suite fails
+when either side changes without the other.
 
 | Dependency | Planned version | License | Scope |
 |---|---:|---|---|
@@ -15,7 +17,9 @@ dependency graph in CI before the first binary release.
 | Shouldly | 4.3.0 | BSD-3-Clause | tests |
 
 Only MIT, BSD-2-Clause, BSD-3-Clause, and Apache-2.0 dependencies are allowed.
-The resolved transitive graph, not this table, is authoritative.
+The lock files and machine-checked allow-list, not this summary table, are
+authoritative. Release packaging may generate a longer notice from the same
+reviewed inventory.
 
 ## Rejected dependency
 

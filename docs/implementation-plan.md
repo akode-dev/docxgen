@@ -49,9 +49,9 @@ Status: in progress.
 
 - complete Core request/result contracts;
 - [complete] base diagnostic registry and completeness tests;
-- architecture tests;
-- CI on Windows, Linux, and macOS;
-- locked restores and package-license gate;
+- [complete] architecture tests;
+- [complete] CI definitions on Windows, Linux, and macOS;
+- [complete] locked restores and package-license gate;
 - JSON report schemas.
 
 ## P2 — Model and Markdown
@@ -125,8 +125,7 @@ Exit: Core test coverage at least 90% for these components.
 
 ## Next agent tasks
 
-1. Complete P1 diagnostic registry and completeness tests.
-2. Add architecture tests for project dependency rules.
-3. Add a resolved dependency-license gate.
-4. Complete cross-platform CI and locked-restore validation.
-5. Begin P2 only after the P1 acceptance slice is green.
+1. Complete Core request/result contracts.
+2. Complete and test the public JSON report schemas.
+3. Confirm the cross-platform CI run is green after the P1 gate merge.
+4. Begin P2 only after the remaining P1 acceptance slice is green.

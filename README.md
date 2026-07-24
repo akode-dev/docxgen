@@ -238,6 +238,10 @@ dotnet build Akode.DocxGen.sln --configuration Release --no-restore
 dotnet test Akode.DocxGen.sln --configuration Release --no-build
 ```
 
+The test step also enforces production project boundaries and compares every
+resolved package/version in the committed lock files with the reviewed
+[package-license allow-list](docs/package-license-policy.md).
+
 ## Working with coding agents
 
 Codex uses the root [`AGENTS.md`](AGENTS.md). Claude Code uses
@@ -300,6 +304,7 @@ The approved order is now:
 - [Model format](docs/model-format.md)
 - [Template authoring](docs/template-authoring-guide.md)
 - [Development guide](docs/development-guide.md)
+- [Package-license policy](docs/package-license-policy.md)
 - [Agent integration](docs/agent-integration.md)
 - [Codex and cloud execution](docs/codex-cloud.md)
 - [Branching and releases](docs/branching-and-release.md)

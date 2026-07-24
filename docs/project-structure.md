@@ -43,6 +43,8 @@ docs/
   adr/
   schemas/
 eng/
+  package-license-allowlist.json
+  package-license-allowlist.schema.json
   hooks/
 .codex/
 .claude/
@@ -183,8 +185,10 @@ results. The MCP package/version is not pinned until implementation begins.
 
 ### Core tests
 
-Fast unit and property tests. Avoid disk I/O where streams and in-memory models
-are sufficient.
+Fast unit and property tests. They also contain repository architecture tests
+and the offline resolved-package license gate. Avoid disk I/O where streams
+and in-memory models are sufficient, except for these deliberate repository
+policy checks.
 
 ### Docx tests
 
@@ -217,6 +221,8 @@ will become executable once Phase 1 CLI commands are implemented.
   command denials.
 - `eng/hooks/`: hook entrypoints that call `validate-model`; activation waits
   until that command is implemented and tested.
+- `eng/package-license-allowlist.json`: exact reviewed package/version/license
+  inventory checked against every lock file by the test suite.
 
 ## CI
 
