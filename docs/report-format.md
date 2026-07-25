@@ -43,7 +43,7 @@ logs.
     }
   ],
   "data": {
-    "output": "out/Proposal-v1.0.docx",
+    "output": "out/Document-v1.0.docx",
     "outputBytes": 184320,
     "templateHash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     "modelHash": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",

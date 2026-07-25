@@ -32,10 +32,8 @@ Use the following public naming:
 | Markdown section marker | `docxgen:section` |
 | Debug environment variable | `DOCXGEN_DEBUG` |
 
-The production solution is `DocxGen.sln`. Historical experiments live below
-`research/` and are excluded from the production solution and release build.
-GitHub release assets use lowercase `docxgen-<rid>` names for predictable
-automation.
+The production solution is `DocxGen.sln`. GitHub release assets use lowercase
+`docxgen-<rid>` names for predictable automation.
 
 Version 2.0.0 is the first public release governed by this naming contract.
 

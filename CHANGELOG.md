@@ -6,6 +6,28 @@ Versioning.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-07-25
+
+### Added
+
+- Optional NuGet.org trusted publishing through GitHub OIDC for all three
+  public packages.
+- Documentation index for user, contributor, contract, and release guides.
+
+### Changed
+
+- Updated official GitHub Actions to Node.js 24-compatible major versions.
+- Reframed the specification, examples, template guidance, and agent guidance
+  for arbitrary document types rather than proposal-only workflows.
+- Consolidated the repository map into the architecture guide and reduced the
+  implementation plan to current status, release acceptance, and roadmap.
+- Kept personal `.claude/` and `.codex/` settings outside version control.
+
+### Removed
+
+- Historical renderer experiments, their obsolete dependency and license
+  inventory, generated artifacts, and dedicated experiment documentation.
+
 ## [2.0.0] - 2026-07-25
 
 ### Added
@@ -58,5 +80,6 @@ Versioning.
 - Opt-in remote image downloads with timeout, size/media-type limits, redirects
   disabled, and non-public address rejection.
 
-[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/akode-dev/docxgen/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v2.0.0

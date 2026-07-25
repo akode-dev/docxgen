@@ -6,7 +6,7 @@
 |---|---|
 | Product | DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Version 2.0 released |
+| Status | Version 2.1 release |
 | Primary users | Document teams, developers, CI, and AI agents |
 | Runtime model | Offline deterministic CLI and embeddable .NET pipeline |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -17,11 +17,11 @@ model schema, or security default requires an explicit specification update.
 
 ## 2. Problem
 
-Proposal content is assembled from customer documents, internal material, and
-subject-matter input. AI agents are effective at drafting and revising that
-content in text files, but producing a polished corporate DOCX repeatedly
-causes agents to create one-off scripts, install dependencies, and manipulate
-OOXML inconsistently.
+Long-form documents combine structured metadata, narrative content, tables,
+images, and governed visual design. Humans and AI agents can draft and revise
+content efficiently in Markdown and JSON, but repeatedly producing a polished
+DOCX often leads to one-off scripts, inconsistent OOXML manipulation, and
+documents that drift from the approved template.
 
 DocxGen provides deterministic forward generation and semantic reverse
 extraction:
@@ -46,9 +46,14 @@ The tool does not generate business content and does not call an LLM.
 8. A valid OOXML package is necessary but not sufficient; representative
    documents require rendered visual review.
 
-## 4. Recommended proposal shape
+## 4. Template topology
 
-The reference proposal template contains:
+DocxGen does not require a particular document type or page sequence. A valid
+template may contain one scalar placeholder, one or more Markdown slots,
+nested objects and collections, headers, footers, conditional branches, or any
+combination of these.
+
+The bundled proposal template is a comprehensive example containing:
 
 1. cover section with fixed branding and scalar placeholders;
 2. optional Document Control page;
@@ -66,14 +71,12 @@ zero. If a template contains fixed Heading 1 section titles and separate
 Markdown slots underneath, the section fragment uses a positive heading
 offset.
 
-This proposal topology is not a universal template contract. The engine also
-supports a one-scalar template, a template containing only
-`{{ds.Body}:MD}`, multiple independent body slots, nested objects and
-collections, headers/footers, and conditional branches.
+These pages demonstrate common governed-document techniques; they are not
+engine requirements.
 
 ## 5. Scope
 
-### 5.1 Phase 1
+### 5.1 Implemented
 
 - cross-platform .NET CLI;
 - DOCX placeholder inspection;
@@ -93,14 +96,14 @@ collections, headers/footers, and conditional branches.
 - Windows, Linux, and macOS CI;
 - template-authoring and agent-integration documentation.
 
-### 5.2 Phase 2
+### 5.2 Roadmap
 
 - semantic DOCX-to-Markdown extraction from the main document body (selected
   and implemented);
 - deterministic JSON Schema generation from placeholder-bearing templates
   (selected and implemented);
 - MCP server over Core;
-- RTL/Arabic after a dedicated spike;
+- RTL/Arabic after a dedicated feasibility review;
 - PDF delivery after implementation and license review;
 - textual DOCX comparison;
 - richer semantic figure hints and cross-references.
@@ -197,7 +200,7 @@ identity/version, empty required values, and `$comment` guidance.
 docxgen validate-model
   --template <template.docx>
   --model <model.json>
-  [--markdown <proposal.md>]
+  [--markdown <content.md>]
   [--assets-dir <directory>]
   [--strict | --lenient]
   [--json]
@@ -225,7 +228,7 @@ not require document generation:
 docxgen render
   --template <template.docx>
   [--model <model.json>]
-  [--markdown <proposal.md>]
+  [--markdown <content.md>]
   --out <output.docx>
   [--assets-dir <directory>]
   [--strict | --lenient]
@@ -254,12 +257,12 @@ together. Precedence is:
 preflight but does not write the final path.
 
 `--append-document-version` reads `data.ds.Document.Version`. Given output
-`Proposal.docx` and version `3.0`, it resolves `Proposal-v3.0.docx`.
+`Document.docx` and version `3.0`, it resolves `Document-v3.0.docx`.
 
 ### 6.7 `convert`
 
 Creates an unbranded draft from Markdown and an optional style reference.
-Production proposals should use `render`.
+Governed documents should use `render`.
 
 ### 6.8 `extract`
 
@@ -329,11 +332,11 @@ Unknown `$` keys are errors.
 
 ### 8.3 Template-specific schema
 
-A production template is shipped as:
+A governed template is shipped as:
 
 ```text
-proposal.docx
-proposal.schema.json
+template.docx
+template.schema.json
 ```
 
 `generate-schema` derives required values, structural types, nested collection
@@ -385,7 +388,7 @@ new report major version; additive optional data may remain within `1.x`.
 
 ## 9. Markdown contract
 
-Phase 1 supports:
+Supported:
 
 - headings H1-H6 with configurable offset;
 - paragraphs;
@@ -399,7 +402,7 @@ Phase 1 supports:
 - horizontal rules or explicit page-break semantics;
 - section anchors in HTML comments.
 
-Not supported in Phase 1:
+Not supported:
 
 - math;
 - Mermaid rendering;
@@ -417,7 +420,7 @@ One Markdown file may populate several template paths:
 ```markdown
 <!-- docxgen:section ExecutiveSummary -->
 
-Akode proposes a **digital platform**.
+This document describes a **digital platform**.
 
 <!-- docxgen:section ds.Approach -->
 
@@ -473,7 +476,7 @@ Prefix the value with `@` to force a string, for example
 - Corporate branding images remain in the template.
 - Markdown image paths resolve relative to the source file or explicit assets
   root and must remain inside that root.
-- Initial formats are PNG and JPEG; other formats require tested support.
+- Supported formats are PNG, JPEG, GIF, BMP, and SVG.
 - Images are inserted inline, preserve aspect ratio, and are clamped to the
   available content width.
 - Alt text comes from Markdown.
@@ -542,7 +545,7 @@ user's final file.
 - decompression size and ZIP-entry limits;
 - raw HTML stripped by default;
 - no template expressions beyond allow-listed formatters;
-- no secrets or customer proposals in logs, fixtures, or CI artifacts;
+- no secrets or confidential documents in logs, fixtures, or CI artifacts;
 - atomic writes;
 - package-license allow-list and vulnerability scan in CI.
 
@@ -551,7 +554,7 @@ user's final file.
 | Area | Requirement |
 |---|---|
 | Determinism | Equal normalized inputs produce equal normalized OOXML |
-| Performance | Target: 60-page proposal in at most 3 seconds and 300 MB RSS |
+| Performance | Target: 60-page document in at most 3 seconds and 300 MB RSS |
 | Portability | Windows, Linux, and macOS without Office installation |
 | Concurrency | One render per renderer instance/process until proven safe |
 | Reliability | No partial output; no silent placeholder removal in strict mode |
@@ -573,16 +576,16 @@ user's final file.
 - visual render fixtures inspected at 100%;
 - a manual Word acceptance pass for the reference template.
 
-Fixtures are synthetic or anonymized. Never copy a confidential proposal into
+Fixtures are synthetic or anonymized. Never copy a confidential document into
 the repository.
 
 ## 16. Acceptance
 
-Phase 1 is accepted when:
+The current release is accepted when:
 
 1. `inspect` reports placeholders from body, header, footer, and text box.
 2. `validate-model` reports missing required values with exact paths and hints.
-3. A single-body Markdown proposal renders headings, nested lists, a table,
+3. A single-body Markdown document renders headings, nested lists, a table,
    links, code, and local images with template styles.
 4. Collections and conditions render without leftover marker rows.
 5. Word opens the output without repair.
@@ -595,7 +598,7 @@ Phase 1 is accepted when:
 12. A fresh Codex and Claude Code session can follow repository instructions,
     run the intended workflow, and avoid ad-hoc document scripts.
 
-The selected Phase 2 extraction slice is accepted when a supported generated
+The extraction capability is accepted when a supported generated
 DOCX can be extracted into Markdown with headings, inline formatting, links,
 lists, quotes, tables, and deterministic image assets; unsupported fields
 produce stable warnings; and the result can be passed back to `convert`.
@@ -603,8 +606,7 @@ produce stable warnings; and the result can be passed back to `convert`.
 ## 17. Delivery and branches
 
 Development starts on `develop`. Work is merged through reviewed feature
-branches. `main` contains stable, releasable commits. No release package is
-published before P0 confirms or supersedes the rendering-engine ADR.
+branches. `main` contains stable, releasable commits.
 
 See [branching and releases](branching-and-release.md) and
 [implementation plan](implementation-plan.md).

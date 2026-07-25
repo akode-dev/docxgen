@@ -7,7 +7,7 @@
   "$schema": "./docs/schemas/docxgen-model-1.0.schema.json",
   "modelVersion": "1.0",
   "template": {
-    "id": "akode-proposal",
+    "id": "document-template",
     "version": "1.0.0"
   },
   "options": {
@@ -52,14 +52,14 @@ and the adjacent template-specific schema.
 Model options are defaults. An explicitly present CLI option wins; omitted CLI
 options preserve the model value.
 
-## Recommended proposal model
+## Complete model example
 
 ```json
 {
   "$schema": "./docs/schemas/docxgen-model-1.0.schema.json",
   "modelVersion": "1.0",
   "template": {
-    "id": "akode-proposal",
+    "id": "document-template",
     "version": "1.0.0"
   },
   "options": {
@@ -70,10 +70,10 @@ options preserve the model value.
   "data": {
     "ds": {
       "Document": {
-        "Title": "Customer Platform Proposal",
-        "Description": "Technical and commercial proposal",
-        "Project": "Customer Platform Modernization",
-        "Client": "Example Corporation",
+        "Title": "Platform Modernization Report",
+        "Description": "Architecture and delivery overview",
+        "Project": "Platform Modernization",
+        "Organization": "Example Corporation",
         "Version": "1.0",
         "Status": "Draft",
         "Date": "2026-07-24",
@@ -94,7 +94,7 @@ options preserve the model value.
         }
       ],
       "Body": {
-        "$mdFile": "proposal.md"
+        "$mdFile": "content.md"
       }
     }
   }
@@ -127,8 +127,8 @@ Use only for short generated fragments. Files are preferred for long sections.
 ```
 
 Use it with a binary placeholder such as
-`{{ds.ClientLogo}:IMG(alt=Client logo)}`. Phase 1 supports the same image media
-types as Markdown images.
+`{{ds.OrganizationLogo}:IMG(alt=Organization logo)}`. The formatter supports
+the same image media types as Markdown images.
 
 ### `$text`
 
@@ -149,7 +149,7 @@ enforced later by the security layer, not by a fixed schema nesting level.
 
 ## Section-anchored Markdown
 
-For a proposal that is easier to edit as one file, use standalone HTML
+For a document that is easier to edit as one file, use standalone HTML
 comments to bind Markdown blocks to model paths:
 
 ```markdown

@@ -87,7 +87,7 @@ merge, security, and placeholder-binding validation without producing DOCX:
 docxgen validate-model
   -t|--template <template.docx>
   -m|--model <model.json|->
-  [--markdown <proposal.md>]
+  [--markdown <content.md>]
   [--assets-dir <directory>]
   [--lenient]
   [--json]
@@ -103,7 +103,7 @@ docxgen render
   -t|--template <template.docx>
   -o|--out <output.docx>
   [-m|--model <model.json|->]
-  [--markdown <proposal.md>]
+  [--markdown <content.md>]
   [--assets-dir <directory>]
   [--lenient]
   [--culture <ietf>]

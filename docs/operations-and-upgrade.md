@@ -5,7 +5,7 @@
 From NuGet:
 
 ```powershell
-dotnet tool install --global Akode.DocxGen.Tool --version 2.0.0
+dotnet tool install --global Akode.DocxGen.Tool --version 2.1.0
 docxgen --help
 ```
 
@@ -14,7 +14,7 @@ For an isolated agent workspace:
 ```powershell
 dotnet tool install Akode.DocxGen.Tool `
   --tool-path .tools `
-  --version 2.0.0
+  --version 2.1.0
 
 .tools/docxgen --help
 ```

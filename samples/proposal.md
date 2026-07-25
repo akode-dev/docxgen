@@ -1,7 +1,7 @@
 # Executive Summary
 
-This synthetic document exercises the future Akode.DocxGen rendering pipeline.
-It contains no customer information.
+This synthetic reference document demonstrates governed DOCX generation from
+Markdown and structured metadata. It contains no customer information.
 
 ## Objectives
 
@@ -9,26 +9,27 @@ It contains no customer information.
 - Apply branding from a Word template.
 - Produce deterministic, valid OOXML.
 
-# Proposed Solution
+# Platform Overview
 
 ## Architecture
 
-The solution separates the model and Markdown pipeline from the DOCX adapter.
+The platform separates structured content, document processing, and the
+approved Word design.
 
 ![Document generation pipeline](architecture.svg "Document generation pipeline")
 
-## Delivery Plan
+## Delivery Approach
 
-1. Prove the rendering engine.
-2. Implement validation and preprocessing.
-3. Build the CLI.
-4. Accept the reference template.
+1. Discover the document requirements.
+2. Confirm the governed template and data contract.
+3. Draft and validate the content.
+4. Render, review, and approve the final document.
 
-| Phase | Outcome |
+| Stage | Outcome |
 |---|---|
-| P0 | Rendering decision |
-| P1-P4 | Working CLI |
-| P5-P6 | Template and release |
+| Discovery | Confirmed scope and source material |
+| Authoring | Reviewed Markdown and structured metadata |
+| Delivery | Validated DOCX ready for approval |
 
 # Assumptions
 

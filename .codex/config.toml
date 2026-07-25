@@ -1,3 +1,0 @@
-# Project-local Codex settings load only after the repository is trusted.
-# Durable engineering guidance lives in ../AGENTS.md.
-project_root_markers = [".git"]

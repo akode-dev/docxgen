@@ -10,7 +10,6 @@ identifier shown here is the package license recorded during review.
 | DocumentFormat.OpenXml | 3.5.1 | MIT |
 | DocumentFormat.OpenXml.Framework | 3.5.1 | MIT |
 | DocxTemplater | 2.8.3 | MIT |
-| DocxTemplater.Markdown | 2.8.3 | MIT |
 | DynamicExpresso.Core | 2.19.3 | MIT |
 | EmptyFiles | 4.4.0 | MIT |
 | Humanizer.Core | 3.0.1 | MIT |

@@ -1,18 +1,17 @@
 # Templates
 
-`proposal.docx` is the synthetic, non-confidential Phase 1 reference template.
-It demonstrates the required package shape and is paired with
-`proposal.schema.json`. It is not an approved corporate brand master; replace
-it with the approved template only after the Word acceptance pass.
+`proposal.docx` is a synthetic, non-confidential reference template. It
+demonstrates a complex package shape and is paired with
+`proposal.schema.json`. It is not an approved corporate brand master.
 
 Each production template is paired with a schema:
 
 ```text
-proposal.docx
-proposal.schema.json
+template.docx
+template.schema.json
 ```
 
-The reference proposal demonstrates this recommended shape:
+The reference proposal demonstrates one possible shape:
 
 1. branded cover;
 2. Document Control or explicit variant without it;
@@ -22,8 +21,8 @@ The reference proposal demonstrates this recommended shape:
 6. branded final page.
 
 This is not a universal engine requirement. Other governed templates may have
-a single placeholder, one or more Markdown slots, nested collections, or no
-proposal-specific cover/Document Control/TOC pages. Generate their adjacent
-contract with `docxgen generate-schema`.
+a single placeholder, one or more Markdown slots, nested collections, or any
+page sequence. Generate their adjacent contract with
+`docxgen generate-schema`.
 
-Do not add real customer documents to this folder.
+Do not add confidential or customer documents to this folder.

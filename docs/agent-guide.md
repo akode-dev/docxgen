@@ -9,7 +9,7 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 1. Read the root agent file loaded by your product.
 2. Run `git status --short --branch`.
 3. Read the relevant specification and ADR.
-4. Confirm the task belongs to the current implementation phase.
+4. Confirm the task belongs to the current release or selected roadmap item.
 5. Create or switch to a short-lived branch from `develop` only when the user
    or workflow authorizes branch creation.
 6. Make the smallest vertical change that satisfies one acceptance slice.
@@ -18,22 +18,21 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 ## Current product state
 
-Phase 1 is complete. The eight-command CLI, Core pipeline, DOCX adapter,
-reference template, schemas, tests, visual evidence, dotnet tool packaging,
-and self-contained release workflow are in place. Version 2.0 adds semantic
-DOCX extraction, deterministic template-schema generation, and the
-Akode/DocxGen open-source product identity. New work should be a scoped
-defect/maintenance change or an explicitly selected backlog item.
+The eight-command CLI, Core pipeline, DOCX adapter, reference template,
+schemas, tests, dotnet tool packaging, and self-contained release workflow are
+in place. The current release includes semantic DOCX extraction and
+deterministic template-schema generation. New work should be a scoped
+defect/maintenance change or an explicitly selected roadmap item.
 
 ## Prohibited shortcuts
 
 - no one-off Python/Node DOCX generator in production;
 - no Office Interop or COM in production (Word automation is permitted only
   for an explicit local visual-acceptance task);
-- no unbounded Markdown/HTML renderer beyond ADR-0005's Phase 1 subset;
+- no unbounded Markdown/HTML renderer beyond ADR-0005's approved subset;
 - no `--lenient` to make missing content disappear;
 - no remote images/raw HTML without an explicit product requirement;
-- no customer proposals in fixtures;
+- no confidential or customer documents in fixtures;
 - no package without approved license review;
 - no push or history rewrite without explicit user authorization.
 

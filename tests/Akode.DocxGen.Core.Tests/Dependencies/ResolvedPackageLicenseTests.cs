@@ -10,6 +10,7 @@ public sealed class ResolvedPackageLicenseTests
 
     private static readonly string[] ForbiddenPackages =
     [
+        "DocxTemplater.Markdown",
         "DocxTemplater.Images",
         "SixLabors.ImageSharp",
     ];
@@ -50,23 +51,6 @@ public sealed class ResolvedPackageLicenseTests
                 StringComparer.OrdinalIgnoreCase))
             .Select(package => $"{package.Identity} in {package.LockFile}")
             .Order(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        offenders.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public void MarkdownExtensionRemainsSpikeOnly()
-    {
-        var offenders = LoadResolvedPackages()
-            .Where(package => package.Id.Equals(
-                "DocxTemplater.Markdown",
-                StringComparison.OrdinalIgnoreCase))
-            .Where(package => !package.LockFile.StartsWith(
-                "research/",
-                StringComparison.Ordinal))
-            .Select(package => package.LockFile)
-            .Order(StringComparer.Ordinal)
             .ToArray();
 
         offenders.ShouldBeEmpty();

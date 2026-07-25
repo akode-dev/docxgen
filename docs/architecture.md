@@ -35,7 +35,7 @@ flowchart TD
     CLI --> Core
     CLI --> Docx["Akode.DocxGen.Docx"]
     Docx --> Core
-    Mcp["Akode.DocxGen.Mcp (Phase 2)"] --> Core
+    Mcp["Akode.DocxGen.Mcp (roadmap)"] --> Core
     Docx --> DXT["DocxTemplater core"]
     Docx --> OX["Open XML SDK"]
     Core --> Markdig["Markdig"]
@@ -83,8 +83,8 @@ Owns process behavior:
 
 ### MCP
 
-Phase 2 exposes typed wrappers over Core. It must not call CLI handlers or
-duplicate pipeline logic.
+The planned MCP adapter exposes typed wrappers over Core. It must not call CLI
+handlers or duplicate pipeline logic.
 
 ## Pipeline
 
@@ -130,8 +130,8 @@ authority. Inspection and generation bridge them:
 
 ```mermaid
 flowchart LR
-    DOCX["proposal.docx"] --> Generate["generate-schema"]
-    Generate --> Schema["proposal.schema.json"]
+    DOCX["template.docx"] --> Generate["generate-schema"]
+    Generate --> Schema["template.schema.json"]
     DOCX --> Inspect["inspect"]
     Schema --> Inspect
     Inspect --> Contract["TemplateSchema"]
@@ -145,6 +145,34 @@ technology-neutral Core shape and overlays `:MD`/`:IMG` semantics. Core uses
 that same shape for schema generation and nested scaffolds. The schema stores
 template id/version and a template hash extension. A hash mismatch makes the
 contract stale; the template owner must inspect, regenerate, and review it.
+
+## Repository map
+
+```text
+src/
+  Akode.DocxGen.Core/      contracts, model/schema logic, Markdown, security
+  Akode.DocxGen.Docx/      DOCX inspection, rendering, extraction, validation
+  Akode.DocxGen.Cli/       command-line adapter and process output
+  Akode.DocxGen.Mcp/       unpublished roadmap adapter
+tests/
+  Akode.DocxGen.Core.Tests/
+  Akode.DocxGen.Docx.Tests/
+  Akode.DocxGen.Cli.Tests/
+  TestAssets/
+templates/                 governed DOCX templates and adjacent schemas
+samples/                   synthetic runnable inputs
+docs/                      public guides, contracts, schemas, and ADRs
+eng/                       verification, license inventory, and agent hooks
+.github/                   CI, release, issue, and pull-request automation
+```
+
+Core never references DOCX, CLI, MCP, or Open XML implementation types. The
+DOCX adapter is the only production layer that references DocxTemplater and
+Open XML SDK. CLI contains no document business logic, and no project
+references CLI.
+
+Generated builds, packages, published binaries, rendered samples, and QA
+images belong under ignored `bin/`, `obj/`, and `artifacts/` directories.
 
 ## Determinism
 
@@ -174,5 +202,4 @@ changes.
 - Word fields are marked for update on open; no layout engine is embedded.
 - Optional whole-page furniture uses explicit template variants initially.
 - The bounded Markdown block renderer follows ADR-0005. It supports only the
-  normative Phase 1 subset and must not become a general HTML/CSS layout
-  engine.
+  approved subset and must not become a general HTML/CSS layout engine.
