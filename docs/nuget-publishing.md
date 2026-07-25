@@ -45,7 +45,7 @@ self-contained GitHub Release archives.
 gh workflow run release.yml --repo akode-dev/docxgen --ref main
 ```
 
-The current `2.1.0` package IDs can be created this way once. The workflow
+The package IDs were first created with `2.1.0`. The workflow
 expects exactly three `.nupkg` files and uses `--skip-duplicate`, so rerunning a
 completed publication does not overwrite an immutable package.
 

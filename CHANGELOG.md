@@ -6,6 +6,14 @@ Versioning.
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-07-25
+
+### Fixed
+
+- Preserved bullet and ordered numbering definitions when Markdown documents
+  contain both list types, so DOCX-to-Markdown extraction no longer turns
+  unordered lists into numbered lists.
+
 ## [2.1.0] - 2026-07-25
 
 ### Added
@@ -80,6 +88,7 @@ Versioning.
 - Opt-in remote image downloads with timeout, size/media-type limits, redirects
   disabled, and non-public address rejection.
 
-[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/akode-dev/docxgen/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/akode-dev/docxgen/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v2.0.0

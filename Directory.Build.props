@@ -18,8 +18,8 @@
     <Company>Akode</Company>
     <Product>DocxGen</Product>
     <Copyright>Copyright © 2026 Akode contributors</Copyright>
-    <Version>2.1.0</Version>
-    <PackageVersion>2.1.0</PackageVersion>
+    <Version>2.1.1</Version>
+    <PackageVersion>2.1.1</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/akode-dev/docxgen</PackageProjectUrl>
     <PackageTags>docx;markdown;openxml;document-generation;ai-agents</PackageTags>

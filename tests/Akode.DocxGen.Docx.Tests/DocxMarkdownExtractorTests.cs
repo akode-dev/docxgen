@@ -37,6 +37,9 @@ public sealed class DocxMarkdownExtractorTests
 
                 Paragraph with **bold**, *italic*, `code`, and [link](https://example.com).
 
+                - Bullet first
+                - Bullet second
+
                 1. First
                 2. Second
 
@@ -76,6 +79,8 @@ public sealed class DocxMarkdownExtractorTests
             result.Markdown.ShouldContain("*italic*");
             result.Markdown.ShouldContain("`code`");
             result.Markdown.ShouldContain("[link](https://example.com)");
+            result.Markdown.ShouldContain("- Bullet first");
+            result.Markdown.ShouldContain("- Bullet second");
             result.Markdown.ShouldContain("1. First");
             result.Markdown.ShouldContain("2. Second");
             result.Markdown.ShouldContain("> A quoted sentence.");
@@ -90,7 +95,7 @@ public sealed class DocxMarkdownExtractorTests
             result.Assets.ShouldHaveSingleItem();
             result.Assets[0].Content.ToArray().ShouldBe(PixelPng);
             result.Stats.Headings.ShouldBe(1);
-            result.Stats.ListItems.ShouldBe(2);
+            result.Stats.ListItems.ShouldBe(4);
             result.Stats.Tables.ShouldBe(1);
             result.Stats.Images.ShouldBe(1);
             result.Diagnostics.ShouldNotContain(
