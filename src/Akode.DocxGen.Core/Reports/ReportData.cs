@@ -1,4 +1,5 @@
 using Akode.DocxGen.Core.Model;
+using Akode.DocxGen.Core.Pipeline;
 
 namespace Akode.DocxGen.Core.Reports;
 
@@ -11,6 +12,17 @@ public sealed record InspectReportData(
     IReadOnlyList<TemplatePlaceholder> Placeholders,
     IReadOnlyList<string> RequiredStyles,
     IReadOnlyList<string> UnsupportedForStaticAnalysis,
+    long DurationMs);
+
+/// <summary>Success data returned by <c>generate-schema</c>.</summary>
+public sealed record GenerateSchemaReportData(
+    string Output,
+    long OutputBytes,
+    string TemplateId,
+    string TemplateVersion,
+    string TemplateHash,
+    int BindingCount,
+    bool Checked,
     long DurationMs);
 
 /// <summary>Success data returned by <c>scaffold-model</c>.</summary>
@@ -56,6 +68,15 @@ public sealed record ConvertReportData(
     long DurationMs,
     MarkdownStats MarkdownStats,
     DocumentValidationSummary? Validation);
+
+/// <summary>Success data returned by <c>extract</c>.</summary>
+public sealed record ExtractReportData(
+    string Output,
+    long OutputBytes,
+    string? AssetsDirectory,
+    IReadOnlyList<string> Assets,
+    long DurationMs,
+    DocxExtractionStats Stats);
 
 /// <summary>Success data returned by <c>validate</c>.</summary>
 public sealed record ValidateDocumentReportData(

@@ -18,10 +18,12 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 ## Current product state
 
-Phase 1 is complete. The six-command CLI, Core pipeline, DOCX adapter,
+Phase 1 is complete. The eight-command CLI, Core pipeline, DOCX adapter,
 reference template, schemas, tests, visual evidence, dotnet tool packaging,
-and self-contained release workflow are in place. Work should now be either a
-scoped defect/maintenance change or an explicitly selected Phase 2 item.
+and self-contained release workflow are in place. Version 2.0 adds semantic
+DOCX extraction, deterministic template-schema generation, and the
+Akode/DocxGen open-source product identity. New work should be a scoped
+defect/maintenance change or an explicitly selected backlog item.
 
 ## Prohibited shortcuts
 
@@ -39,6 +41,7 @@ scoped defect/maintenance change or an explicitly selected Phase 2 item.
 
 ```text
 inspect
+  -> generate-schema (new template) or generate-schema --check (governed template)
   -> scaffold-model
   -> edit JSON/Markdown
   -> validate-model
@@ -53,7 +56,13 @@ Agents consume stdout JSON. Each failure is repaired from:
 - `diagnostics[].message`;
 - `diagnostics[].hint`.
 
-Do not scrape human stderr or infer placeholder names.
+Do not scrape human stderr or infer placeholder names. Do not infer business
+formats or optionality from labels that are absent from the generated schema.
+
+For reverse conversion, agents call `extract --file ... --out ... --json`,
+review warning diagnostics, and edit the resulting Markdown plus its adjacent
+assets directory. They must retain the source DOCX when exact Word layout,
+headers/footers, comments, or tracked changes matter.
 
 ## Hooks
 

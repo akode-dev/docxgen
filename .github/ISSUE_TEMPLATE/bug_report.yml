@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a reproducible DocxGen problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Use synthetic inputs and remove confidential information.
+  - type: input
+    id: version
+    attributes:
+      label: DocxGen version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system and architecture
+      placeholder: Windows 11 x64, Ubuntu 24.04 ARM64, macOS ARM64
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or API call
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: JSON diagnostics and exit code
+      description: Prefer output produced with --json.
+      render: json
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a synthetic fixture or describe the smallest reproducible case.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: The report and attachments contain no confidential or personal data.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

@@ -6,6 +6,9 @@ using Akode.DocxGen.Core.Model;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocxTemplater;
+using DxtNode = DocxTemplater.Schema.TemplateSchemaNode;
+using DxtNodeKind = DocxTemplater.Schema.TemplateNodeKind;
 
 namespace Akode.DocxGen.Docx.Inspection;
 
@@ -24,6 +27,8 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
             $"sha256:{Convert.ToHexStringLower(SHA256.HashData(bytes))}";
         var diagnostics = new DiagnosticCollector();
         var builders = new Dictionary<string, PlaceholderBuilder>(StringComparer.Ordinal);
+        var semanticKinds = new Dictionary<string, ModelValueKind>(
+            StringComparer.Ordinal);
 
         try
         {
@@ -41,12 +46,22 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
             }
             else
             {
-                Scan(main.Document, "main", builders, diagnostics);
+                Scan(
+                    main.Document,
+                    "main",
+                    builders,
+                    semanticKinds,
+                    diagnostics);
                 foreach (var header in main.HeaderParts)
                 {
                     if (header.Header is not null)
                     {
-                        Scan(header.Header, "header", builders, diagnostics);
+                        Scan(
+                            header.Header,
+                            "header",
+                            builders,
+                            semanticKinds,
+                            diagnostics);
                     }
                 }
 
@@ -54,23 +69,43 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                 {
                     if (footer.Footer is not null)
                     {
-                        Scan(footer.Footer, "footer", builders, diagnostics);
+                        Scan(
+                            footer.Footer,
+                            "footer",
+                            builders,
+                            semanticKinds,
+                            diagnostics);
                     }
                 }
 
                 if (main.FootnotesPart?.Footnotes is { } footnotes)
                 {
-                    Scan(footnotes, "footnotes", builders, diagnostics);
+                    Scan(
+                        footnotes,
+                        "footnotes",
+                        builders,
+                        semanticKinds,
+                        diagnostics);
                 }
 
                 if (main.EndnotesPart?.Endnotes is { } endnotes)
                 {
-                    Scan(endnotes, "endnotes", builders, diagnostics);
+                    Scan(
+                        endnotes,
+                        "endnotes",
+                        builders,
+                        semanticKinds,
+                        diagnostics);
                 }
 
                 if (main.WordprocessingCommentsPart?.Comments is { } comments)
                 {
-                    Scan(comments, "comments", builders, diagnostics);
+                    Scan(
+                        comments,
+                        "comments",
+                        builders,
+                        semanticKinds,
+                        diagnostics);
                 }
             }
         }
@@ -109,16 +144,22 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                 "CodeInline",
                 "Hyperlink",
                 "Caption",
-                "AkodeTable",
+                "DocxGenTable",
             ]
             : [];
+        var roots = diagnostics.HasErrors
+            ? []
+            : DiscoverShape(bytes, semanticKinds, diagnostics);
         return new TemplateSchema(
             TemplateId: null,
             TemplateVersion: null,
             hash,
             placeholders,
             requiredStyles,
-            diagnostics.Items);
+            diagnostics.Items)
+        {
+            Roots = roots,
+        };
     }
 
     private static byte[] ReadAll(Stream source)
@@ -137,6 +178,7 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
         OpenXmlPartRootElement root,
         string location,
         IDictionary<string, PlaceholderBuilder> builders,
+        Dictionary<string, ModelValueKind> semanticKinds,
         DiagnosticCollector diagnostics)
     {
         var stack = new Stack<string>();
@@ -156,15 +198,32 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                 if (token.StartsWith('#'))
                 {
                     var collection = NormalizePath(token[1..], stack);
+                    if (!IsModelPath(collection))
+                    {
+                        continue;
+                    }
+
                     stack.Push(collection);
                     GetOrCreate(builders, collection, ModelValueKind.Collection)
                         .Locations.Add(location);
+                    semanticKinds[collection] = ModelValueKind.Collection;
                     continue;
                 }
 
                 if (token.StartsWith('/'))
                 {
-                    if (stack.Count > 0)
+                    var closing = token[1..].Trim();
+                    if (stack.Count > 0
+                        && closing.Length > 0
+                        && (string.Equals(
+                                stack.Peek(),
+                                closing,
+                                StringComparison.Ordinal)
+                            || stack.Peek().EndsWith(
+                                closing.StartsWith('.')
+                                    ? closing
+                                    : $".{closing}",
+                                StringComparison.Ordinal)))
                     {
                         stack.Pop();
                     }
@@ -189,13 +248,6 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                     continue;
                 }
 
-                if (stack.Count > 0 && token.Length > 0 && token[0] == '.')
-                {
-                    builders[stack.Peek()].ItemProperties.Add(
-                        path[(stack.Peek().Length + 1)..].Split('.')[0]);
-                    continue;
-                }
-
                 var formatter = match.Groups["formatter"].Success
                     ? match.Groups["formatter"].Value
                     : null;
@@ -205,6 +257,25 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                     "IMG" => ModelValueKind.Binary,
                     _ => ModelValueKind.Text,
                 };
+                if (!semanticKinds.TryGetValue(path, out var existingKind)
+                    || existingKind == ModelValueKind.Text
+                    || kind == ModelValueKind.Markdown)
+                {
+                    semanticKinds[path] = kind;
+                }
+
+                if (stack.Count > 0)
+                {
+                    var collectionPath = stack.Peek();
+                    var prefix = $"{collectionPath}.";
+                    if (path.StartsWith(prefix, StringComparison.Ordinal))
+                    {
+                        builders[collectionPath].ItemProperties.Add(
+                            path[prefix.Length..].Split('.')[0]);
+                        continue;
+                    }
+                }
+
                 var builder = GetOrCreate(builders, path, kind);
                 builder.Formatter ??= formatter;
                 builder.FormatterArguments ??= match.Groups["args"].Success
@@ -231,6 +302,89 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                 }
             }
         }
+    }
+
+    private static TemplateShapeNode[] DiscoverShape(
+        byte[] bytes,
+        IReadOnlyDictionary<string, ModelValueKind> semanticKinds,
+        DiagnosticCollector diagnostics)
+    {
+        try
+        {
+            using var stream = new MemoryStream(bytes, writable: false);
+            using var template = new DocxTemplate(
+                stream,
+                new ProcessSettings
+                {
+                    BindingErrorHandling = BindingErrorHandling.ThrowException,
+                });
+            var schema = template.GetTemplateSchema();
+            return schema.Roots.Values
+                .OrderBy(node => node.Name, StringComparer.Ordinal)
+                .Select(
+                    node => ConvertShape(
+                        node,
+                        node.Name,
+                        semanticKinds,
+                        collectionItem: false))
+                .ToArray();
+        }
+        catch (Exception exception) when (
+            exception is ArgumentException
+                or FormatException
+                or InvalidDataException
+                or InvalidOperationException
+                or OpenXmlTemplateException)
+        {
+            diagnostics.Add(
+                DiagnosticCode.TemplateSyntaxError,
+                message:
+                    $"The template shape could not be analyzed: {exception.Message}",
+                hint:
+                    "Correct the reported template marker and run inspect again.");
+            return [];
+        }
+    }
+
+    private static TemplateShapeNode ConvertShape(
+        DxtNode source,
+        string path,
+        IReadOnlyDictionary<string, ModelValueKind> semanticKinds,
+        bool collectionItem)
+    {
+        var kind = source.Kind switch
+        {
+            DxtNodeKind.Collection => ModelValueKind.Collection,
+            DxtNodeKind.Object => ModelValueKind.StructuredObject,
+            _ => !collectionItem
+                && semanticKinds.TryGetValue(path, out var semanticKind)
+                ? semanticKind
+                : ModelValueKind.Text,
+        };
+        var properties = source.Properties.Values
+            .OrderBy(property => property.Name, StringComparer.Ordinal)
+            .Select(
+                property => ConvertShape(
+                    property,
+                    $"{path}.{property.Name}",
+                    semanticKinds,
+                    collectionItem: false))
+            .ToArray();
+        TemplateShapeNode? item = null;
+        if (source.ItemSchema is not null)
+        {
+            item = ConvertShape(
+                source.ItemSchema,
+                path,
+                semanticKinds,
+                collectionItem: true);
+        }
+
+        return new TemplateShapeNode(
+            source.Name,
+            kind,
+            properties,
+            item);
     }
 
     private static PlaceholderBuilder GetOrCreate(

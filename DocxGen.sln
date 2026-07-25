@@ -21,10 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akode.DocxGen.Docx.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akode.DocxGen.Cli.Tests", "tests\Akode.DocxGen.Cli.Tests\Akode.DocxGen.Cli.Tests.csproj", "{4A7D68BF-14BC-412F-B06E-61FF082ABDAF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spike", "spike", "{D6EA9C13-5DDC-B6DF-E3F6-EC65D4C25D12}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akode.DocxGen.RendererSpike", "spike\Akode.DocxGen.RendererSpike\Akode.DocxGen.RendererSpike.csproj", "{8DE15ABA-947C-4453-B7A5-28D5C5446836}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,18 +115,6 @@ Global
 		{4A7D68BF-14BC-412F-B06E-61FF082ABDAF}.Release|x64.Build.0 = Release|Any CPU
 		{4A7D68BF-14BC-412F-B06E-61FF082ABDAF}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A7D68BF-14BC-412F-B06E-61FF082ABDAF}.Release|x86.Build.0 = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|x64.Build.0 = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Debug|x86.Build.0 = Debug|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|x64.ActiveCfg = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|x64.Build.0 = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|x86.ActiveCfg = Release|Any CPU
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +127,5 @@ Global
 		{8F81C4E4-5B16-4301-80F3-B4E3C3E3350F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{3256BCC5-CE4B-4EBC-A9A7-ADD613F9EF8F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{4A7D68BF-14BC-412F-B06E-61FF082ABDAF} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{8DE15ABA-947C-4453-B7A5-28D5C5446836} = {D6EA9C13-5DDC-B6DF-E3F6-EC65D4C25D12}
 	EndGlobalSection
 EndGlobal

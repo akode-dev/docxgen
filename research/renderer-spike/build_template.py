@@ -293,10 +293,10 @@ def configure_styles(document):
     revision_heading.paragraph_format.space_after = Pt(6)
     revision_heading.paragraph_format.keep_with_next = True
 
-    if "AkodeTable" not in styles:
-        table_style = styles.add_style("AkodeTable", WD_STYLE_TYPE.TABLE)
+    if "DocxGenTable" not in styles:
+        table_style = styles.add_style("DocxGenTable", WD_STYLE_TYPE.TABLE)
     else:
-        table_style = styles["AkodeTable"]
+        table_style = styles["DocxGenTable"]
     table_style.base_style = styles["Table Grid"]
     set_font(table_style, 10)
 
@@ -328,7 +328,7 @@ def configure_footer(section, final=False):
     paragraph.paragraph_format.space_after = Pt(0)
     if final:
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = paragraph.add_run("akode.com  •  hello@akode.com")
+        run = paragraph.add_run("github.com/akode-dev/docxgen")
         run.font.color.rgb = RGBColor.from_string(MUTED)
         run.font.size = Pt(9)
         return
@@ -374,7 +374,7 @@ def add_metadata_table(document):
         ("Version / status", "v{{ds.Document.Version}} • {{ds.Document.Status}}"),
     )
     table = document.add_table(rows=0, cols=2)
-    table.style = "AkodeTable"
+    table.style = "DocxGenTable"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     set_table_borders(table)
@@ -409,7 +409,7 @@ def add_cover_metadata_table(document):
         ),
     )
     table = document.add_table(rows=0, cols=2)
-    table.style = "AkodeTable"
+    table.style = "DocxGenTable"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     set_table_borders(table)
@@ -429,7 +429,7 @@ def add_cover_metadata_table(document):
 
 def add_revision_table(document):
     table = document.add_table(rows=2, cols=4)
-    table.style = "AkodeTable"
+    table.style = "DocxGenTable"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     set_table_borders(table)
@@ -477,10 +477,10 @@ def add_toc(document):
 
 def build():
     document = Document()
-    document.core_properties.title = "Akode.DocxGen renderer spike template"
-    document.core_properties.subject = "P0 rendering-engine validation"
-    document.core_properties.author = "Akode.DocxGen"
-    document.core_properties.keywords = "docx, markdown, template, spike"
+    document.core_properties.title = "DocxGen synthetic proposal template"
+    document.core_properties.subject = "Reference template for tests and examples"
+    document.core_properties.author = "Akode contributors"
+    document.core_properties.keywords = "docxgen, docx, markdown, template"
 
     configure_styles(document)
     for section in document.sections:
@@ -535,7 +535,7 @@ def build():
     configure_page(body_section)
     configure_header(
         body_section,
-        "AKODE.DOCXGEN",
+        "DOCXGEN",
         include_placeholders=True,
     )
     configure_footer(body_section)
@@ -561,7 +561,7 @@ def build():
     note.runs[0].font.color.rgb = RGBColor.from_string(MUTED)
     for _ in range(5):
         document.add_paragraph()
-    contact = document.add_paragraph("akode.com  •  hello@akode.com")
+    contact = document.add_paragraph("github.com/akode-dev/docxgen")
     contact.alignment = WD_ALIGN_PARAGRAPH.CENTER
     contact.runs[0].bold = True
     contact.runs[0].font.color.rgb = RGBColor.from_string(BLUE)

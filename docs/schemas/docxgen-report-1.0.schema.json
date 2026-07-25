@@ -1,11 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.example/schemas/docxgen-report-1.0.schema.json",
+  "$id": "urn:akode:docxgen:schema:report:1.0",
   "title": "Akode.DocxGen command report 1.0",
-  "description": "Versioned stdout envelope for all Phase 1 commands.",
+  "description": "Versioned stdout envelope for all Akode.DocxGen commands.",
   "oneOf": [
     {
       "$ref": "#/$defs/inspectSuccess"
+    },
+    {
+      "$ref": "#/$defs/generateSchemaSuccess"
     },
     {
       "$ref": "#/$defs/scaffoldModelSuccess"
@@ -18,6 +21,9 @@
     },
     {
       "$ref": "#/$defs/convertSuccess"
+    },
+    {
+      "$ref": "#/$defs/extractSuccess"
     },
     {
       "$ref": "#/$defs/validateSuccess"
@@ -44,10 +50,12 @@
         "command": {
           "enum": [
             "inspect",
+            "generate-schema",
             "scaffold-model",
             "validate-model",
             "render",
             "convert",
+            "extract",
             "validate"
           ]
         },
@@ -198,6 +206,25 @@
       ],
       "unevaluatedProperties": false
     },
+    "generateSchemaSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "generate-schema"
+            },
+            "data": {
+              "$ref": "#/$defs/generateSchemaData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "scaffoldModelSuccess": {
       "allOf": [
         {
@@ -268,6 +295,25 @@
             },
             "data": {
               "$ref": "#/$defs/convertData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "extractSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "extract"
+            },
+            "data": {
+              "$ref": "#/$defs/extractData"
             }
           }
         }
@@ -542,6 +588,52 @@
         }
       }
     },
+    "generateSchemaData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output",
+        "outputBytes",
+        "templateId",
+        "templateVersion",
+        "templateHash",
+        "bindingCount",
+        "checked",
+        "durationMs"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "templateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "bindingCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checked": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
     "scaffoldModelData": {
       "type": "object",
       "additionalProperties": false,
@@ -738,6 +830,76 @@
               "type": "null"
             }
           ]
+        }
+      }
+    },
+    "extractData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output",
+        "outputBytes",
+        "assets",
+        "durationMs",
+        "stats"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assetsDirectory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assets": {
+          "$ref": "#/$defs/pathArray"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stats": {
+          "$ref": "#/$defs/docxExtractionStats"
+        }
+      }
+    },
+    "docxExtractionStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paragraphs",
+        "headings",
+        "listItems",
+        "tables",
+        "images"
+      ],
+      "properties": {
+        "paragraphs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "headings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "listItems": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tables": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "images": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },

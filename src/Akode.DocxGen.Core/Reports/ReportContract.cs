@@ -13,6 +13,8 @@ public static class ReportContract
         new[]
         {
             CommandName.Convert,
+            CommandName.Extract,
+            CommandName.GenerateSchema,
             CommandName.Inspect,
             CommandName.Render,
             CommandName.ScaffoldModel,
@@ -27,6 +29,9 @@ public static class CommandName
     /// <summary>The template inspection command.</summary>
     public const string Inspect = "inspect";
 
+    /// <summary>The template-specific JSON Schema generation command.</summary>
+    public const string GenerateSchema = "generate-schema";
+
     /// <summary>The model scaffolding command.</summary>
     public const string ScaffoldModel = "scaffold-model";
 
@@ -38,6 +43,9 @@ public static class CommandName
 
     /// <summary>The template-less conversion command.</summary>
     public const string Convert = "convert";
+
+    /// <summary>The DOCX-to-Markdown extraction command.</summary>
+    public const string Extract = "extract";
 
     /// <summary>The existing-document validation command.</summary>
     public const string Validate = "validate";

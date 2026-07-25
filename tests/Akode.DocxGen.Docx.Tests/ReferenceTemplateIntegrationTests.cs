@@ -2,6 +2,7 @@ using Akode.DocxGen.Core.Abstractions;
 using Akode.DocxGen.Core.Model;
 using Akode.DocxGen.Core.Pipeline;
 using Akode.DocxGen.Docx.Conversion;
+using Akode.DocxGen.Docx.Extraction;
 using Akode.DocxGen.Docx.Inspection;
 using Akode.DocxGen.Docx.PostProcessing;
 using Akode.DocxGen.Docx.Rendering;
@@ -138,6 +139,7 @@ public sealed class ReferenceTemplateIntegrationTests
             new DocxTemplateInspector(),
             new DocxTemplaterRenderer(),
             new DocxMarkdownConverter(),
+            new DocxMarkdownExtractor(),
             new OpenXmlDocumentValidator(),
             new IDocumentPostProcessor[]
             {
@@ -152,13 +154,13 @@ public sealed class ReferenceTemplateIntegrationTests
              directory is not null;
              directory = directory.Parent)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Akode.DocxGen.sln")))
+            if (File.Exists(Path.Combine(directory.FullName, "DocxGen.sln")))
             {
                 return directory.FullName;
             }
         }
 
         throw new InvalidOperationException(
-            $"Could not find Akode.DocxGen.sln above '{AppContext.BaseDirectory}'.");
+            $"Could not find DocxGen.sln above '{AppContext.BaseDirectory}'.");
     }
 }

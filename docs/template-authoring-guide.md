@@ -12,7 +12,14 @@ proposal.schema.json
 ```
 
 The template contains design and fixed labels. The schema contains the exact
-data contract.
+structural data contract. For a new or changed template, run:
+
+```text
+docxgen generate-schema --template proposal.docx --out proposal.schema.json --overwrite
+docxgen generate-schema --template proposal.docx --out proposal.schema.json --check
+```
+
+The first command generates the contract; the second is suitable for CI.
 
 ## Recommended sections
 
@@ -21,6 +28,10 @@ data contract.
 3. Table of contents.
 4. Main body marker.
 5. Final branded page.
+
+These sections are recommendations for proposals, not engine requirements. A
+valid template may contain only one scalar, only `{{ds.Body}:MD}`, several
+body slots, or nested data collections.
 
 Use `Next Page` section breaks when headers, footers, or page setup change. Do
 not use odd/even section starts unless a deliberate blank page is acceptable.
@@ -58,6 +69,9 @@ docxgen inspect --template proposal.docx --include-text-probe --json
 
 after every placeholder change.
 
+`inspect --schema-out` emits an inspection DTO, not JSON Schema. Use
+`generate-schema` for the adjacent `.schema.json`.
+
 Markdown placeholders occupy an otherwise empty paragraph. Do not put a label,
 punctuation, or other marker on the same paragraph.
 
@@ -66,7 +80,7 @@ punctuation, or other marker on the same paragraph.
 - Normal;
 - Heading 1 through Heading 6;
 - List Paragraph;
-- AkodeTable or Table Grid;
+- DocxGenTable or Table Grid;
 - Quote;
 - Code;
 - CodeInline;
@@ -128,6 +142,7 @@ clamped to the available content width.
 A template is accepted only after:
 
 - `inspect` is clean;
+- `generate-schema --check` is clean for generated contracts;
 - schema and placeholder set agree;
 - style-contract tests pass;
 - short and long samples render;

@@ -9,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  tool-package:
+  packages:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,42 +29,84 @@ jobs:
           cache-dependency-path: '**/packages.lock.json'
 
       - name: Restore
-        run: dotnet restore Akode.DocxGen.sln --locked-mode
+        run: dotnet restore DocxGen.sln --locked-mode
+
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        run: |
+          [xml] $props = Get-Content Directory.Build.props
+          $version = [string] $props.Project.PropertyGroup.PackageVersion
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+            if ($env:GITHUB_REF_NAME -notmatch '^v(?<version>[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?)$') {
+              throw "Tag '$env:GITHUB_REF_NAME' is not a supported semantic version."
+            }
+
+            $version = $Matches.version
+          }
+
+          "value=$version" >> $env:GITHUB_OUTPUT
 
       - name: Build
-        run: dotnet build Akode.DocxGen.sln --configuration Release --no-restore
+        run: >
+          dotnet build DocxGen.sln
+          --configuration Release
+          --no-restore
+          -p:Version=${{ steps.version.outputs.value }}
 
       - name: Test
-        run: dotnet test Akode.DocxGen.sln --configuration Release --no-build
+        run: dotnet test DocxGen.sln --configuration Release --no-build
 
-      - name: Pack dotnet tool
-        run: >
-          dotnet pack src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj
-          --configuration Release
-          --no-build
-          --output artifacts/packages
+      - name: Pack libraries and dotnet tool
+        shell: pwsh
+        run: |
+          $projects = @(
+            "src/Akode.DocxGen.Core/Akode.DocxGen.Core.csproj",
+            "src/Akode.DocxGen.Docx/Akode.DocxGen.Docx.csproj",
+            "src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj"
+          )
+          foreach ($project in $projects) {
+            dotnet pack $project `
+              --configuration Release `
+              --no-build `
+              -p:PackageVersion=${{ steps.version.outputs.value }} `
+              --output artifacts/packages
+            if ($LASTEXITCODE -ne 0) {
+              throw "Could not pack $project."
+            }
+          }
 
-      - name: Upload dotnet tool
+      - name: Upload NuGet packages
         uses: actions/upload-artifact@v4
         with:
-          name: Akode.DocxGen-dotnet-tool
+          name: docxgen-nuget
           path: artifacts/packages/*.nupkg
           if-no-files-found: error
 
   single-file:
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-latest
             rid: win-x64
-            executable: Akode.DocxGen.Cli.exe
+            executable: docxgen.exe
+          - os: windows-latest
+            rid: win-arm64
+            executable: docxgen.exe
           - os: ubuntu-latest
             rid: linux-x64
-            executable: Akode.DocxGen.Cli
+            executable: docxgen
+          - os: ubuntu-latest
+            rid: linux-arm64
+            executable: docxgen
           - os: macos-latest
             rid: osx-x64
-            executable: Akode.DocxGen.Cli
+            executable: docxgen
+          - os: macos-latest
+            rid: osx-arm64
+            executable: docxgen
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -80,6 +127,22 @@ jobs:
           -p:PublishSingleFile=true
           -p:PublishTrimmed=false
 
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        run: |
+          [xml] $props = Get-Content Directory.Build.props
+          $version = [string] $props.Project.PropertyGroup.PackageVersion
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+            if ($env:GITHUB_REF_NAME -notmatch '^v(?<version>[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?)$') {
+              throw "Tag '$env:GITHUB_REF_NAME' is not a supported semantic version."
+            }
+
+            $version = $Matches.version
+          }
+
+          "value=$version" >> $env:GITHUB_OUTPUT
+
       - name: Publish single file
         run: >
           dotnet publish src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj
@@ -89,6 +152,7 @@ jobs:
           --no-restore
           -p:PublishSingleFile=true
           -p:PublishTrimmed=false
+          -p:Version=${{ steps.version.outputs.value }}
           -p:DebugSymbols=false
           -p:DebugType=None
           --output artifacts/publish/${{ matrix.rid }}
@@ -112,16 +176,17 @@ jobs:
       - name: Upload single-file executable
         uses: actions/upload-artifact@v4
         with:
-          name: Akode.DocxGen-${{ matrix.rid }}
+          name: docxgen-${{ matrix.rid }}
           path: artifacts/publish/${{ matrix.rid }}
           if-no-files-found: error
 
   publish-release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
-      - tool-package
+      - packages
       - single-file
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -137,24 +202,31 @@ jobs:
           New-Item -ItemType Directory -Force -Path $releaseDirectory | Out-Null
 
           Copy-Item `
-            "artifacts/Akode.DocxGen-dotnet-tool/*.nupkg" `
+            "artifacts/docxgen-nuget/*.nupkg" `
             $releaseDirectory
 
-          $windowsDirectory = "artifacts/Akode.DocxGen-win-x64"
-          Compress-Archive `
-            -Path "$windowsDirectory/*" `
-            -DestinationPath "$releaseDirectory/Akode.DocxGen-win-x64.zip"
+          foreach ($runtimeIdentifier in @("win-x64", "win-arm64")) {
+            $sourceDirectory = "artifacts/docxgen-$runtimeIdentifier"
+            Compress-Archive `
+              -Path "$sourceDirectory/*" `
+              -DestinationPath "$releaseDirectory/docxgen-$runtimeIdentifier.zip"
+          }
 
-          foreach ($runtimeIdentifier in @("linux-x64", "osx-x64")) {
-            $sourceDirectory = "artifacts/Akode.DocxGen-$runtimeIdentifier"
-            $executable = Join-Path $sourceDirectory "Akode.DocxGen.Cli"
+          foreach ($runtimeIdentifier in @(
+            "linux-x64",
+            "linux-arm64",
+            "osx-x64",
+            "osx-arm64"
+          )) {
+            $sourceDirectory = "artifacts/docxgen-$runtimeIdentifier"
+            $executable = Join-Path $sourceDirectory "docxgen"
             chmod +x $executable
             if ($LASTEXITCODE -ne 0) {
               throw "Could not mark $executable as executable."
             }
 
             tar `
-              -czf "$releaseDirectory/Akode.DocxGen-$runtimeIdentifier.tar.gz" `
+              -czf "$releaseDirectory/docxgen-$runtimeIdentifier.tar.gz" `
               -C $sourceDirectory `
               .
             if ($LASTEXITCODE -ne 0) {
@@ -191,7 +263,7 @@ jobs:
               "$GITHUB_REF_NAME" \
               release/* \
               --generate-notes \
-              --title "Akode.DocxGen $GITHUB_REF_NAME" \
+              --title "DocxGen $GITHUB_REF_NAME" \
               --verify-tag \
               --repo "$GITHUB_REPOSITORY"
           fi

@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Akode.DocxGen.Core.Diagnostics;
 using Akode.DocxGen.Core.Model;
+using Akode.DocxGen.Core.Pipeline;
 using Akode.DocxGen.Core.Reports;
+using Json.Schema;
 using Shouldly;
 using Xunit;
 
@@ -80,6 +82,79 @@ public sealed class ReportContractTests
     }
 
     [Fact]
+    public void ExtractReportSerializesAssetsAndSemanticStats()
+    {
+        var data = new ExtractReportData(
+            "out/document.md",
+            512,
+            "out/document.assets",
+            ["out/document.assets/image-001.png"],
+            17,
+            new DocxExtractionStats(8, 2, 3, 1, 1));
+        var report = CommandReport.Success(
+            CommandName.Extract,
+            "DOCX extracted.",
+            data);
+
+        var serialized = ReportJsonSerializer.Serialize(report);
+        using var json = JsonDocument.Parse(serialized);
+        var root = json.RootElement;
+
+        root.GetProperty("command").GetString().ShouldBe("extract");
+        root.GetProperty("data")
+            .GetProperty("assets")
+            .GetArrayLength()
+            .ShouldBe(1);
+        root.GetProperty("data")
+            .GetProperty("stats")
+            .GetProperty("listItems")
+            .GetInt32()
+            .ShouldBe(3);
+        var schemaPath = Path.Combine(
+            RepositoryLayout.Root,
+            "docs",
+            "schemas",
+            "docxgen-report-1.0.schema.json");
+        var schema = JsonSchema.FromText(File.ReadAllText(schemaPath));
+        schema.Evaluate(
+                json.RootElement,
+                new EvaluationOptions
+                {
+                    OutputFormat = OutputFormat.List,
+                })
+            .IsValid
+            .ShouldBeTrue();
+    }
+
+    [Fact]
+    public void GenerateSchemaReportSerializesAndValidates()
+    {
+        var data = new GenerateSchemaReportData(
+            "out/proposal.schema.json",
+            4096,
+            "proposal",
+            "2.1.0",
+            Hash,
+            12,
+            Checked: false,
+            DurationMs: 7);
+        var report = CommandReport.Success(
+            CommandName.GenerateSchema,
+            "Template schema generated.",
+            data);
+
+        var serialized = ReportJsonSerializer.Serialize(report);
+        using var json = JsonDocument.Parse(serialized);
+        var root = json.RootElement;
+
+        root.GetProperty("command").GetString().ShouldBe("generate-schema");
+        root.GetProperty("data")
+            .GetProperty("bindingCount")
+            .GetInt32()
+            .ShouldBe(12);
+    }
+
+    [Fact]
     public void ReportFactoriesRejectContradictoryStates()
     {
         var error = DiagnosticRegistry.Create(DiagnosticCode.ModelInvalidJson);
@@ -125,7 +200,18 @@ public sealed class ReportContractTests
             .GetProperty("const")
             .GetString()
             .ShouldBe(ReportContract.Version);
-        root.GetProperty("oneOf").GetArrayLength().ShouldBe(7);
+        root.GetProperty("oneOf").GetArrayLength().ShouldBe(9);
+        ReportContract.Commands.ShouldContain(CommandName.Extract);
+        var schemaCommands = definitions.GetProperty("baseEnvelope")
+            .GetProperty("properties")
+            .GetProperty("command")
+            .GetProperty("enum")
+            .EnumerateArray()
+            .Select(value => value.GetString()!)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        schemaCommands.ShouldBe(
+            ReportContract.Commands.Order(StringComparer.Ordinal));
 
         foreach (var reference in FindReferences(root))
         {

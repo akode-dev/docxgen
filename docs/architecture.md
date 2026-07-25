@@ -6,10 +6,18 @@
 flowchart LR
     Author["Human or AI author"] --> MD["Markdown and JSON"]
     Designer["Template designer"] --> T["DOCX template and schema"]
-    MD --> CLI["Akode.DocxGen CLI"]
+    T --> Generator["Schema generator"]
+    Generator --> Schema["Draft 2020-12 contract"]
+    MD --> CLI["docxgen CLI"]
     T --> CLI
     CLI --> O["Generated DOCX"]
+    Host[".NET application"] --> Library["Akode.DocxGen package"]
+    MD --> Library
+    T --> Library
+    Library --> O
     O --> Word["Microsoft Word finalization"]
+    Existing["Existing DOCX"] --> CLI
+    CLI --> Extracted["Semantic Markdown and image assets"]
 ```
 
 The author owns content and metadata. The template designer owns branded
@@ -20,7 +28,11 @@ DocxGen joins the two without invoking an LLM or Word.
 
 ```mermaid
 flowchart TD
-    CLI["Akode.DocxGen.Cli"] --> Core["Akode.DocxGen.Core"]
+    CLI["Akode.DocxGen.Cli"] --> Factory["Akode.DocxGen facade"]
+    Host["Application host"] --> Factory
+    Factory --> Core["Akode.DocxGen.Core"]
+    Factory --> Docx["Akode.DocxGen.Docx"]
+    CLI --> Core
     CLI --> Docx["Akode.DocxGen.Docx"]
     Docx --> Core
     Mcp["Akode.DocxGen.Mcp (Phase 2)"] --> Core
@@ -34,6 +46,7 @@ flowchart TD
 Owns domain-level behavior:
 
 - model contracts and parsing;
+- deterministic template-specific JSON Schema generation;
 - base/template schema validation;
 - Markdown preprocessing and anchored sections;
 - merge precedence;
@@ -53,6 +66,7 @@ Owns the document technology adapter:
 - template package inspection;
 - ordered Open XML post-processing;
 - Open XML validation;
+- semantic main-body extraction and embedded-image export;
 - normalized golden-test helpers.
 
 ### CLI
@@ -93,24 +107,44 @@ flowchart TD
 Each stage returns diagnostics instead of writing to the console. Strict mode
 stops before rendering when required data is missing or of the wrong kind.
 
-## Template and schema relationship
-
-The DOCX is the visual authority. The adjacent JSON Schema is the data-contract
-authority. `inspect` bridges them:
+The reverse pipeline is deliberately separate:
 
 ```mermaid
 flowchart LR
-    DOCX["proposal.docx"] --> Inspect["inspect"]
-    Schema["proposal.schema.json"] --> Inspect
+    A["Open macro-free DOCX"] --> B["Read main body, styles, and numbering"]
+    B --> C["Map supported Word semantics to Markdown"]
+    C --> D["Extract embedded image parts with deterministic names"]
+    D --> E["Preflight output paths"]
+    E --> F["Write assets, Markdown, and typed report"]
+```
+
+It does not depend on template placeholders and does not attempt to reproduce
+page geometry, headers, footers, floating layout, comments, or tracked-change
+history. Those constructs are either outside the initial contract or reported
+as semantic downgrades.
+
+## Template and schema relationship
+
+The DOCX is the visual authority. The adjacent JSON Schema is the data-contract
+authority. Inspection and generation bridge them:
+
+```mermaid
+flowchart LR
+    DOCX["proposal.docx"] --> Generate["generate-schema"]
+    Generate --> Schema["proposal.schema.json"]
+    DOCX --> Inspect["inspect"]
+    Schema --> Inspect
     Inspect --> Contract["TemplateSchema"]
     Contract --> Agent["Agent/IDE"]
     Contract --> Validate["validate-model"]
     Contract --> Render["render"]
 ```
 
-The schema stores template id/version and a template hash extension. A hash
-mismatch makes the contract stale; the template owner must inspect and review
-the regenerated schema.
+The DOCX adapter converts DocxTemplater's static schema tree into a
+technology-neutral Core shape and overlays `:MD`/`:IMG` semantics. Core uses
+that same shape for schema generation and nested scaffolds. The schema stores
+template id/version and a template hash extension. A hash mismatch makes the
+contract stale; the template owner must inspect, regenerate, and review it.
 
 ## Determinism
 

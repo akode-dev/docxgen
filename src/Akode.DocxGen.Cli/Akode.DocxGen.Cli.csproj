@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AssemblyName>docxgen</AssemblyName>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>docxgen</ToolCommandName>
-    <PackageId>Akode.DocxGen.Cli</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>Akode.DocxGen.Tool</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Description>Deterministic Markdown and JSON to DOCX rendering with governed Word templates.</Description>
-    <PackageTags>docx;markdown;openxml;cli;document-generation</PackageTags>
+    <Description>Cross-platform DocxGen CLI for deterministic DOCX generation, extraction, inspection, and validation.</Description>
+    <PackageTags>$(PackageTags);cli;dotnet-tool</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

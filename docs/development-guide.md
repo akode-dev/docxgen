@@ -114,7 +114,7 @@ does not validate every package relationship or field.
 Create the dotnet tool:
 
 ```powershell
-dotnet pack src/Akode.DocxGen.Cli `
+dotnet pack src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj `
   --configuration Release `
   --no-build `
   --output artifacts/packages
@@ -123,7 +123,7 @@ dotnet pack src/Akode.DocxGen.Cli `
 Create one self-contained executable:
 
 ```powershell
-dotnet publish src/Akode.DocxGen.Cli `
+dotnet publish src/Akode.DocxGen.Cli/Akode.DocxGen.Cli.csproj `
   --configuration Release `
   --runtime win-x64 `
   --self-contained true `
@@ -132,6 +132,7 @@ dotnet publish src/Akode.DocxGen.Cli `
   --output artifacts/publish/win-x64
 ```
 
-Approved release RIDs are `win-x64`, `linux-x64`, and `osx-x64`. The SDK
-resolves its RID-specific runtime and single-file build tasks during the
-explicit release job; application NuGet dependencies remain locked.
+Approved release RIDs are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`,
+`osx-x64`, and `osx-arm64`. The SDK resolves its RID-specific runtime and
+single-file build tasks during the explicit release job; application NuGet
+dependencies remain locked.

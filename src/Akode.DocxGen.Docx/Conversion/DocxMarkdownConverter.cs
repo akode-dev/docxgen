@@ -6,8 +6,8 @@ using Akode.DocxGen.Core.Pipeline;
 using Akode.DocxGen.Core.Security;
 using Akode.DocxGen.Docx.PostProcessing;
 using Akode.DocxGen.Docx.Rendering;
-using Akode.DocxGen.Docx.Validation;
 using Akode.DocxGen.Docx.Utilities;
+using Akode.DocxGen.Docx.Validation;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -414,7 +414,7 @@ internal static class DefaultDocumentStyles
 
     private static Style TableStyle() =>
         new(
-            new StyleName { Val = "Akode Table" },
+            new StyleName { Val = "DocxGen Table" },
             new TableStyleProperties(
                 new RunProperties(new Bold()),
                 new TableCellProperties(
@@ -428,6 +428,6 @@ internal static class DefaultDocumentStyles
             })
         {
             Type = StyleValues.Table,
-            StyleId = "AkodeTable",
+            StyleId = "DocxGenTable",
         };
 }

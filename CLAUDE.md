@@ -14,7 +14,8 @@ product goal is a deterministic .NET tool. Do not bypass failures with
 Use the implemented machine-readable workflow:
 
 ```text
-inspect -> scaffold-model -> validate-model -> render --dry-run -> render
+inspect -> generate-schema/check -> scaffold-model -> validate-model
+        -> render --dry-run -> render
 ```
 
 Read JSON failures, fix the path named in `errors[].path`, follow

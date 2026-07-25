@@ -1,10 +1,14 @@
 # Project structure
 
 ```text
-Akode.DocxGen.sln
+DocxGen.sln
 AGENTS.md
 CLAUDE.md
 README.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+SUPPORT.md
 CHANGELOG.md
 THIRD-PARTY-NOTICES.md
 Directory.Build.props
@@ -17,17 +21,20 @@ src/
     Abstractions/       technology-neutral adapter boundaries
     Diagnostics/        stable codes, registry, exit codes
     Markdown/           anchors, GFM tables, neutral Markdown AST/parser
-    Model/              JSON reader, values, merge, binding, schema contract
+    Model/              JSON reader, values, merge, binding, schema generation
     Pipeline/           requests/results and DocxGenPipeline orchestration
     Reports/            versioned command-report DTOs
     Security/           containment, limits, local/remote asset resolution
   Akode.DocxGen.Docx/
     Conversion/         standalone Markdown-to-DOCX
+    Extraction/         semantic DOCX-to-Markdown and embedded assets
     Inspection/         package-wide template inspection
     PostProcessing/     fields, properties, leftover markers
     Rendering/          DocxTemplater binding and Open XML Markdown rendering
     Utilities/          stream ownership helpers
     Validation/         Open XML SDK validation
+    DocxGenPipelineFactory.cs
+                        ready-to-use public application facade
   Akode.DocxGen.Cli/
     Commands/           System.CommandLine command factory/handlers
     Output/             JSON/human output, atomic files, versioned names
@@ -53,15 +60,20 @@ docs/
   adr/
   schemas/
   spikes/
+  embedding.md
 eng/
   hooks/
   verify.ps1
   verify.sh
   generate-third-party-notices.ps1
   package-license-allowlist.json
-.github/workflows/
-  ci.yml
-  release.yml
+research/
+  renderer-spike/       isolated historical experiment, not production
+.github/
+  ISSUE_TEMPLATE/
+  workflows/
+    ci.yml
+    release.yml
 ```
 
 ## Responsibilities and boundaries
@@ -71,6 +83,7 @@ eng/
 Core contains no Open XML or CLI implementation types. It owns:
 
 - model/schema reading and adjacent-template reconciliation;
+- deterministic structural schema generation from neutral template shapes;
 - deterministic Markdown preprocessing and source merging;
 - local/remote asset security policy;
 - strict/lenient binding;
@@ -81,8 +94,9 @@ Core contains no Open XML or CLI implementation types. It owns:
 
 The adapter is the only production project that references DocxTemplater and
 Open XML SDK. It owns template discovery, binding, native Word elements,
-post-processing, conversion, and validation. The rejected
-`DocxTemplater.Markdown` dependency remains only in the retained spike.
+post-processing, forward conversion, semantic extraction, validation, and the
+ready-to-use `Akode.DocxGen` facade. The rejected `DocxTemplater.Markdown`
+dependency remains only in the retained research experiment.
 
 ### CLI
 
@@ -100,7 +114,8 @@ shell out to the CLI or duplicate validation/rendering.
 
 `templates/` contains synthetic or approved governed templates. Each production
 template has an adjacent `.schema.json` with exact ID, version, hash, fields,
-and collections. `samples/` is a complete non-confidential runnable example.
+and collections. The structural contract can be regenerated with
+`generate-schema`; `samples/` is a complete non-confidential runnable example.
 
 ## Tests and gates
 
@@ -115,3 +130,12 @@ and collections. `samples/` is a complete non-confidential runnable example.
 
 Builds, packages, published binaries, rendered samples, and QA page images go
 under ignored `artifacts/`, `bin/`, and `obj/` directories.
+
+## Published surfaces
+
+| Repository project | Published surface |
+|---|---|
+| `Akode.DocxGen.Core` | `Akode.DocxGen.Core` NuGet contracts package |
+| `Akode.DocxGen.Docx` | `Akode.DocxGen` ready-to-use NuGet package |
+| `Akode.DocxGen.Cli` | `Akode.DocxGen.Tool` and `docxgen` executables |
+| `Akode.DocxGen.Mcp` | Unpublished Phase 2 placeholder |

@@ -1,14 +1,14 @@
-# Akode.DocxGen technical specification
+# DocxGen technical specification
 
 ## 1. Document status
 
 | Field | Value |
 |---|---|
-| Product | Akode.DocxGen |
+| Product | DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Phase 1 implemented and release-ready |
-| Primary users | Bid teams, developers, CI, coding agents |
-| Runtime model | Offline deterministic CLI |
+| Status | Version 2.0 released |
+| Primary users | Document teams, developers, CI, and AI agents |
+| Runtime model | Offline deterministic CLI and embeddable .NET pipeline |
 | License policy | MIT/BSD/Apache-2.0 only |
 
 This document is the normative product specification. ADRs may refine an
@@ -23,10 +23,13 @@ content in text files, but producing a polished corporate DOCX repeatedly
 causes agents to create one-off scripts, install dependencies, and manipulate
 OOXML inconsistently.
 
-Akode.DocxGen must provide one deterministic transformation:
+DocxGen provides deterministic forward generation and semantic reverse
+extraction:
 
 ```text
 (DOCX template, validated model, Markdown, local assets) -> DOCX
+placeholder-bearing DOCX template -> Draft 2020-12 model schema
+DOCX -> Markdown + embedded image assets
 ```
 
 The tool does not generate business content and does not call an LLM.
@@ -43,9 +46,9 @@ The tool does not generate business content and does not call an LLM.
 8. A valid OOXML package is necessary but not sufficient; representative
    documents require rendered visual review.
 
-## 4. Primary document shape
+## 4. Recommended proposal shape
 
-The reference template contains:
+The reference proposal template contains:
 
 1. cover section with fixed branding and scalar placeholders;
 2. optional Document Control page;
@@ -62,6 +65,11 @@ single-body mode, Markdown H1 maps to Word Heading 1 and `headingOffset` is
 zero. If a template contains fixed Heading 1 section titles and separate
 Markdown slots underneath, the section fragment uses a positive heading
 offset.
+
+This proposal topology is not a universal template contract. The engine also
+supports a one-scalar template, a template containing only
+`{{ds.Body}:MD}`, multiple independent body slots, nested objects and
+collections, headers/footers, and conditional branches.
 
 ## 5. Scope
 
@@ -87,6 +95,10 @@ offset.
 
 ### 5.2 Phase 2
 
+- semantic DOCX-to-Markdown extraction from the main document body (selected
+  and implemented);
+- deterministic JSON Schema generation from placeholder-bearing templates
+  (selected and implemented);
 - MCP server over Core;
 - RTL/Arabic after a dedicated spike;
 - PDF delivery after implementation and license review;
@@ -97,7 +109,7 @@ offset.
 
 - LLM content generation;
 - Markdown editor or web UI;
-- DOCX-to-Markdown synchronization;
+- pixel-perfect or layout-preserving DOCX-to-Markdown synchronization;
 - tracked-change round-trip to Markdown;
 - Office Interop, COM automation, or headless Word;
 - arbitrary floating-object layout authored in Markdown;
@@ -122,7 +134,7 @@ offset.
 ```text
 docxgen inspect
   --template <template.docx>
-  [--schema-out <template.schema.json>]
+  [--schema-out <inspection.json>]
   [--include-text-probe]
   [--json]
 ```
@@ -138,11 +150,35 @@ Responsibilities:
 - detect suspicious split/unclosed placeholders;
 - check the required style contract;
 - reconcile discovered placeholders with an adjacent template schema;
-- optionally emit an initial editable JSON Schema.
+- optionally emit the inspection DTO for tooling.
 
 `inspect` never renders or modifies the template.
 
-### 6.3 `scaffold-model`
+### 6.3 `generate-schema`
+
+```text
+docxgen generate-schema
+  --template <template.docx>
+  --out <template.schema.json>
+  [--template-id <id>]
+  [--template-version <version>]
+  [--check]
+  [--overwrite]
+  [--json]
+```
+
+The command statically derives a self-contained Draft 2020-12 model contract
+from scalar, object, collection, conditional, switch, expression, Markdown,
+and image bindings in all inspected document parts. Every reachable binding
+is required, matching strict-mode preflight and union-of-branches analysis.
+The schema contains exact template identity, version, and hash metadata.
+
+Generation is deterministic. `--check` performs a non-mutating normalized-text
+comparison suitable for CI. The command never infers business formats, enums,
+ranges, defaults, descriptions, or semantic optionality from Word labels or
+visual layout.
+
+### 6.4 `scaffold-model`
 
 ```text
 docxgen scaffold-model
@@ -155,7 +191,7 @@ docxgen scaffold-model
 The generated model contains `$schema`, model contract version, template
 identity/version, empty required values, and `$comment` guidance.
 
-### 6.4 `validate-model`
+### 6.5 `validate-model`
 
 ```text
 docxgen validate-model
@@ -183,7 +219,7 @@ not require document generation:
 - remote image and raw HTML policy;
 - Markdown preprocessing diagnostics.
 
-### 6.5 `render`
+### 6.6 `render`
 
 ```text
 docxgen render
@@ -220,12 +256,35 @@ preflight but does not write the final path.
 `--append-document-version` reads `data.ds.Document.Version`. Given output
 `Proposal.docx` and version `3.0`, it resolves `Proposal-v3.0.docx`.
 
-### 6.6 `convert`
+### 6.7 `convert`
 
 Creates an unbranded draft from Markdown and an optional style reference.
 Production proposals should use `render`.
 
-### 6.7 `validate`
+### 6.8 `extract`
+
+Extracts the main DOCX body into portable Markdown and exports embedded images:
+
+```text
+docxgen extract
+  --file <input.docx>
+  --out <output.md>
+  [--assets-dir <directory>]
+  [--overwrite]
+  [--json]
+```
+
+The default assets directory is `<output-name>.assets` beside the Markdown
+file. Paths embedded in Markdown are relative to the Markdown output.
+Extraction preserves supported document semantics, not Word layout. It
+includes paragraphs, Heading 1–6, inline formatting/code, links, hard line
+breaks, ordered/unordered nested lists, quote/code/caption styles, GFM tables,
+horizontal rules, and embedded images. Generated fields and unsupported Word
+constructs are omitted or downgraded with stable diagnostics. Headers,
+footers, comments, footnotes, and tracked deletions are outside the initial
+contract.
+
+### 6.9 `validate`
 
 Validates an existing DOCX using Open XML SDK and product-specific checks for
 leftover placeholders, broken relationships, and required package parts.
@@ -277,12 +336,16 @@ proposal.docx
 proposal.schema.json
 ```
 
-The schema declares required values, exact types, formats, length constraints,
-collection item shapes, and template metadata. It includes an
-`x-docxgen-templateHash` extension. `inspect` detects stale contracts.
+`generate-schema` derives required values, structural types, nested collection
+item shapes, template identity/version, and the `x-docxgen-templateHash`
+extension directly from placeholder-bearing DOCX content. `inspect` detects
+stale adjacent contracts.
 
-Requiredness cannot be inferred reliably from placeholder text alone, so the
-schema is maintained alongside the template and checked against it.
+All statically reachable bindings are required because static template
+analysis cannot prove runtime branch reachability. Business formats, enums,
+ranges, descriptions, defaults, and optional business semantics cannot be
+inferred reliably from placeholder text; they require a future explicit
+annotation contract or deliberate schema review.
 
 ### 8.4 Machine-readable command reports
 
@@ -429,7 +492,7 @@ Templates must define:
 - `Normal`;
 - `Heading1` through at least `Heading4`, preferably `Heading6`;
 - `ListParagraph`;
-- `TableGrid` or `AkodeTable`;
+- `TableGrid` or `DocxGenTable`;
 - `Quote`;
 - paragraph `Code`;
 - character `CodeInline`;
@@ -531,6 +594,11 @@ Phase 1 is accepted when:
 11. The license gate passes.
 12. A fresh Codex and Claude Code session can follow repository instructions,
     run the intended workflow, and avoid ad-hoc document scripts.
+
+The selected Phase 2 extraction slice is accepted when a supported generated
+DOCX can be extracted into Markdown with headings, inline formatting, links,
+lists, quotes, tables, and deterministic image assets; unsupported fields
+produce stable warnings; and the result can be passed back to `convert`.
 
 ## 17. Delivery and branches
 

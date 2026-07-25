@@ -107,4 +107,74 @@ public sealed class PipelineContractTests
         Should.Throw<ArgumentOutOfRangeException>(
             () => new ConvertRequest(markdown, headingOffset: headingOffset));
     }
+
+    [Fact]
+    public void ExtractRequestNormalizesMarkdownImagePrefix()
+    {
+        var request = new ExtractRequest(
+            new InputArtifact("document.docx", Stream.Null),
+            @"document.assets\images\");
+
+        request.ImagePathPrefix.ShouldBe("document.assets/images");
+        Should.Throw<ArgumentException>(
+            () => new ExtractRequest(
+                new InputArtifact("document.docx", Stream.Null),
+                " "));
+    }
+
+    [Fact]
+    public void ExtractedAssetSnapshotsBytesAndRejectsDirectories()
+    {
+        var bytes = new byte[] { 1, 2, 3 };
+        var asset = new ExtractedAsset("image-001.png", "image/png", bytes);
+
+        bytes[0] = 9;
+
+        asset.Content.ToArray().ShouldBe([1, 2, 3]);
+        Should.Throw<ArgumentException>(
+            () => new ExtractedAsset(
+                "nested/image.png",
+                "image/png",
+                bytes));
+    }
+
+    [Theory]
+    [InlineData(" template", null)]
+    [InlineData("template/id", null)]
+    [InlineData("шаблон", null)]
+    [InlineData("template", "1.0+build")]
+    [InlineData("template", " ")]
+    public void GenerateSchemaRequestRejectsUnsafeIdentityParts(
+        string templateId,
+        string? templateVersion)
+    {
+        var template = new InputArtifact("template.docx", Stream.Null);
+
+        Should.Throw<ArgumentException>(
+            () => new GenerateSchemaRequest(
+                template,
+                templateId,
+                templateVersion));
+    }
+
+    [Fact]
+    public void GenerateSchemaResultDerivesSuccessFromDiagnostics()
+    {
+        var error = DiagnosticRegistry.Create(DiagnosticCode.SchemaNoBindings);
+
+        new GenerateSchemaResult(
+            "{}",
+            "template",
+            "1.0.0",
+            "sha256:hash",
+            1,
+            []).IsSuccess.ShouldBeTrue();
+        new GenerateSchemaResult(
+            string.Empty,
+            "template",
+            "1.0.0",
+            "sha256:hash",
+            0,
+            [error]).IsSuccess.ShouldBeFalse();
+    }
 }

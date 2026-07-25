@@ -11,12 +11,13 @@ using Akode.DocxGen.Core.Security;
 
 namespace Akode.DocxGen.Core.Pipeline;
 
-/// <summary>Coordinates all technology-neutral Phase 1 operations.</summary>
+/// <summary>Coordinates all technology-neutral document operations.</summary>
 public sealed class DocxGenPipeline
 {
     private readonly ITemplateInspector templateInspector;
     private readonly IDocumentRenderer documentRenderer;
     private readonly IMarkdownDocumentConverter markdownConverter;
+    private readonly IDocxMarkdownExtractor markdownExtractor;
     private readonly IOoxmlValidator ooxmlValidator;
     private readonly IReadOnlyList<IDocumentPostProcessor> postProcessors;
 
@@ -25,6 +26,7 @@ public sealed class DocxGenPipeline
         ITemplateInspector templateInspector,
         IDocumentRenderer documentRenderer,
         IMarkdownDocumentConverter markdownConverter,
+        IDocxMarkdownExtractor markdownExtractor,
         IOoxmlValidator ooxmlValidator,
         IEnumerable<IDocumentPostProcessor> postProcessors)
     {
@@ -34,6 +36,8 @@ public sealed class DocxGenPipeline
             documentRenderer ?? throw new ArgumentNullException(nameof(documentRenderer));
         this.markdownConverter =
             markdownConverter ?? throw new ArgumentNullException(nameof(markdownConverter));
+        this.markdownExtractor =
+            markdownExtractor ?? throw new ArgumentNullException(nameof(markdownExtractor));
         this.ooxmlValidator =
             ooxmlValidator ?? throw new ArgumentNullException(nameof(ooxmlValidator));
         ArgumentNullException.ThrowIfNull(postProcessors);
@@ -63,6 +67,24 @@ public sealed class DocxGenPipeline
             ]);
     }
 
+    /// <summary>Generates a structural Draft 2020-12 schema from a template.</summary>
+    public async Task<GenerateSchemaResult> GenerateSchemaAsync(
+        GenerateSchemaRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var bytes = await ReadAllAsync(
+            request.Template.Content,
+            cancellationToken).ConfigureAwait(false);
+        using var stream = new MemoryStream(bytes, writable: false);
+        var inspected = templateInspector.Inspect(stream, cancellationToken);
+        return TemplateJsonSchemaGenerator.Generate(
+            inspected,
+            request.Template.Name,
+            request.TemplateId,
+            request.TemplateVersion);
+    }
+
     /// <summary>Creates a model scaffold from an inspected template.</summary>
     public async Task<ScaffoldModelResult> ScaffoldModelAsync(
         ScaffoldModelRequest request,
@@ -74,9 +96,27 @@ public sealed class DocxGenPipeline
             cancellationToken).ConfigureAwait(false);
         var stubs = new Dictionary<string, string>(StringComparer.Ordinal);
         var data = new JsonObject();
-        foreach (var placeholder in inspection.Schema.Placeholders)
+        if (inspection.Schema.Roots.Count > 0)
         {
-            InsertPlaceholder(data, placeholder, request.WithMarkdownStubs, stubs);
+            foreach (var root in inspection.Schema.Roots)
+            {
+                data[root.Name] = CreateShapeValue(
+                    root,
+                    root.Name,
+                    request.WithMarkdownStubs,
+                    stubs);
+            }
+        }
+        else
+        {
+            foreach (var placeholder in inspection.Schema.Placeholders)
+            {
+                InsertPlaceholder(
+                    data,
+                    placeholder,
+                    request.WithMarkdownStubs,
+                    stubs);
+            }
         }
 
         var envelope = new JsonObject
@@ -212,6 +252,12 @@ public sealed class DocxGenPipeline
         ConvertRequest request,
         CancellationToken cancellationToken = default) =>
         markdownConverter.ConvertAsync(request, cancellationToken);
+
+    /// <summary>Extracts semantic Markdown and embedded assets from a DOCX.</summary>
+    public Task<ExtractResult> ExtractAsync(
+        ExtractRequest request,
+        CancellationToken cancellationToken = default) =>
+        markdownExtractor.ExtractAsync(request, cancellationToken);
 
     /// <summary>Validates an existing DOCX package.</summary>
     public ValidateDocumentResult ValidateDocument(ValidateDocumentRequest request)
@@ -446,6 +492,61 @@ public sealed class DocxGenPipeline
         var fileName = $"sections/{ToKebabCase(leaf)}.md";
         stubs[fileName] = $"# {leaf}{Environment.NewLine}{Environment.NewLine}";
         return new JsonObject { ["$mdFile"] = fileName };
+    }
+
+    private static JsonNode CreateShapeValue(
+        TemplateShapeNode node,
+        string path,
+        bool withMarkdownStubs,
+        IDictionary<string, string> stubs)
+    {
+        switch (node.Kind)
+        {
+            case ModelValueKind.Markdown when withMarkdownStubs:
+                {
+                    var fileName = $"sections/{ToKebabCase(node.Name)}.md";
+                    if (stubs.ContainsKey(fileName))
+                    {
+                        fileName =
+                            $"sections/{ToKebabCase(path.Replace('.', '-'))}.md";
+                    }
+
+                    stubs[fileName] =
+                        $"# {node.Name}{Environment.NewLine}{Environment.NewLine}";
+                    return new JsonObject { ["$mdFile"] = fileName };
+                }
+
+            case ModelValueKind.Markdown:
+                return new JsonObject { ["$md"] = string.Empty };
+            case ModelValueKind.Binary:
+                return new JsonObject { ["$file"] = string.Empty };
+            case ModelValueKind.Collection:
+                return new JsonArray(
+                    node.Item is null
+                        ? new JsonObject()
+                        : CreateShapeValue(
+                            node.Item,
+                            path,
+                            withMarkdownStubs,
+                            stubs));
+            case ModelValueKind.StructuredObject:
+                {
+                    var result = new JsonObject();
+                    foreach (var property in node.Properties)
+                    {
+                        result[property.Name] = CreateShapeValue(
+                            property,
+                            $"{path}.{property.Name}",
+                            withMarkdownStubs,
+                            stubs);
+                    }
+
+                    return result;
+                }
+
+            default:
+                return JsonValue.Create(string.Empty);
+        }
     }
 
     private static JsonArray CreateCollectionItem(IReadOnlyList<string> properties)
