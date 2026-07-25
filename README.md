@@ -21,10 +21,24 @@ DocxGen is a cross-platform .NET 10 project. Use it as:
 
 - the `docxgen` CLI or a standalone executable;
 - an allowed `DocxGen` tool in an AI-agent workflow;
-- the `Akode.DocxGen` NuGet library inside a .NET application.
+- the `Akode.DocxGen` NuGet library inside a .NET application;
+- the document engine behind the cross-platform
+  [`DocxGen UI`](https://github.com/akode-dev/docxgenui) desktop application.
 
 It runs locally, requires no LLM, and keeps remote images and raw HTML disabled
 unless the caller explicitly enables them.
+
+## Desktop application
+
+Prefer a graphical interface?
+[`akode-dev/docxgenui`](https://github.com/akode-dev/docxgenui) is an
+open-source, local-first desktop application powered by this `Akode.DocxGen`
+engine. It provides guided Markdown-to-Word, template rendering, and
+Word-to-Markdown workflows for Windows, macOS, and Linux.
+
+[Download the latest DocxGen UI installers](https://github.com/akode-dev/docxgenui/releases/latest)
+or review its source, documentation, and issue tracker in the
+[`docxgenui` repository](https://github.com/akode-dev/docxgenui).
 
 ## What it can build
 
