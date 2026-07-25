@@ -503,18 +503,18 @@ public sealed class DocxGenPipeline
         switch (node.Kind)
         {
             case ModelValueKind.Markdown when withMarkdownStubs:
-            {
-                var fileName = $"sections/{ToKebabCase(node.Name)}.md";
-                if (stubs.ContainsKey(fileName))
                 {
-                    fileName =
-                        $"sections/{ToKebabCase(path.Replace('.', '-'))}.md";
-                }
+                    var fileName = $"sections/{ToKebabCase(node.Name)}.md";
+                    if (stubs.ContainsKey(fileName))
+                    {
+                        fileName =
+                            $"sections/{ToKebabCase(path.Replace('.', '-'))}.md";
+                    }
 
-                stubs[fileName] =
-                    $"# {node.Name}{Environment.NewLine}{Environment.NewLine}";
-                return new JsonObject { ["$mdFile"] = fileName };
-            }
+                    stubs[fileName] =
+                        $"# {node.Name}{Environment.NewLine}{Environment.NewLine}";
+                    return new JsonObject { ["$mdFile"] = fileName };
+                }
 
             case ModelValueKind.Markdown:
                 return new JsonObject { ["$md"] = string.Empty };
@@ -530,19 +530,19 @@ public sealed class DocxGenPipeline
                             withMarkdownStubs,
                             stubs));
             case ModelValueKind.StructuredObject:
-            {
-                var result = new JsonObject();
-                foreach (var property in node.Properties)
                 {
-                    result[property.Name] = CreateShapeValue(
-                        property,
-                        $"{path}.{property.Name}",
-                        withMarkdownStubs,
-                        stubs);
-                }
+                    var result = new JsonObject();
+                    foreach (var property in node.Properties)
+                    {
+                        result[property.Name] = CreateShapeValue(
+                            property,
+                            $"{path}.{property.Name}",
+                            withMarkdownStubs,
+                            stubs);
+                    }
 
-                return result;
-            }
+                    return result;
+                }
 
             default:
                 return JsonValue.Create(string.Empty);

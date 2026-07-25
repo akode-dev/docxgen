@@ -5,7 +5,7 @@ using Akode.DocxGen.Cli.Commands;
 
 using var services = CompositionRoot.Build();
 var root = new RootCommand(
-    "Akode DocxGen — render polished DOCX documents and extract semantic Markdown.");
+    "DocxGen — generate, inspect, validate, and extract DOCX documents.");
 
 root.Subcommands.Add(CommandFactory.Inspect(services));
 root.Subcommands.Add(CommandFactory.GenerateSchema(services));

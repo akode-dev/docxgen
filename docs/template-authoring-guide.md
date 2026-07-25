@@ -80,7 +80,7 @@ punctuation, or other marker on the same paragraph.
 - Normal;
 - Heading 1 through Heading 6;
 - List Paragraph;
-- AkodeTable or Table Grid;
+- DocxGenTable or Table Grid;
 - Quote;
 - Code;
 - CodeInline;

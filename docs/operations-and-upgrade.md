@@ -2,20 +2,19 @@
 
 ## Installation
 
-From an internal NuGet feed:
+From NuGet:
 
 ```powershell
-dotnet tool install --global Akode.DocxGen.Cli --version 1.0.0
+dotnet tool install --global Akode.DocxGen.Tool --version 2.0.0
 docxgen --help
 ```
 
 For an isolated agent workspace:
 
 ```powershell
-dotnet tool install Akode.DocxGen.Cli `
+dotnet tool install Akode.DocxGen.Tool `
   --tool-path .tools `
-  --version 1.0.0 `
-  --add-source <approved-feed>
+  --version 2.0.0
 
 .tools/docxgen --help
 ```
@@ -28,7 +27,8 @@ binary against its adjacent `SHA256SUMS` file before use.
 Use:
 
 ```text
-inspect -> scaffold-model -> validate-model -> render --dry-run
+inspect -> generate-schema/check -> scaffold-model -> validate-model
+        -> render --dry-run
         -> render --validate -> open in Word and refresh fields
 ```
 
@@ -64,13 +64,13 @@ Before upgrading:
 Upgrade:
 
 ```powershell
-dotnet tool update --global Akode.DocxGen.Cli --version <version>
+dotnet tool update --global Akode.DocxGen.Tool --version <version>
 ```
 
 Rollback:
 
 ```powershell
-dotnet tool update --global Akode.DocxGen.Cli --version <previous-version>
+dotnet tool update --global Akode.DocxGen.Tool --version <previous-version>
 ```
 
 ## Failure handling
@@ -86,3 +86,16 @@ dotnet tool update --global Akode.DocxGen.Cli --version <previous-version>
 
 The renderer never requires an LLM credential and is offline by default.
 Remote images should be mirrored locally for repeatable production builds.
+
+## Migrating from 1.x to 2.0
+
+Version 2.0 adopts the public DocxGen/Akode naming contract:
+
+Version 2.0 standardizes package references and namespaces on
+`Akode.DocxGen.*`, the tool package on `Akode.DocxGen.Tool`, the executable on
+`docxgen`/`docxgen.exe`, and machine identifiers on the complete `docxgen`
+name.
+
+Update package references, namespaces, executable allow-lists, adjacent
+schemas, environment variables, and Markdown anchors together. Regenerate a
+schema and run `validate-model` before rendering with 2.0.

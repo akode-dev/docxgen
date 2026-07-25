@@ -207,32 +207,32 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             switch (element)
             {
                 case Paragraph paragraph:
-                {
-                    paragraphCount++;
-                    var rendered = RenderParagraph(paragraph, blockContext: true);
-                    if (rendered.IsListItem)
                     {
-                        if (rendered.Text.Length > 0)
+                        paragraphCount++;
+                        var rendered = RenderParagraph(paragraph, blockContext: true);
+                        if (rendered.IsListItem)
                         {
-                            if (list.Length > 0)
+                            if (rendered.Text.Length > 0)
                             {
-                                list.Append('\n');
+                                if (list.Length > 0)
+                                {
+                                    list.Append('\n');
+                                }
+
+                                list.Append(rendered.Text);
                             }
 
-                            list.Append(rendered.Text);
+                            return;
                         }
 
-                        return;
-                    }
+                        FlushList(blocks, list);
+                        if (rendered.Text.Length > 0)
+                        {
+                            blocks.Add(rendered.Text);
+                        }
 
-                    FlushList(blocks, list);
-                    if (rendered.Text.Length > 0)
-                    {
-                        blocks.Add(rendered.Text);
+                        break;
                     }
-
-                    break;
-                }
 
                 case Table table:
                     FlushList(blocks, list);

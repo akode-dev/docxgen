@@ -1,14 +1,14 @@
-# Akode.DocxGen technical specification
+# DocxGen technical specification
 
 ## 1. Document status
 
 | Field | Value |
 |---|---|
-| Product | Akode.DocxGen |
+| Product | DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Phase 1 released; extraction and template-schema generation implemented on `develop` |
-| Primary users | Bid teams, developers, CI, coding agents |
-| Runtime model | Offline deterministic CLI |
+| Status | Version 2.0 released |
+| Primary users | Document teams, developers, CI, and AI agents |
+| Runtime model | Offline deterministic CLI and embeddable .NET pipeline |
 | License policy | MIT/BSD/Apache-2.0 only |
 
 This document is the normative product specification. ADRs may refine an
@@ -23,7 +23,7 @@ content in text files, but producing a polished corporate DOCX repeatedly
 causes agents to create one-off scripts, install dependencies, and manipulate
 OOXML inconsistently.
 
-Akode.DocxGen provides deterministic forward generation and semantic reverse
+DocxGen provides deterministic forward generation and semantic reverse
 extraction:
 
 ```text
@@ -492,7 +492,7 @@ Templates must define:
 - `Normal`;
 - `Heading1` through at least `Heading4`, preferably `Heading6`;
 - `ListParagraph`;
-- `TableGrid` or `AkodeTable`;
+- `TableGrid` or `DocxGenTable`;
 - `Quote`;
 - paragraph `Code`;
 - character `CodeInline`;

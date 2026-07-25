@@ -1,154 +1,82 @@
-### C#
-# Build results
+# .NET build and package output
 [Bb]in/
 [Oo]bj/
-
-# Visual Studio cache/options directory
-.vs/
-
-# User-specific files
-*.suo
-*.user
-
-# Debug symbols
-*.pdb
-
-# NuGet Packages
-*.nupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
-
-# .NET build artifacts
-artifacts/
-
-# Publish output
-publish/
-out/
-*.tmp-*
-
-### Python
-# Byte-compiled files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-*.egg
-
-# dotenv environment variable files
-.env
-.env.*
-!.env.example
-
-# Virtual environments
-.venv
-env/
-venv/
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.pytest_cache/
-
-# Type checkers
-.mypy_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-# .python-version
-
-### Windows
-# Windows thumbnail cache files
-Thumbs.db
-
-# Folder config file
-[Dd]esktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows shortcuts
-*.lnk
-
-### Linux
-# Backup files
-*~
-
-# Temporary files from deleted open files
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder
-.Trash-*
-
-# NFS temporary files
-.nfs*
-
-### VisualStudio
-# User-specific files
-*.suo
-*.user
-
-# Build results
 [Dd]ebug/
 [Rr]elease/
+[Aa]rtifacts/
+artifacts/
+publish/
+out/
 x64/
 x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
-[Bb]in/
-[Oo]bj/
-
-# Visual Studio cache/options directory
-.vs/
-
-# MSTest test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-
-# NuGet
+*.pdb
+*.binlog
 *.nupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
+*.snupkg
 *.nuget.props
 *.nuget.targets
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
 
-# Publish Web Output
-*.[Pp]ublish.xml
+# Test, coverage, and benchmark output
+[Tt]est[Rr]esult*/
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+*.trx
+htmlcov/
+BenchmarkDotNet.Artifacts/
 
-### VS Code
-# VSCode settings (keep shared configuration)
+# IDE and editor state
+.vs/
+.idea/
+.fleet/
+.history/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# Local History for Visual Studio Code
-.history/
-
-# Built Visual Studio Code Extensions
+*.suo
+*.user
+*.userprefs
+*.rsuser
+*.sln.docstates
+*.sln.iml
+*.DotSettings.user
 *.vsix
 
-### Repository-local agent state
+# Python research tooling
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg
+*.egg-info/
+.venv/
+env/
+venv/
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Local environment and agent state
+.env
+.env.*
+!.env.example
 .claude/settings.local.json
 .codex/*.local.*
 
-### Generated document previews and test artifacts
+# Generated document output. Governed fixtures are explicitly retained.
 *.pdf
 *.docx
 !src/Akode.DocxGen.Docx/
@@ -156,9 +84,24 @@ x86/
 !src/Akode.DocxGen.Docx/*.json
 !src/Akode.DocxGen.Docx/**/*.cs
 !src/Akode.DocxGen.Docx/**/*.md
+src/Akode.DocxGen.Docx/[Bb]in/
+src/Akode.DocxGen.Docx/[Oo]bj/
 !templates/**/*.docx
 !samples/**/*.docx
 !tests/TestAssets/**/*.docx
-!spike/**/assets/*.docx
-coverage/
-TestResults/
+!research/**/assets/*.docx
+*.tmp-*
+
+# Operating-system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*

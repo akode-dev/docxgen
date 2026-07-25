@@ -96,7 +96,7 @@ static MarkdownFormatter CreateMarkdownFormatter()
 {
     var configuration = new MarkDownFormatterConfiguration
     {
-        TableStyle = "AkodeTable",
+        TableStyle = "DocxGenTable",
         OrderedListStyle = "List Number",
         UnorderedListStyle = "List Bullet",
     };

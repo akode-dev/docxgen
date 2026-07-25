@@ -8,9 +8,13 @@ flowchart LR
     Designer["Template designer"] --> T["DOCX template and schema"]
     T --> Generator["Schema generator"]
     Generator --> Schema["Draft 2020-12 contract"]
-    MD --> CLI["Akode.DocxGen CLI"]
+    MD --> CLI["docxgen CLI"]
     T --> CLI
     CLI --> O["Generated DOCX"]
+    Host[".NET application"] --> Library["Akode.DocxGen package"]
+    MD --> Library
+    T --> Library
+    Library --> O
     O --> Word["Microsoft Word finalization"]
     Existing["Existing DOCX"] --> CLI
     CLI --> Extracted["Semantic Markdown and image assets"]
@@ -24,7 +28,11 @@ DocxGen joins the two without invoking an LLM or Word.
 
 ```mermaid
 flowchart TD
-    CLI["Akode.DocxGen.Cli"] --> Core["Akode.DocxGen.Core"]
+    CLI["Akode.DocxGen.Cli"] --> Factory["Akode.DocxGen facade"]
+    Host["Application host"] --> Factory
+    Factory --> Core["Akode.DocxGen.Core"]
+    Factory --> Docx["Akode.DocxGen.Docx"]
+    CLI --> Core
     CLI --> Docx["Akode.DocxGen.Docx"]
     Docx --> Core
     Mcp["Akode.DocxGen.Mcp (Phase 2)"] --> Core

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.example/schemas/proposal-template-1.0.schema.json",
+  "$id": "urn:akode:docxgen:schema:proposal-template:1.0",
   "title": "Akode proposal template contract 1.0",
   "x-docxgen-templateId": "akode-proposal",
   "x-docxgen-templateVersion": "1.0.0",

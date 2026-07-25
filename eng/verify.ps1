@@ -6,13 +6,13 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 
 Push-Location $repositoryRoot
 try {
-    dotnet restore Akode.DocxGen.sln
+    dotnet restore DocxGen.sln
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet build Akode.DocxGen.sln --configuration Release --no-restore
+    dotnet build DocxGen.sln --configuration Release --no-restore
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet test Akode.DocxGen.sln --configuration Release --no-build
+    dotnet test DocxGen.sln --configuration Release --no-build
     exit $LASTEXITCODE
 }
 finally {

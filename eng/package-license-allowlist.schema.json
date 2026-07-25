@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.com/schemas/docxgen/package-license-allowlist.schema.json",
+  "$id": "urn:akode:docxgen:schema:package-license-allowlist:1.0",
   "title": "Akode.DocxGen resolved package license allow-list",
   "type": "object",
   "additionalProperties": false,

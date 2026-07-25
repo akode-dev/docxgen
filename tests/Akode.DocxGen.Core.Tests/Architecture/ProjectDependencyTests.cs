@@ -157,6 +157,23 @@ public sealed class ProjectDependencyTests
         ProjectNameFromReference(reference).ShouldBe(expectedName);
     }
 
+    [Fact]
+    public void GeneratedRepositoryPathsAreExcludedFromArchitectureGates()
+    {
+        RepositoryLayout.IsGeneratedPath(
+                Path.Combine(RepositoryLayout.Root, "artifacts", "qa", "sample.csproj"))
+            .ShouldBeTrue();
+        RepositoryLayout.IsGeneratedPath(
+                Path.Combine(RepositoryLayout.Root, "src", "Project", "bin", "sample.dll"))
+            .ShouldBeTrue();
+        RepositoryLayout.IsGeneratedPath(
+                Path.Combine(RepositoryLayout.Root, "tests", "Project", "obj", "assets.json"))
+            .ShouldBeTrue();
+        RepositoryLayout.IsGeneratedPath(
+                Path.Combine(RepositoryLayout.Root, "src", "Project", "Project.csproj"))
+            .ShouldBeFalse();
+    }
+
     private static void AssertProject(
         IReadOnlyDictionary<string, ProjectModel> projects,
         string name,
@@ -173,6 +190,7 @@ public sealed class ProjectDependencyTests
     private static Dictionary<string, ProjectModel> LoadProjects(string root) =>
         Directory
             .EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories)
+            .Where(path => !RepositoryLayout.IsGeneratedPath(path))
             .Select(LoadProject)
             .ToDictionary(project => project.Name, StringComparer.Ordinal);
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.example/schemas/docxgen-model-1.0.schema.json",
+  "$id": "urn:akode:docxgen:schema:model:1.0",
   "title": "Akode.DocxGen model 1.0",
   "type": "object",
   "required": [

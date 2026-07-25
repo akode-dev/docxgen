@@ -63,7 +63,7 @@ public sealed class ResolvedPackageLicenseTests
                 "DocxTemplater.Markdown",
                 StringComparison.OrdinalIgnoreCase))
             .Where(package => !package.LockFile.StartsWith(
-                "spike/",
+                "research/",
                 StringComparison.Ordinal))
             .Select(package => package.LockFile)
             .Order(StringComparer.Ordinal)
@@ -106,7 +106,8 @@ public sealed class ResolvedPackageLicenseTests
         foreach (var path in Directory.EnumerateFiles(
                      RepositoryLayout.Root,
                      "packages.lock.json",
-                     SearchOption.AllDirectories))
+                     SearchOption.AllDirectories)
+                     .Where(path => !RepositoryLayout.IsGeneratedPath(path)))
         {
             using var document = JsonDocument.Parse(File.ReadAllText(path));
             foreach (var framework in document.RootElement

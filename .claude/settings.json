@@ -9,9 +9,12 @@
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(docxgen inspect:*)",
+      "Bash(docxgen generate-schema:*)",
       "Bash(docxgen scaffold-model:*)",
       "Bash(docxgen validate-model:*)",
       "Bash(docxgen render:*)",
+      "Bash(docxgen convert:*)",
+      "Bash(docxgen extract:*)",
       "Bash(docxgen validate:*)"
     ],
     "deny": [

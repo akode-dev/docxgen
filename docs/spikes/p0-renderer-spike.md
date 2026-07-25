@@ -8,7 +8,7 @@
 ## Reproduce
 
 The harness and fixtures are in
-`spike/Akode.DocxGen.RendererSpike`. Its README contains the build and run
+`research/renderer-spike`. Its README contains the build and run
 commands. The template builder creates:
 
 1. cover with scalar fields and a VML text-box placeholder;
@@ -29,7 +29,7 @@ commands. The template builder creates:
 | Headings H1-H4 | Pass | Word heading styles and updated TOC entries |
 | Bold/italic | Pass | run properties retained |
 | Nested lists | Partial | semantic nesting works; nested ordered labels miss spacing |
-| Pipe table | Pass | `AkodeTable` is applied |
+| Pipe table | Pass | `DocxGenTable` is applied |
 | Local image | Pass | one inline SVG inserted by Open XML post-processing |
 | Final section | Pass | final page remains last |
 | Fields | Pass | `w:updateFields`, Word updated one TOC and page fields |
