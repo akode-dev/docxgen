@@ -281,7 +281,7 @@
       "Akode.DocxGen": {
         "type": "Project",
         "dependencies": {
-          "Akode.DocxGen.Core": "[2.1.0, )",
+          "Akode.DocxGen.Core": "[2.1.1, )",
           "DocumentFormat.OpenXml": "[3.5.1, )",
           "DocxTemplater": "[2.8.3, )"
         }
@@ -296,8 +296,8 @@
       "Akode.DocxGen.Tool": {
         "type": "Project",
         "dependencies": {
-          "Akode.DocxGen": "[2.1.0, )",
-          "Akode.DocxGen.Core": "[2.1.0, )",
+          "Akode.DocxGen": "[2.1.1, )",
+          "Akode.DocxGen.Core": "[2.1.1, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.0, )",
           "Microsoft.Extensions.Logging.Console": "[10.0.0, )",
           "Microsoft.Extensions.Options": "[10.0.0, )",
