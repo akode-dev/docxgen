@@ -172,12 +172,15 @@ to `--out`; an explicit assets directory must be on the same file-system root.
 All output paths are checked before the first write.
 
 Extraction is semantic and best-effort, not a Word-layout round trip. It
-supports paragraphs, Heading 1–6, bold, italic, strikethrough, inline code,
+supports paragraphs, Heading 1–9, bold, italic, strikethrough, inline code,
 links, hard line breaks, ordered/unordered nested lists, quote/code/caption
-styles, GFM tables, horizontal rules, and embedded images. It reads the main
-body only. Headers, footers, comments, footnotes, tracked deletions, floating
-layout, and generated fields such as TOC results are omitted or downgraded
-with stable `EXT` diagnostics.
+styles, GFM tables, horizontal rules, and embedded images. Because portable
+Markdown has six heading levels, Word Heading 7–9 is retained as level 6 with
+an `EXT` downgrade warning. Duplicate style or numbering identifiers are
+handled deterministically using their first definition and also reported as
+warnings. Extraction reads the main body only. Headers, footers, comments,
+footnotes, tracked deletions, floating layout, and generated fields such as
+TOC results are omitted or downgraded with stable `EXT` diagnostics.
 
 ## `validate`
 

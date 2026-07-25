@@ -6,6 +6,17 @@ Versioning.
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-07-25
+
+### Fixed
+
+- Made DOCX-to-Markdown extraction tolerant of duplicate style, numbering, and
+  abstract-numbering identifiers found in real-world Word documents.
+- Preserved deep Word heading semantics by mapping Heading 7 and above to
+  Markdown level 6 with a stable downgrade warning instead of flattening them
+  into ordinary paragraphs.
+- Recognized heading style names containing spaces, hyphens, or underscores.
+
 ## [2.1.1] - 2026-07-25
 
 ### Fixed
