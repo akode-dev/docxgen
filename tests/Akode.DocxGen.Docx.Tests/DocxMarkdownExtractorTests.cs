@@ -181,6 +181,118 @@ public sealed class DocxMarkdownExtractorTests
     }
 
     [Fact]
+    public async Task DuplicateStyleIdentifiersDoNotPreventHeadingExtraction()
+    {
+        using var packageStream = new MemoryStream();
+        using (var package = WordprocessingDocument.Create(
+                   packageStream,
+                   WordprocessingDocumentType.Document,
+                   autoSave: true))
+        {
+            var main = package.AddMainDocumentPart();
+            main.Document = new Document(
+                new Body(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new ParagraphStyleId { Val = "Heading1" }),
+                        new Run(new Text("Top section"))),
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new ParagraphStyleId { Val = "CustomSeven" }),
+                        new Run(new Text("Deep section")))));
+
+            var stylePart = main.AddNewPart<StyleDefinitionsPart>();
+            stylePart.Styles = new Styles(
+                CreateParagraphStyle("Heading1", "Heading 1", outlineLevel: 0),
+                CreateParagraphStyle("Heading1", "Heading 1", outlineLevel: 0),
+                CreateParagraphStyle("CustomSeven", "Heading-7", outlineLevel: 6));
+        }
+
+        using var input = new MemoryStream(
+            packageStream.ToArray(),
+            writable: false);
+        var result = await new DocxMarkdownExtractor().ExtractAsync(
+            new ExtractRequest(
+                new InputArtifact("duplicate-styles.docx", input),
+                "duplicate-styles.assets"),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Markdown.ShouldContain("# Top section");
+        result.Markdown.ShouldContain("###### Deep section");
+        result.Stats.Headings.ShouldBe(2);
+        result.Diagnostics.Count(diagnostic =>
+            diagnostic.Code == DiagnosticCode.ExtractionFeatureDowngraded)
+            .ShouldBe(2);
+        result.Diagnostics.ShouldContain(diagnostic =>
+            diagnostic.Message.Contains(
+                "Duplicate Word style identifier",
+                StringComparison.Ordinal));
+        result.Diagnostics.ShouldContain(diagnostic =>
+            diagnostic.Message.Contains(
+                "Word heading level 7",
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task DuplicateNumberingIdentifiersDoNotPreventListExtraction()
+    {
+        using var packageStream = new MemoryStream();
+        using (var package = WordprocessingDocument.Create(
+                   packageStream,
+                   WordprocessingDocumentType.Document,
+                   autoSave: true))
+        {
+            var main = package.AddMainDocumentPart();
+            main.Document = new Document(
+                new Body(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new NumberingProperties(
+                                new NumberingLevelReference { Val = 0 },
+                                new NumberingId { Val = 1 })),
+                        new Run(new Text("First item")))));
+
+            var numberingPart = main.AddNewPart<NumberingDefinitionsPart>();
+            numberingPart.Numbering = new Numbering(
+                CreateAbstractNumber(1, NumberFormatValues.Bullet),
+                CreateAbstractNumber(1, NumberFormatValues.Decimal),
+                new NumberingInstance(new AbstractNumId { Val = 1 })
+                {
+                    NumberID = 1,
+                },
+                new NumberingInstance(new AbstractNumId { Val = 1 })
+                {
+                    NumberID = 1,
+                });
+        }
+
+        using var input = new MemoryStream(
+            packageStream.ToArray(),
+            writable: false);
+        var result = await new DocxMarkdownExtractor().ExtractAsync(
+            new ExtractRequest(
+                new InputArtifact("duplicate-numbering.docx", input),
+                "duplicate-numbering.assets"),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Markdown.ShouldContain("- First item");
+        result.Stats.ListItems.ShouldBe(1);
+        result.Diagnostics.Count(diagnostic =>
+            diagnostic.Code == DiagnosticCode.ExtractionFeatureDowngraded)
+            .ShouldBe(2);
+        result.Diagnostics.ShouldContain(diagnostic =>
+            diagnostic.Message.Contains(
+                "Duplicate Word numbering identifier",
+                StringComparison.Ordinal));
+        result.Diagnostics.ShouldContain(diagnostic =>
+            diagnostic.Message.Contains(
+                "Duplicate Word abstract numbering identifier",
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task FieldIsOmittedWithoutDroppingSurroundingParagraphText()
     {
         using var packageStream = new MemoryStream();
@@ -256,4 +368,31 @@ public sealed class DocxMarkdownExtractorTests
             diagnostic => diagnostic.Code == DiagnosticCode.ExtractionFailure);
         result.Diagnostics[0].Message.ShouldContain("Macro-enabled");
     }
+
+    private static Style CreateParagraphStyle(
+        string id,
+        string name,
+        int outlineLevel) =>
+        new(
+            new StyleName { Val = name },
+            new StyleParagraphProperties(
+                new OutlineLevel { Val = outlineLevel }))
+        {
+            Type = StyleValues.Paragraph,
+            StyleId = id,
+        };
+
+    private static AbstractNum CreateAbstractNumber(
+        int id,
+        NumberFormatValues format) =>
+        new(
+            new Level(
+                new StartNumberingValue { Val = 1 },
+                new NumberingFormat { Val = format })
+            {
+                LevelIndex = 0,
+            })
+        {
+            AbstractNumberId = id,
+        };
 }

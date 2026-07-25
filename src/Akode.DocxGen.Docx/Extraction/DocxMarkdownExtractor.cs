@@ -170,7 +170,9 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             this.main = main;
             this.imagePathPrefix = imagePathPrefix;
             this.cancellationToken = cancellationToken;
-            styles = new StyleResolver(main.StyleDefinitionsPart?.Styles);
+            styles = new StyleResolver(
+                main.StyleDefinitionsPart?.Styles,
+                WarnDowngrade);
             numbering = new NumberingResolver(
                 main.NumberingDefinitionsPart?.Numbering,
                 WarnDowngrade);
@@ -291,11 +293,20 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
 
             var style = styles.ResolveParagraph(properties);
             var headingLevel = styles.HeadingLevel(properties);
-            if (headingLevel is >= 1 and <= 6 && blockContext)
+            if (headingLevel >= 1 && blockContext)
             {
+                var markdownLevel = Math.Min(headingLevel, 6);
+                if (headingLevel > markdownLevel)
+                {
+                    WarnDowngrade(
+                        $"heading-level:{headingLevel}",
+                        "/word/document.xml",
+                        $"Word heading level {headingLevel} was represented as Markdown heading level 6.");
+                }
+
                 headingCount++;
                 return new RenderedParagraph(
-                    new string('#', headingLevel) + " " + inline.Trim(),
+                    new string('#', markdownLevel) + " " + inline.Trim(),
                     false);
             }
 
@@ -900,15 +911,27 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
     {
         private readonly Dictionary<string, Style> byId;
 
-        public StyleResolver(Styles? styles)
+        public StyleResolver(
+            Styles? styles,
+            Action<string, string, string> warn)
         {
-            byId = styles?
-                .Elements<Style>()
-                .Where(style => !string.IsNullOrWhiteSpace(style.StyleId?.Value))
-                .ToDictionary(
-                    style => style.StyleId!.Value!,
-                    StringComparer.OrdinalIgnoreCase)
-                ?? new Dictionary<string, Style>(StringComparer.OrdinalIgnoreCase);
+            byId = new Dictionary<string, Style>(StringComparer.OrdinalIgnoreCase);
+            foreach (var style in styles?.Elements<Style>() ?? [])
+            {
+                var styleId = style.StyleId?.Value;
+                if (string.IsNullOrWhiteSpace(styleId))
+                {
+                    continue;
+                }
+
+                if (!byId.TryAdd(styleId, style))
+                {
+                    warn(
+                        $"duplicate-style:{styleId}",
+                        "/word/styles.xml",
+                        $"Duplicate Word style identifier '{styleId}' was ignored; the first definition was used.");
+                }
+            }
         }
 
         public string? ResolveParagraph(ParagraphProperties? properties) =>
@@ -920,7 +943,7 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
         public int HeadingLevel(ParagraphProperties? properties)
         {
             var direct = properties?.OutlineLevel?.Val?.Value;
-            if (direct is >= 0 and <= 5)
+            if (direct is >= 0 and <= 8)
             {
                 return direct.Value + 1;
             }
@@ -948,7 +971,7 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                     .OutlineLevel?
                     .Val?
                     .Value;
-                if (outline is >= 0 and <= 5)
+                if (outline is >= 0 and <= 8)
                 {
                     return outline.Value + 1;
                 }
@@ -1027,7 +1050,11 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                 return null;
             }
 
-            var compact = value.Replace(" ", string.Empty, StringComparison.Ordinal);
+            var compact = new string(
+                value.Where(character =>
+                    !char.IsWhiteSpace(character)
+                    && character is not '-' and not '_')
+                .ToArray());
             if (!compact.StartsWith("Heading", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
@@ -1038,7 +1065,7 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                 NumberStyles.None,
                 CultureInfo.InvariantCulture,
                 out var level)
-                && level is >= 1 and <= 6
+                && level >= 1
                     ? level
                     : null;
         }
@@ -1056,16 +1083,41 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             Action<string, string, string> warn)
         {
             this.warn = warn;
-            instances = numbering?
-                .Elements<NumberingInstance>()
-                .Where(item => item.NumberID?.Value is not null)
-                .ToDictionary(item => item.NumberID!.Value)
-                ?? [];
-            abstracts = numbering?
-                .Elements<AbstractNum>()
-                .Where(item => item.AbstractNumberId?.Value is not null)
-                .ToDictionary(item => item.AbstractNumberId!.Value)
-                ?? [];
+            instances = [];
+            foreach (var instance in numbering?.Elements<NumberingInstance>() ?? [])
+            {
+                var numberId = instance.NumberID?.Value;
+                if (numberId is null)
+                {
+                    continue;
+                }
+
+                if (!instances.TryAdd(numberId.Value, instance))
+                {
+                    warn(
+                        $"duplicate-numbering:{numberId.Value}",
+                        "/word/numbering.xml",
+                        $"Duplicate Word numbering identifier '{numberId.Value}' was ignored; the first definition was used.");
+                }
+            }
+
+            abstracts = [];
+            foreach (var abstractNumber in numbering?.Elements<AbstractNum>() ?? [])
+            {
+                var abstractId = abstractNumber.AbstractNumberId?.Value;
+                if (abstractId is null)
+                {
+                    continue;
+                }
+
+                if (!abstracts.TryAdd(abstractId.Value, abstractNumber))
+                {
+                    warn(
+                        $"duplicate-abstract-numbering:{abstractId.Value}",
+                        "/word/numbering.xml",
+                        $"Duplicate Word abstract numbering identifier '{abstractId.Value}' was ignored; the first definition was used.");
+                }
+            }
         }
 
         public ListInfo? Resolve(ParagraphProperties? properties)
