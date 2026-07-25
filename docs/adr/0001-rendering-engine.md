@@ -39,7 +39,7 @@ the adapter phase.
 
 ## P0 outcome
 
-The retained spike proved template schema extraction, scalar/object binding,
+The evaluation proved template schema extraction, scalar/object binding,
 collection row expansion, fields, sections, headers, footers, VML text-box
 replacement, and Open XML validation.
 
@@ -52,5 +52,4 @@ The proposed decision was rejected because:
 - nested ordered numbering had visible spacing defects;
 - the Images extension introduced an unapproved ImageSharp license.
 
-See `docs/spikes/p0-renderer-spike.md` for evidence and ADR-0005 for the
-replacement decision.
+ADR-0005 records the replacement decision.

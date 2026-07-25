@@ -136,3 +136,7 @@ Approved release RIDs are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`,
 `osx-x64`, and `osx-arm64`. The SDK resolves its RID-specific runtime and
 single-file build tasks during the explicit release job; application NuGet
 dependencies remain locked.
+
+NuGet.org publishing uses GitHub OIDC trusted publishing rather than a
+long-lived API key. Maintainer setup and release behavior are documented in
+[NuGet.org publishing](nuget-publishing.md).

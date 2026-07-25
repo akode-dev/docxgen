@@ -10,12 +10,11 @@ Codex project guidance:
 
 - root `AGENTS.md`;
 - optional closer `AGENTS.md` files when subtree rules differ;
-- `.codex/config.toml` for minimal trusted-project settings;
 - `docs/agent-guide.md` for the working lifecycle.
 
 Official Codex guidance treats `AGENTS.md` as the durable repository convention
-surface. Project `.codex` configuration and hooks are loaded only for trusted
-repositories.
+surface. Personal `.codex/` configuration is ignored by this repository and
+is loaded only for trusted repositories.
 
 ## Local Codex CLI
 

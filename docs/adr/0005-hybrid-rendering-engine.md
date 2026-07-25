@@ -6,7 +6,7 @@
 
 ## Context
 
-P0 proved that DocxTemplater 2.8.3 is useful for template schema discovery,
+Evaluation showed that DocxTemplater 2.8.3 is useful for template schema discovery,
 scalar/object replacement, collection row expansion, and package-part
 preservation. Its Markdown extension does not satisfy the normative Phase 1
 contract: it drops code, does not create hyperlinks, does not apply the Quote
@@ -59,5 +59,5 @@ package-preservation behavior already proven in DocxTemplater core.
 - P3 scope grows by the bounded Open XML block renderer and image geometry.
 - The renderer is intentionally not a general HTML/CSS or CommonMark engine.
 - Every supported Markdown feature requires structural and visual fixtures.
-- `DocxTemplater.Markdown` remains only in the retained P0 spike.
+- Rejected Markdown and image extensions remain absent from the dependency graph.
 - The real approved Akode template still requires a P5 Word acceptance pass.

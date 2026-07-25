@@ -1,27 +1,27 @@
 # Template authoring guide
 
-This guide targets Word template designers and bid managers.
+This guide targets Word template designers and document-automation teams.
 
 ## Template package
 
 Ship:
 
 ```text
-proposal.docx
-proposal.schema.json
+template.docx
+template.schema.json
 ```
 
 The template contains design and fixed labels. The schema contains the exact
 structural data contract. For a new or changed template, run:
 
 ```text
-docxgen generate-schema --template proposal.docx --out proposal.schema.json --overwrite
-docxgen generate-schema --template proposal.docx --out proposal.schema.json --check
+docxgen generate-schema --template template.docx --out template.schema.json --overwrite
+docxgen generate-schema --template template.docx --out template.schema.json --check
 ```
 
 The first command generates the contract; the second is suitable for CI.
 
-## Recommended sections
+## Optional document sections
 
 1. Cover page.
 2. Document Control page or a separate template variant.
@@ -29,9 +29,9 @@ The first command generates the contract; the second is suitable for CI.
 4. Main body marker.
 5. Final branded page.
 
-These sections are recommendations for proposals, not engine requirements. A
-valid template may contain only one scalar, only `{{ds.Body}:MD}`, several
-body slots, or nested data collections.
+These sections demonstrate a common governed-document layout; none is an
+engine requirement. A valid template may contain only one scalar, only
+`{{ds.Body}:MD}`, several body slots, or nested data collections.
 
 Use `Next Page` section breaks when headers, footers, or page setup change. Do
 not use odd/even section starts unless a deliberate blank page is acceptable.
@@ -40,7 +40,7 @@ not use odd/even section starts unless a deliberate blank page is acceptable.
 
 Embed permanent brand elements directly:
 
-- Akode logo;
+- organization logo;
 - cover/background artwork;
 - theme colors and fonts;
 - header/footer artwork;
@@ -64,7 +64,7 @@ Type each placeholder in one operation. Do not style individual characters.
 Paste as plain text when copying. Run:
 
 ```text
-docxgen inspect --template proposal.docx --include-text-probe --json
+docxgen inspect --template template.docx --include-text-probe --json
 ```
 
 after every placeholder change.
@@ -118,7 +118,7 @@ Do not replace the TOC with literal text or Markdown.
 
 Use scalar placeholders for document metadata and a loop row for revision
 history. A separate `with-document-control` template variant is preferred over
-conditional deletion of an entire Word section in Phase 1.
+conditional deletion of an entire Word section.
 
 ## Images
 

@@ -200,7 +200,7 @@
       "Akode.DocxGen": {
         "type": "Project",
         "dependencies": {
-          "Akode.DocxGen.Core": "[2.0.0, )",
+          "Akode.DocxGen.Core": "[2.1.0, )",
           "DocumentFormat.OpenXml": "[3.5.1, )",
           "DocxTemplater": "[2.8.3, )"
         }

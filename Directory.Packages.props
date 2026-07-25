@@ -16,10 +16,6 @@
     <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
   </ItemGroup>
 
-  <ItemGroup Label="Retained P0 spike">
-    <PackageVersion Include="DocxTemplater.Markdown" Version="2.8.3" />
-  </ItemGroup>
-
   <ItemGroup Label="CLI and hosting">
     <PackageVersion Include="System.CommandLine" Version="2.0.10" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />

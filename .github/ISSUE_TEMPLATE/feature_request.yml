@@ -12,7 +12,7 @@ body:
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: behavior
     attributes:
       label: Proposed behavior
       description: Include an example CLI or .NET API when useful.

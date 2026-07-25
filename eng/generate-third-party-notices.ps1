@@ -31,7 +31,8 @@ else {
     Join-Path $repositoryRoot $OutputPath
 }
 
-[System.IO.File]::WriteAllLines(
+$content = [string]::Join("`n", $lines) + "`n"
+[System.IO.File]::WriteAllText(
     $resolvedOutput,
-    $lines,
+    $content,
     [System.Text.UTF8Encoding]::new($false))

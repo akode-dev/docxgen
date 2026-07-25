@@ -1,7 +1,8 @@
 # Samples
 
 This folder contains synthetic authoring inputs for the committed reference
-template. `architecture.svg` demonstrates bounded local-image insertion.
+proposal template. The proposal is an example document type, not a product
+restriction. `architecture.svg` demonstrates bounded local-image insertion.
 
 Planned execution:
 

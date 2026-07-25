@@ -8,16 +8,15 @@ needed.
 
 1. Read `README.md`.
 2. Read `docs/technical-specification.md` and `docs/architecture.md`.
-3. Read `docs/implementation-plan.md`, then follow the user/issue scope. Phase
-   2 work requires an explicitly selected backlog item.
+3. Read `docs/implementation-plan.md`, then follow the user/issue scope. New
+   product scope requires an explicitly selected roadmap item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-Version 2.0 is released with DOCX extraction, template-schema generation, and
-the Akode/DocxGen open-source product identity. Preserve the eight-command CLI,
+Version 2.1 is the current release line. Preserve the eight-command CLI,
 model/report schemas, stable diagnostics, security defaults, deterministic
 template-schema generation, template contract, and cross-platform packaging
-behavior. New product scope belongs to the Phase 2 backlog unless the user or
-issue explicitly selects it.
+behavior. New product scope belongs to the roadmap unless the user or issue
+explicitly selects it.
 
 ## Architecture boundaries
 
@@ -27,7 +26,8 @@ issue explicitly selects it.
   Open XML SDK.
 - `Akode.DocxGen.Cli` is a thin command-line adapter. Business logic does not
   belong in command handlers.
-- `Akode.DocxGen.Mcp` is Phase 2. Do not duplicate Core or CLI behavior there.
+- `Akode.DocxGen.Mcp` is a roadmap item. Do not duplicate Core or CLI behavior
+  there.
 - Core must never reference Docx, CLI, MCP, or Open XML implementation types.
 - No project may reference CLI.
 - Console output belongs only in `Akode.DocxGen.Cli/Output`.

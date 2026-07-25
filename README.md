@@ -48,6 +48,10 @@ The bundled template and sample are synthetic and safe to reuse:
 templates/proposal.docx + samples/model.json + samples/proposal.md
 ```
 
+They demonstrate one governed proposal, but DocxGen is document-type
+independent. Replace them with any placeholder-bearing DOCX template and its
+matching content model.
+
 ## Install
 
 Install the .NET tool:
@@ -203,7 +207,7 @@ inside JSON:
 {
   "modelVersion": "1.0",
   "template": {
-    "id": "proposal",
+    "id": "document-template",
     "version": "1.0.0"
   },
   "data": {
@@ -213,7 +217,7 @@ inside JSON:
         "Version": "1.0"
       },
       "Body": {
-        "$mdFile": "proposal.md"
+        "$mdFile": "content.md"
       }
     }
   }
@@ -240,7 +244,6 @@ templates/   reusable governed DOCX templates and schemas
 samples/     runnable Markdown, JSON, and image inputs
 docs/        public guides, contracts, architecture, and ADRs
 eng/         verification scripts and agent hooks
-research/    isolated experiments excluded from the production solution
 ```
 
 The production packages are:
@@ -251,9 +254,11 @@ The production packages are:
 | `Akode.DocxGen.Core` | Technology-neutral contracts and orchestration |
 | `Akode.DocxGen.Tool` | The `docxgen` command-line tool |
 
-Architecture boundaries and the full directory map are documented in
-[architecture](docs/architecture.md) and
-[project structure](docs/project-structure.md).
+Architecture boundaries and the directory map are documented in
+[architecture](docs/architecture.md). The [documentation index](docs/README.md)
+links user, contributor, contract, and release guides. Maintainers can
+configure keyless releases with the
+[NuGet.org publishing guide](docs/nuget-publishing.md).
 
 ## Contributing
 

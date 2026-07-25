@@ -33,7 +33,7 @@ claude
 ```
 
 Both agents should receive a bounded maintenance task or an explicitly
-selected Phase 2 backlog item.
+selected roadmap item.
 
 ## Product tool identity
 
@@ -72,9 +72,9 @@ docxgen render ...
 ```
 
 Add `convert`, `extract`, or `validate` only for workflows that use them.
-The repository's Claude Code example is `.claude/settings.json`; Codex loads
-durable project behavior from `AGENTS.md` and trusted project settings from
-`.codex/config.toml`.
+Repository-wide behavior lives in `AGENTS.md` and `CLAUDE.md`. Personal
+`.claude/` and `.codex/` configuration is intentionally ignored and must be
+created locally when needed.
 
 ## Hook design
 
@@ -96,17 +96,17 @@ configuration may invoke the implemented command.
 
 ### Codex
 
-Codex project hooks may be configured under `.codex`, but project-local config
-loads only for a trusted repository. `AGENTS.md` is the durable repository
-instruction surface; a reusable DocxGen workflow belongs in a skill, while a
-typed named tool belongs in the planned MCP adapter. Keep hook commands
-relative to the Git root and cross-platform where practical.
+Codex project hooks may be configured locally under `.codex`, but
+project-local config loads only for a trusted repository. `AGENTS.md` is the
+durable repository instruction surface; a reusable DocxGen workflow belongs
+in a skill, while a typed named tool belongs in the planned MCP adapter. Keep
+hook commands relative to the Git root and cross-platform where practical.
 
 ### Claude Code
 
-Shared command permissions live in `.claude/settings.json`. Local approvals and
-secrets belong in ignored `.claude/settings.local.json`. Destructive Git
-operations and push remain denied by project defaults.
+Personal command permissions, approvals, and secrets belong in the ignored
+`.claude/` directory. Shared engineering constraints remain in `CLAUDE.md` and
+`AGENTS.md`.
 
 ## Non-interactive execution
 
@@ -131,5 +131,5 @@ A fresh agent session should be able to:
 5. update tests and relevant docs;
 6. provide an evidence-based handoff.
 
-For the finished product, a proposal-generation task must complete using the
+For the finished product, a document-generation task must complete using the
 DocxGen commands without generating an ad-hoc document script.

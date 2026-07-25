@@ -51,7 +51,7 @@ BenchmarkDotNet.Artifacts/
 *.DotSettings.user
 *.vsix
 
-# Python research tooling
+# Python tooling
 __pycache__/
 *.py[cod]
 *$py.class
@@ -73,8 +73,8 @@ venv/
 .env
 .env.*
 !.env.example
-.claude/settings.local.json
-.codex/*.local.*
+.claude/
+.codex/
 
 # Generated document output. Governed fixtures are explicitly retained.
 *.pdf
@@ -89,7 +89,6 @@ src/Akode.DocxGen.Docx/[Oo]bj/
 !templates/**/*.docx
 !samples/**/*.docx
 !tests/TestAssets/**/*.docx
-!research/**/assets/*.docx
 *.tmp-*
 
 # Operating-system files
