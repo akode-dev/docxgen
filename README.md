@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/akode-dev/docxgen/actions/workflows/ci.yml/badge.svg)](https://github.com/akode-dev/docxgen/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/akode-dev/docxgen)](https://github.com/akode-dev/docxgen/releases)
+[![NuGet](https://img.shields.io/nuget/v/Akode.DocxGen.svg)](https://www.nuget.org/packages/Akode.DocxGen/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Akode.DocxGen.svg)](https://www.nuget.org/packages/Akode.DocxGen/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 DocxGen turns Markdown and structured JSON into polished Word documents using
