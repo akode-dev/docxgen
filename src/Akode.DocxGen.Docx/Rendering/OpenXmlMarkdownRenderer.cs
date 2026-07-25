@@ -721,8 +721,18 @@ internal sealed class OpenXmlMarkdownRenderer
 
         var bulletAbstract = CreateAbstractNumber(nextAbstractId, ordered: false);
         var orderedAbstract = CreateAbstractNumber(nextAbstractId + 1, ordered: true);
-        part.Numbering.AddChild(bulletAbstract, true);
-        part.Numbering.AddChild(orderedAbstract, true);
+        var firstInstance = part.Numbering.Elements<NumberingInstance>()
+            .FirstOrDefault();
+        if (firstInstance is null)
+        {
+            part.Numbering.AppendChild(bulletAbstract);
+            part.Numbering.AppendChild(orderedAbstract);
+        }
+        else
+        {
+            part.Numbering.InsertBefore(bulletAbstract, firstInstance);
+            part.Numbering.InsertBefore(orderedAbstract, firstInstance);
+        }
         var bulletInstance = new NumberingInstance(
             new AbstractNumId { Val = nextAbstractId })
         {
@@ -733,8 +743,8 @@ internal sealed class OpenXmlMarkdownRenderer
         {
             NumberID = nextNumberId + 1,
         };
-        part.Numbering.AddChild(bulletInstance, true);
-        part.Numbering.AddChild(orderedInstance, true);
+        part.Numbering.AppendChild(bulletInstance);
+        part.Numbering.AppendChild(orderedInstance);
         part.Numbering.Save();
         return (nextNumberId, nextNumberId + 1);
     }
@@ -808,7 +818,7 @@ internal sealed class OpenXmlMarkdownRenderer
                 LevelIndex = level,
             });
 
-        numbering.AddChild(instance, true);
+        numbering.AppendChild(instance);
         numbering.Save();
         return numberId;
     }
