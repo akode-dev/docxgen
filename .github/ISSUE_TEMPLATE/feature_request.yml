@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a focused DocxGen capability
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What document or integration workflow is currently difficult?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include an example CLI or .NET API when useful.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Primary surface
+      options:
+        - CLI or standalone executable
+        - .NET package
+        - AI-agent integration
+        - DOCX template or rendering
+        - DOCX extraction
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance example
+      description: Describe the smallest input and expected output that would prove the feature.
+    validations:
+      required: true

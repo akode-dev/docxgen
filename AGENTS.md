@@ -12,8 +12,8 @@ needed.
    2 work requires an explicitly selected backlog item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-Phase 1 is released; DOCX extraction and template-schema generation are
-implemented for the next minor release. Preserve the eight-command CLI,
+Version 2.0 is released with DOCX extraction, template-schema generation, and
+the Akode/DocxGen open-source product identity. Preserve the eight-command CLI,
 model/report schemas, stable diagnostics, security defaults, deterministic
 template-schema generation, template contract, and cross-platform packaging
 behavior. New product scope belongs to the Phase 2 backlog unless the user or
@@ -57,9 +57,9 @@ issue explicitly selects it.
 Run from the repository root:
 
 ```powershell
-dotnet restore Akode.DocxGen.sln
-dotnet build Akode.DocxGen.sln --configuration Release --no-restore
-dotnet test Akode.DocxGen.sln --configuration Release --no-build
+dotnet restore DocxGen.sln
+dotnet build DocxGen.sln --configuration Release --no-restore
+dotnet test DocxGen.sln --configuration Release --no-build
 ```
 
 For package changes, regenerate and commit lock files, review every new

@@ -1,13 +1,21 @@
 # Changelog
 
-All notable changes to Akode.DocxGen are documented here. The format follows
+All notable changes to DocxGen are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and Semantic
 Versioning.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-25
+
 ### Added
 
+- Ready-to-use `Akode.DocxGen` runtime package and
+  `DocxGenPipelineFactory.CreatePipeline()` for in-process .NET applications.
+- Self-contained ARM64 release artifacts for Windows, Linux, and macOS, in
+  addition to the existing x64 targets.
+- Open-source contribution, security, support, conduct, issue, and pull-request
+  guidance.
 - `extract` command and Core/adapter contracts for semantic DOCX-to-Markdown
   conversion, including headings, inline formatting, links, native lists,
   quote/code/caption styles, GFM tables, and deterministic embedded-image
@@ -20,6 +28,25 @@ Versioning.
 - Hierarchical template inspection and scaffold generation for arbitrary
   template topologies, plus non-mutating `generate-schema --check` drift
   detection and stable `SCH` diagnostics.
+
+### Changed
+
+- Established the former organization-specific product as **DocxGen**.
+- Renamed .NET namespaces and projects to `Akode.DocxGen.*`, the dotnet tool
+  package to `Akode.DocxGen.Tool`, and standalone executables to
+  `docxgen`/`docxgen.exe`.
+- Standardized machine-readable extension fields, Markdown section anchors,
+  and the debug environment variable on the complete `docxgen` name.
+- Moved the historical rendering experiment under `research/renderer-spike`
+  and removed it from the production solution.
+- Reworked public documentation and package/release metadata for CLI,
+  AI-agent, and embedded library consumers.
+
+### Breaking
+
+- The product identity changes public namespaces, package IDs, executable names,
+  `x-docxgen-*` schema extension fields, `docxgen:section` anchors, and the
+  `DOCXGEN_DEBUG` environment variable. This release is therefore 2.0.0.
 
 ## [1.0.0] - 2026-07-24
 
@@ -53,5 +80,6 @@ Versioning.
 - Opt-in remote image downloads with timeout, size/media-type limits, redirects
   disabled, and non-public address rejection.
 
-[Unreleased]: https://github.com/akode-dev/docxgen/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/akode-dev/docxgen/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v1.0.0

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.example/schemas/docxgen-report-1.0.schema.json",
+  "$id": "urn:akode:docxgen:schema:report:1.0",
   "title": "Akode.DocxGen command report 1.0",
   "description": "Versioned stdout envelope for all Akode.DocxGen commands.",
   "oneOf": [

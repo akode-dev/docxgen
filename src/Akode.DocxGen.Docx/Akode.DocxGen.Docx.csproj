@@ -1,4 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Akode.DocxGen</PackageId>
+    <Description>Ready-to-use DOCX template inspection, rendering, extraction, and validation for DocxGen.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Akode.DocxGen.Core\Akode.DocxGen.Core.csproj" />
   </ItemGroup>
@@ -6,5 +12,9 @@
   <ItemGroup>
     <PackageReference Include="DocxTemplater" />
     <PackageReference Include="DocumentFormat.OpenXml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>

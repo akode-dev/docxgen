@@ -154,13 +154,13 @@ public sealed class ReferenceTemplateIntegrationTests
              directory is not null;
              directory = directory.Parent)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Akode.DocxGen.sln")))
+            if (File.Exists(Path.Combine(directory.FullName, "DocxGen.sln")))
             {
                 return directory.FullName;
             }
         }
 
         throw new InvalidOperationException(
-            $"Could not find Akode.DocxGen.sln above '{AppContext.BaseDirectory}'.");
+            $"Could not find DocxGen.sln above '{AppContext.BaseDirectory}'.");
     }
 }

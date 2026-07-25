@@ -274,7 +274,7 @@ internal sealed class OpenXmlMarkdownRenderer
             new TableProperties(
                 new TableStyle
                 {
-                    Val = ResolveStyleId("AkodeTable", "TableGrid", "Table Grid")
+                    Val = ResolveStyleId("DocxGenTable", "TableGrid", "Table Grid")
                         ?? "TableGrid",
                 },
                 new TableWidth

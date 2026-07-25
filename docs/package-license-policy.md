@@ -54,7 +54,7 @@ offline on Windows, Linux, and macOS.
    `eng/package-license-allowlist.json`.
 5. Remove stale inventory entries and update `THIRD-PARTY-NOTICES.md` when the
    human summary changes.
-6. Run `dotnet restore Akode.DocxGen.sln --locked-mode` and `eng/verify`.
+6. Run `dotnet restore DocxGen.sln --locked-mode` and `eng/verify`.
 
 Never add an allow-list entry solely to silence the test. License changes,
 compound expressions, custom terms, or missing metadata require an explicit

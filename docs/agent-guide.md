@@ -20,8 +20,10 @@ project rules live in root `AGENTS.md`; Claude-specific loading starts in root
 
 Phase 1 is complete. The eight-command CLI, Core pipeline, DOCX adapter,
 reference template, schemas, tests, visual evidence, dotnet tool packaging,
-and self-contained release workflow are in place. Work should now be either a
-scoped defect/maintenance change or an explicitly selected Phase 2 item.
+and self-contained release workflow are in place. Version 2.0 adds semantic
+DOCX extraction, deterministic template-schema generation, and the
+Akode/DocxGen open-source product identity. New work should be a scoped
+defect/maintenance change or an explicitly selected backlog item.
 
 ## Prohibited shortcuts
 

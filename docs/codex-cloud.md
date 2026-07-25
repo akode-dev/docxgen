@@ -40,14 +40,14 @@ Configure:
 
 - repository access;
 - .NET 10 SDK;
-- NuGet access to nuget.org and, later, the Akode Azure Artifacts feed;
+- NuGet access to nuget.org and any explicitly approved private feed;
 - no production/customer secrets for normal builds;
 - optional artifact retention for test logs and synthetic rendered fixtures.
 
 Recommended setup command:
 
 ```bash
-dotnet restore Akode.DocxGen.sln
+dotnet restore DocxGen.sln
 ```
 
 Recommended verification command:
@@ -64,14 +64,14 @@ pull request. They must not push unless the task explicitly grants that action.
 Never commit:
 
 - OpenAI or Anthropic credentials;
-- Azure Artifacts personal access tokens;
+- private package-feed access tokens;
 - customer documents;
 - confidential generated output;
 - `.claude/settings.local.json`;
 - local `.env` variants.
 
 Use the host's encrypted secret/environment facility. Build and unit tests
-should not require LLM credentials because Akode.DocxGen does not call an LLM.
+should not require LLM credentials because DocxGen does not call an LLM.
 
 ## Network policy
 

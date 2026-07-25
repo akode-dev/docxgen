@@ -80,8 +80,8 @@ governance task. The product implementation does not depend on its branding.
 Complete:
 
 - NuGet dotnet tool package;
-- self-contained single-file release workflow for `win-x64`, `linux-x64`,
-  and `osx-x64`;
+- self-contained single-file release workflow for Windows, Linux, and macOS on
+  x64 and ARM64;
 - checksums, license, third-party notices, changelog, and operations guide;
 - release workflow runs only on explicit dispatch or a `v*` tag.
 
@@ -99,7 +99,7 @@ Complete:
 
 ### Selected slice — semantic DOCX extraction
 
-Implemented for the next minor release:
+Implemented after the 1.0 release:
 
 - Core `IDocxMarkdownExtractor`, immutable request/result/assets/stats, and
   pipeline orchestration;
@@ -175,3 +175,39 @@ reference model against a generated adjacent schema.
 - governed PDF export strategy;
 - DOCX semantic diff;
 - advanced captions and cross-references.
+
+### P8 — Open-source productization and Akode namespace
+
+Selected on 2026-07-25. The complete acceptance slice is:
+
+- publish the product as **DocxGen**, with `docxgen`/`docxgen.exe` executable
+  names and `Akode.DocxGen.*` .NET namespaces;
+- move the renderer experiment under `research/` and keep it outside the
+  production solution;
+- provide the `Akode.DocxGen` runtime package, `Akode.DocxGen.Core` contracts
+  package, and `Akode.DocxGen.Tool` CLI package;
+- expose a ready-to-use public pipeline factory for application embedding;
+- produce self-contained x64 and ARM64 archives for Windows, Linux, and macOS;
+- rewrite the root README around CLI, AI-agent, and library use cases;
+- add contribution, conduct, security, support, issue, and pull-request
+  guidance;
+- update the reference template, schemas, agent permissions, package metadata,
+  release workflow, and every public document to the new naming contract;
+- prove the product identity with an old-name repository scan, package/tool smoke tests,
+  complete solution verification, structural DOCX checks, and page-by-page
+  visual review.
+
+Because namespace, package, executable, schema-extension, environment-variable,
+and Markdown-anchor names change, P8 is the next major product release.
+
+P8 implementation is complete on 2026-07-25. Verification covers:
+
+- clean Release restore/build and 102 automated tests;
+- `dotnet format --verify-no-changes`;
+- all three 2.0.0 NuGet packages and an external package-consumer smoke test;
+- local installation and execution of `Akode.DocxGen.Tool`, including
+  `docxgen --version`, template inspection, and model validation;
+- self-contained single-file publication for all six approved x64/ARM64 RIDs;
+- old-name scans across source, DOCX XML, package contents, and executables;
+- structural template integration plus visual inspection of all five raw
+  template pages.

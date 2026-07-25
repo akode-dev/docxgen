@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akode.example/schemas/proposal-reference-1.0.schema.json",
+  "$id": "urn:akode:docxgen:schema:proposal-reference:1.0",
   "title": "Akode proposal reference template contract 1.0",
   "x-docxgen-templateId": "akode-proposal-reference",
   "x-docxgen-templateVersion": "1.0.0",
-  "x-docxgen-templateHash": "sha256:a6d338db24416cd849402e0bc6a7d5e8fc9fc13ddec40416d5da36804c80bdba",
+  "x-docxgen-templateHash": "sha256:1850db1ca62b349b6b103f3251751c0207c14761ee28079e1e6c34873ae762f7",
   "allOf": [
     {
       "$ref": "../docs/schemas/docxgen-model-1.0.schema.json"

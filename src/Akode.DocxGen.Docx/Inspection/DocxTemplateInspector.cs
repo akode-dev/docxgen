@@ -3,10 +3,10 @@ using System.Text.RegularExpressions;
 using Akode.DocxGen.Core.Abstractions;
 using Akode.DocxGen.Core.Diagnostics;
 using Akode.DocxGen.Core.Model;
-using DocxTemplater;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocxTemplater;
 using DxtNode = DocxTemplater.Schema.TemplateSchemaNode;
 using DxtNodeKind = DocxTemplater.Schema.TemplateNodeKind;
 
@@ -144,7 +144,7 @@ public sealed partial class DocxTemplateInspector : ITemplateInspector
                 "CodeInline",
                 "Hyperlink",
                 "Caption",
-                "AkodeTable",
+                "DocxGenTable",
             ]
             : [];
         var roots = diagnostics.HasErrors
