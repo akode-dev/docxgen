@@ -113,6 +113,61 @@ Implemented for the next minor release:
 Exact Word layout, headers/footers, comments, footnotes, and tracked-change
 round trips remain explicitly outside this slice.
 
+### P7 — deterministic template schema generation
+
+Selected on 2026-07-25. The complete acceptance slice is:
+
+#### P7.1 — Contract and architecture
+
+- add `generate-schema` as a public non-interactive command;
+- keep `inspect --schema-out` as the existing inspection DTO contract;
+- generate a self-contained Draft 2020-12 schema from one DOCX template;
+- record the decision and inference boundaries in ADR-0008.
+
+#### P7.2 — Hierarchical template discovery
+
+- preserve existing flat placeholder diagnostics and locations;
+- add a technology-neutral object/collection/value shape to `TemplateSchema`;
+- use DocxTemplater's static schema analysis for nested objects, collections,
+  conditions, switches, and expressions;
+- overlay `:MD` and `:IMG` semantic kinds discovered from template markers;
+- retain deterministic fallback construction from flat placeholders.
+
+#### P7.3 — Schema and model generation
+
+- infer text, Markdown, binary, object, and array schemas;
+- make every statically reachable binding required, matching strict rendering;
+- constrain template ID/version and embed the template hash;
+- scaffold nested objects and nested collection items from the same shape;
+- emit no business formats, enums, ranges, or defaults that are not encoded in
+  the template.
+
+#### P7.4 — CLI and automation
+
+- support `--template-id`, `--template-version`, `--overwrite`, and `--json`;
+- support `--check` for non-mutating CI drift detection;
+- add typed report data, stable `SCH` diagnostics, and report-schema coverage;
+- preserve atomic output and stable exit-code behavior.
+
+#### P7.5 — Arbitrary-topology acceptance
+
+- test a one-scalar template and a one-`:MD` template;
+- test nested objects, nested collections, images, headers/footers, and
+  conditional/expression references;
+- prove generated-schema validation, scaffold generation, and rendering;
+- reclassify cover, Document Control, TOC, and closing page as proposal
+  recommendations rather than universal template requirements;
+- pass restore, Release build, all tests, and CLI generation/check smoke tests.
+
+P7 does not infer dates, email formats, enums, descriptions, optional business
+fields, or page layout from labels or visual appearance. Those constraints
+require an explicit future annotation contract.
+
+P7 implementation is complete on 2026-07-25. Release restore/build/test passes
+with 100 tests, and CLI smoke coverage proves generation, successful
+non-mutating `--check`, `E-SCH-002` drift failure, and validation of the
+reference model against a generated adjacent schema.
+
 ### Remaining backlog
 
 - MCP stdio adapter over the same Core;

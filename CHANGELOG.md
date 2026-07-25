@@ -14,6 +14,12 @@ Versioning.
   export.
 - Stable extraction diagnostics, resource limits, typed JSON report data, and
   report-contract `1.0` schema support for agent automation.
+- `generate-schema` command for deterministic, self-contained Draft 2020-12
+  contracts derived from placeholder-bearing DOCX templates, including nested
+  objects/collections, conditions, headers/footers, `:MD`, and `:IMG`.
+- Hierarchical template inspection and scaffold generation for arbitrary
+  template topologies, plus non-mutating `generate-schema --check` drift
+  detection and stable `SCH` diagnostics.
 
 ## [1.0.0] - 2026-07-24
 

@@ -14,6 +14,7 @@ public static class ReportContract
         {
             CommandName.Convert,
             CommandName.Extract,
+            CommandName.GenerateSchema,
             CommandName.Inspect,
             CommandName.Render,
             CommandName.ScaffoldModel,
@@ -27,6 +28,9 @@ public static class CommandName
 {
     /// <summary>The template inspection command.</summary>
     public const string Inspect = "inspect";
+
+    /// <summary>The template-specific JSON Schema generation command.</summary>
+    public const string GenerateSchema = "generate-schema";
 
     /// <summary>The model scaffolding command.</summary>
     public const string ScaffoldModel = "scaffold-model";

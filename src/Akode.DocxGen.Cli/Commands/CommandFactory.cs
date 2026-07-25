@@ -105,6 +105,138 @@ internal static class CommandFactory
         return command;
     }
 
+    public static Command GenerateSchema(IServiceProvider services)
+    {
+        var template = RequiredFile("--template", "-t", "Path to the .docx template.");
+        var output = RequiredFile(
+            "--out",
+            "-o",
+            "Output path for the generated Draft 2020-12 schema.");
+        var templateId = new Option<string?>("--template-id")
+        {
+            Description =
+                "Template identifier; defaults to a safe form of the DOCX filename.",
+        };
+        var templateVersion = new Option<string?>("--template-version")
+        {
+            Description = "Template version; defaults to 1.0.0.",
+        };
+        var check = new Option<bool>("--check")
+        {
+            Description =
+                "Verify that --out matches deterministic generation without writing.",
+        };
+        var overwrite = new Option<bool>("--overwrite");
+        var json = JsonOption();
+        var command = new Command(
+            "generate-schema",
+            "Generate a Draft 2020-12 model schema from DOCX template markers.")
+        {
+            template,
+            output,
+            templateId,
+            templateVersion,
+            check,
+            overwrite,
+            json,
+        };
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var useJson = parseResult.GetValue(json);
+            var timer = Stopwatch.StartNew();
+            try
+            {
+                var checkOnly = parseResult.GetValue(check);
+                if (checkOnly && parseResult.GetValue(overwrite))
+                {
+                    throw new ArgumentException(
+                        "--check and --overwrite cannot be used together.");
+                }
+
+                var templateFile = parseResult.GetRequiredValue(template);
+                var outputFile = parseResult.GetRequiredValue(output);
+                await using var templateStream = OpenRead(templateFile.FullName);
+                var pipeline = services.GetRequiredService<DocxGenPipeline>();
+                var result = await pipeline.GenerateSchemaAsync(
+                    new GenerateSchemaRequest(
+                        new InputArtifact(templateFile.FullName, templateStream),
+                        parseResult.GetValue(templateId),
+                        parseResult.GetValue(templateVersion)),
+                    cancellationToken).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                {
+                    return WriteFailure<GenerateSchemaReportData>(
+                        CommandName.GenerateSchema,
+                        ExitCode.TemplateError,
+                        "Template schema generation failed.",
+                        result.Diagnostics,
+                        useJson);
+                }
+
+                var outputPath = Path.GetFullPath(outputFile.FullName);
+                if (checkOnly)
+                {
+                    if (!File.Exists(outputPath)
+                        || !string.Equals(
+                            NormalizeGeneratedText(
+                                await File.ReadAllTextAsync(
+                                    outputPath,
+                                    cancellationToken).ConfigureAwait(false)),
+                            NormalizeGeneratedText(result.SchemaJson),
+                            StringComparison.Ordinal))
+                    {
+                        var diagnostics = result.Diagnostics
+                            .Append(
+                                DiagnosticRegistry.Create(
+                                    DiagnosticCode.SchemaOutOfDate,
+                                    outputPath))
+                            .ToArray();
+                        return WriteFailure<GenerateSchemaReportData>(
+                            CommandName.GenerateSchema,
+                            ExitCode.TemplateError,
+                            "Generated template schema is out of date.",
+                            diagnostics,
+                            useJson);
+                    }
+                }
+                else
+                {
+                    await AtomicFileWriter.WriteTextAsync(
+                        outputPath,
+                        result.SchemaJson,
+                        parseResult.GetValue(overwrite),
+                        cancellationToken).ConfigureAwait(false);
+                }
+
+                timer.Stop();
+                return WriteSuccess(
+                    CommandName.GenerateSchema,
+                    checkOnly
+                        ? "Generated template schema is current."
+                        : "Template schema generated successfully.",
+                    new GenerateSchemaReportData(
+                        outputPath,
+                        Encoding.UTF8.GetByteCount(result.SchemaJson),
+                        result.TemplateId,
+                        result.TemplateVersion,
+                        result.TemplateHash,
+                        result.BindingCount,
+                        checkOnly,
+                        timer.ElapsedMilliseconds),
+                    result.Diagnostics,
+                    useJson);
+            }
+            catch (Exception exception) when (IsHandled(exception))
+            {
+                return WriteException<GenerateSchemaReportData>(
+                    CommandName.GenerateSchema,
+                    exception,
+                    useJson);
+            }
+        });
+        return command;
+    }
+
     public static Command ScaffoldModel(IServiceProvider services)
     {
         var template = RequiredFile("--template", "-t", "Path to the .docx template.");
@@ -825,6 +957,12 @@ internal static class CommandFactory
 
         return markdown?.DirectoryName ?? Directory.GetCurrentDirectory();
     }
+
+    private static string NormalizeGeneratedText(string value) =>
+        value
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace('\r', '\n')
+            .TrimEnd() + "\n";
 
     private static void EnsureExtractionOutputsAvailable(
         string output,

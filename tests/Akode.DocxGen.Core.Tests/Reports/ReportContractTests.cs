@@ -127,6 +127,34 @@ public sealed class ReportContractTests
     }
 
     [Fact]
+    public void GenerateSchemaReportSerializesAndValidates()
+    {
+        var data = new GenerateSchemaReportData(
+            "out/proposal.schema.json",
+            4096,
+            "proposal",
+            "2.1.0",
+            Hash,
+            12,
+            Checked: false,
+            DurationMs: 7);
+        var report = CommandReport.Success(
+            CommandName.GenerateSchema,
+            "Template schema generated.",
+            data);
+
+        var serialized = ReportJsonSerializer.Serialize(report);
+        using var json = JsonDocument.Parse(serialized);
+        var root = json.RootElement;
+
+        root.GetProperty("command").GetString().ShouldBe("generate-schema");
+        root.GetProperty("data")
+            .GetProperty("bindingCount")
+            .GetInt32()
+            .ShouldBe(12);
+    }
+
+    [Fact]
     public void ReportFactoriesRejectContradictoryStates()
     {
         var error = DiagnosticRegistry.Create(DiagnosticCode.ModelInvalidJson);
@@ -172,7 +200,7 @@ public sealed class ReportContractTests
             .GetProperty("const")
             .GetString()
             .ShouldBe(ReportContract.Version);
-        root.GetProperty("oneOf").GetArrayLength().ShouldBe(8);
+        root.GetProperty("oneOf").GetArrayLength().ShouldBe(9);
         ReportContract.Commands.ShouldContain(CommandName.Extract);
         var schemaCommands = definitions.GetProperty("baseEnvelope")
             .GetProperty("properties")

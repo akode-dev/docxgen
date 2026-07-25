@@ -208,20 +208,34 @@ body sections. An explicit JSON value at the same leaf wins and produces
 
 ## Template-specific schema
 
-The base schema cannot know whether `Document.Title` is required. Each template
-therefore ships its own schema with exact requirements. `inspect` cross-checks
-the schema with discovered placeholders.
+The base schema cannot know whether `Document.Title` exists. Each governed
+template therefore ships its own schema. Generate its structural baseline:
+
+```text
+docxgen generate-schema --template template.docx --out template.schema.json
+```
+
+The generated schema is self-contained, closes discovered objects, requires
+all statically reachable bindings, models nested collections, constrains
+template identity/version, and records the template hash. `inspect`
+cross-checks the adjacent schema with discovered placeholders.
+
+Schema generation is deliberately syntax-driven. Dates, emails, enums,
+descriptions, defaults, numeric limits, and business optionality are not
+guessed from labels or document appearance.
 
 ## Agent behavior
 
 Agents should:
 
 1. run `inspect`;
-2. generate or update the scaffold;
-3. edit model and Markdown;
-4. run `validate-model`;
-5. fix each error using `path` and `hint`;
-6. run `render --dry-run`;
-7. render the final file.
+2. run `generate-schema` for a new template or `generate-schema --check` for
+   a governed one;
+3. generate or update the scaffold;
+4. edit model and Markdown;
+5. run `validate-model`;
+6. fix each error using `path` and `hint`;
+7. run `render --dry-run`;
+8. render the final file.
 
 Agents must not switch to lenient mode to hide missing required content.

@@ -105,6 +105,12 @@ public static class DiagnosticCode
     /// <summary>A table header was inferred for valid GFM output.</summary>
     public const string ExtractionTableHeaderInferred = "W-EXT-004";
 
+    /// <summary>A template has no statically discoverable model bindings.</summary>
+    public const string SchemaNoBindings = "E-SCH-001";
+
+    /// <summary>A checked generated schema is missing or out of date.</summary>
+    public const string SchemaOutOfDate = "E-SCH-002";
+
     /// <summary>An unexpected internal product failure occurred.</summary>
     public const string UnexpectedFailure = "E-INT-001";
 }

@@ -14,6 +14,17 @@ public sealed record InspectReportData(
     IReadOnlyList<string> UnsupportedForStaticAnalysis,
     long DurationMs);
 
+/// <summary>Success data returned by <c>generate-schema</c>.</summary>
+public sealed record GenerateSchemaReportData(
+    string Output,
+    long OutputBytes,
+    string TemplateId,
+    string TemplateVersion,
+    string TemplateHash,
+    int BindingCount,
+    bool Checked,
+    long DurationMs);
+
 /// <summary>Success data returned by <c>scaffold-model</c>.</summary>
 public sealed record ScaffoldModelReportData(
     string Output,

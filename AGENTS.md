@@ -12,11 +12,12 @@ needed.
    2 work requires an explicitly selected backlog item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-Phase 1 is released and DOCX extraction is implemented for the next minor
-release. Preserve the seven-command CLI,
-model/report schemas, stable diagnostics, security defaults, template
-contract, and cross-platform packaging behavior. New product scope belongs to
-the Phase 2 backlog unless the user or issue explicitly selects it.
+Phase 1 is released; DOCX extraction and template-schema generation are
+implemented for the next minor release. Preserve the eight-command CLI,
+model/report schemas, stable diagnostics, security defaults, deterministic
+template-schema generation, template contract, and cross-platform packaging
+behavior. New product scope belongs to the Phase 2 backlog unless the user or
+issue explicitly selects it.
 
 ## Architecture boundaries
 
@@ -39,8 +40,8 @@ the Phase 2 backlog unless the user or issue explicitly selects it.
   Markdown block renderer with Markdig and Open XML SDK.
 - Do not restore `DocxTemplater.Markdown`, `DocxTemplater.Images`, ImageSharp,
   or another document engine without a new ADR and license review.
-- Treat `inspect`, JSON output, diagnostics, exit codes, and `hint` fields as
-  public API.
+- Treat `inspect`, `generate-schema`, JSON output, diagnostics, exit codes,
+  and `hint` fields as public API.
 - A fixed corporate logo remains in the template. Variable content figures
   normally arrive through Markdown.
 - Rendering is offline by default. Remote images and raw HTML remain disabled

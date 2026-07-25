@@ -1,6 +1,6 @@
 # CLI reference
 
-DocxGen exposes seven non-interactive commands. Use `docxgen <command> --help`
+DocxGen exposes eight non-interactive commands. Use `docxgen <command> --help`
 for the installed executable or:
 
 ```powershell
@@ -33,9 +33,38 @@ The result includes template ID/version/hash, placeholder paths/kinds,
 collection item properties, requiredness from the adjacent schema, locations,
 required Word styles, and inspection diagnostics.
 
+`--schema-out` writes this inspection DTO. It is not a JSON Schema; use
+`generate-schema` for the normative model contract.
+
+## `generate-schema`
+
+Creates a deterministic, self-contained Draft 2020-12 model schema from the
+bindings statically reachable in a DOCX template:
+
+```text
+docxgen generate-schema
+  -t|--template <template.docx>
+  -o|--out <template.schema.json>
+  [--template-id <id>]
+  [--template-version <version>]
+  [--check]
+  [--overwrite]
+  [--json]
+```
+
+The command discovers nested objects and collections, branches, expressions,
+headers/footers, `:MD`, and `:IMG`. Every discovered binding is required to
+match strict-mode rendering. It does not infer business formats, enums,
+descriptions, defaults, or optionality from visible Word labels.
+
+ID defaults to a safe lowercase form of the DOCX filename; version defaults to
+`1.0.0`. `--check` compares `--out` to deterministic generation without
+writing and returns template error `3` with `E-SCH-002` when it is missing or
+out of date. `--check` and `--overwrite` are mutually exclusive.
+
 ## `scaffold-model`
 
-Creates an editable model from inspected placeholders:
+Creates an editable hierarchical model from inspected placeholders:
 
 ```text
 docxgen scaffold-model

@@ -12,7 +12,7 @@ proposal.docx
 proposal.schema.json
 ```
 
-Required shape:
+The reference proposal demonstrates this recommended shape:
 
 1. branded cover;
 2. Document Control or explicit variant without it;
@@ -20,5 +20,10 @@ Required shape:
 4. standalone `{{ds.Body}:MD}`;
 5. next-page section break;
 6. branded final page.
+
+This is not a universal engine requirement. Other governed templates may have
+a single placeholder, one or more Markdown slots, nested collections, or no
+proposal-specific cover/Document Control/TOC pages. Generate their adjacent
+contract with `docxgen generate-schema`.
 
 Do not add real customer documents to this folder.
