@@ -32,8 +32,22 @@ public static class ModelBinder
         }
 
         var unbound = new List<string>();
+        var collectionPaths = schema.Placeholders
+            .Where(placeholder => placeholder.Kind == ModelValueKind.Collection)
+            .Select(placeholder => placeholder.Path)
+            .ToArray();
         foreach (var placeholder in schema.Placeholders)
         {
+            if (collectionPaths.Any(
+                    collection =>
+                        placeholder.Path.Length > collection.Length
+                        && placeholder.Path.StartsWith(
+                            collection + ".",
+                            StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
             if (!TryResolve(roots, placeholder.Path, out var value) || IsMissing(value))
             {
                 unbound.Add(placeholder.Path);

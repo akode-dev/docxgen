@@ -179,6 +179,16 @@ public static class DiagnosticRegistry
             "The first table row was inferred as a Markdown header.",
             "Mark the first row as a header in Word when that distinction must be explicit."),
         new(
+            DiagnosticCode.SchemaNoBindings,
+            DiagnosticSeverity.Error,
+            "The template has no statically discoverable model bindings.",
+            "Add at least one supported scalar, Markdown, image, collection, condition, or expression marker to the DOCX template."),
+        new(
+            DiagnosticCode.SchemaOutOfDate,
+            DiagnosticSeverity.Error,
+            "The generated template schema is missing or out of date.",
+            "Run generate-schema without --check, review the structural change, and commit the updated adjacent schema."),
+        new(
             DiagnosticCode.UnexpectedFailure,
             DiagnosticSeverity.Error,
             "An unexpected internal product failure occurred.",

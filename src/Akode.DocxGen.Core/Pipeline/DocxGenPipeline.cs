@@ -67,6 +67,24 @@ public sealed class DocxGenPipeline
             ]);
     }
 
+    /// <summary>Generates a structural Draft 2020-12 schema from a template.</summary>
+    public async Task<GenerateSchemaResult> GenerateSchemaAsync(
+        GenerateSchemaRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var bytes = await ReadAllAsync(
+            request.Template.Content,
+            cancellationToken).ConfigureAwait(false);
+        using var stream = new MemoryStream(bytes, writable: false);
+        var inspected = templateInspector.Inspect(stream, cancellationToken);
+        return TemplateJsonSchemaGenerator.Generate(
+            inspected,
+            request.Template.Name,
+            request.TemplateId,
+            request.TemplateVersion);
+    }
+
     /// <summary>Creates a model scaffold from an inspected template.</summary>
     public async Task<ScaffoldModelResult> ScaffoldModelAsync(
         ScaffoldModelRequest request,
@@ -78,9 +96,27 @@ public sealed class DocxGenPipeline
             cancellationToken).ConfigureAwait(false);
         var stubs = new Dictionary<string, string>(StringComparer.Ordinal);
         var data = new JsonObject();
-        foreach (var placeholder in inspection.Schema.Placeholders)
+        if (inspection.Schema.Roots.Count > 0)
         {
-            InsertPlaceholder(data, placeholder, request.WithMarkdownStubs, stubs);
+            foreach (var root in inspection.Schema.Roots)
+            {
+                data[root.Name] = CreateShapeValue(
+                    root,
+                    root.Name,
+                    request.WithMarkdownStubs,
+                    stubs);
+            }
+        }
+        else
+        {
+            foreach (var placeholder in inspection.Schema.Placeholders)
+            {
+                InsertPlaceholder(
+                    data,
+                    placeholder,
+                    request.WithMarkdownStubs,
+                    stubs);
+            }
         }
 
         var envelope = new JsonObject
@@ -456,6 +492,61 @@ public sealed class DocxGenPipeline
         var fileName = $"sections/{ToKebabCase(leaf)}.md";
         stubs[fileName] = $"# {leaf}{Environment.NewLine}{Environment.NewLine}";
         return new JsonObject { ["$mdFile"] = fileName };
+    }
+
+    private static JsonNode CreateShapeValue(
+        TemplateShapeNode node,
+        string path,
+        bool withMarkdownStubs,
+        IDictionary<string, string> stubs)
+    {
+        switch (node.Kind)
+        {
+            case ModelValueKind.Markdown when withMarkdownStubs:
+            {
+                var fileName = $"sections/{ToKebabCase(node.Name)}.md";
+                if (stubs.ContainsKey(fileName))
+                {
+                    fileName =
+                        $"sections/{ToKebabCase(path.Replace('.', '-'))}.md";
+                }
+
+                stubs[fileName] =
+                    $"# {node.Name}{Environment.NewLine}{Environment.NewLine}";
+                return new JsonObject { ["$mdFile"] = fileName };
+            }
+
+            case ModelValueKind.Markdown:
+                return new JsonObject { ["$md"] = string.Empty };
+            case ModelValueKind.Binary:
+                return new JsonObject { ["$file"] = string.Empty };
+            case ModelValueKind.Collection:
+                return new JsonArray(
+                    node.Item is null
+                        ? new JsonObject()
+                        : CreateShapeValue(
+                            node.Item,
+                            path,
+                            withMarkdownStubs,
+                            stubs));
+            case ModelValueKind.StructuredObject:
+            {
+                var result = new JsonObject();
+                foreach (var property in node.Properties)
+                {
+                    result[property.Name] = CreateShapeValue(
+                        property,
+                        $"{path}.{property.Name}",
+                        withMarkdownStubs,
+                        stubs);
+                }
+
+                return result;
+            }
+
+            default:
+                return JsonValue.Create(string.Empty);
+        }
     }
 
     private static JsonArray CreateCollectionItem(IReadOnlyList<string> properties)

@@ -17,7 +17,7 @@ src/
     Abstractions/       technology-neutral adapter boundaries
     Diagnostics/        stable codes, registry, exit codes
     Markdown/           anchors, GFM tables, neutral Markdown AST/parser
-    Model/              JSON reader, values, merge, binding, schema contract
+    Model/              JSON reader, values, merge, binding, schema generation
     Pipeline/           requests/results and DocxGenPipeline orchestration
     Reports/            versioned command-report DTOs
     Security/           containment, limits, local/remote asset resolution
@@ -72,6 +72,7 @@ eng/
 Core contains no Open XML or CLI implementation types. It owns:
 
 - model/schema reading and adjacent-template reconciliation;
+- deterministic structural schema generation from neutral template shapes;
 - deterministic Markdown preprocessing and source merging;
 - local/remote asset security policy;
 - strict/lenient binding;
@@ -101,7 +102,8 @@ shell out to the CLI or duplicate validation/rendering.
 
 `templates/` contains synthetic or approved governed templates. Each production
 template has an adjacent `.schema.json` with exact ID, version, hash, fields,
-and collections. `samples/` is a complete non-confidential runnable example.
+and collections. The structural contract can be regenerated with
+`generate-schema`; `samples/` is a complete non-confidential runnable example.
 
 ## Tests and gates
 

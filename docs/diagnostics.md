@@ -37,6 +37,7 @@ Current areas:
 | `MRG` | source merge and precedence |
 | `RND` | renderer failures |
 | `EXT` | DOCX-to-Markdown extraction and semantic downgrades |
+| `SCH` | generated template schema and drift detection |
 | `IO` | file-system and stream operations |
 | `USG` | invalid CLI usage |
 | `INT` | unexpected internal product defects |

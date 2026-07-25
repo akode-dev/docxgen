@@ -137,4 +137,44 @@ public sealed class PipelineContractTests
                 "image/png",
                 bytes));
     }
+
+    [Theory]
+    [InlineData(" template", null)]
+    [InlineData("template/id", null)]
+    [InlineData("шаблон", null)]
+    [InlineData("template", "1.0+build")]
+    [InlineData("template", " ")]
+    public void GenerateSchemaRequestRejectsUnsafeIdentityParts(
+        string templateId,
+        string? templateVersion)
+    {
+        var template = new InputArtifact("template.docx", Stream.Null);
+
+        Should.Throw<ArgumentException>(
+            () => new GenerateSchemaRequest(
+                template,
+                templateId,
+                templateVersion));
+    }
+
+    [Fact]
+    public void GenerateSchemaResultDerivesSuccessFromDiagnostics()
+    {
+        var error = DiagnosticRegistry.Create(DiagnosticCode.SchemaNoBindings);
+
+        new GenerateSchemaResult(
+            "{}",
+            "template",
+            "1.0.0",
+            "sha256:hash",
+            1,
+            []).IsSuccess.ShouldBeTrue();
+        new GenerateSchemaResult(
+            string.Empty,
+            "template",
+            "1.0.0",
+            "sha256:hash",
+            0,
+            [error]).IsSuccess.ShouldBeFalse();
+    }
 }

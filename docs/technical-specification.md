@@ -6,7 +6,7 @@
 |---|---|
 | Product | Akode.DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Phase 1 released; semantic DOCX extraction implemented for next minor release |
+| Status | Phase 1 released; extraction and template-schema generation implemented on `develop` |
 | Primary users | Bid teams, developers, CI, coding agents |
 | Runtime model | Offline deterministic CLI |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -28,6 +28,7 @@ extraction:
 
 ```text
 (DOCX template, validated model, Markdown, local assets) -> DOCX
+placeholder-bearing DOCX template -> Draft 2020-12 model schema
 DOCX -> Markdown + embedded image assets
 ```
 
@@ -45,9 +46,9 @@ The tool does not generate business content and does not call an LLM.
 8. A valid OOXML package is necessary but not sufficient; representative
    documents require rendered visual review.
 
-## 4. Primary document shape
+## 4. Recommended proposal shape
 
-The reference template contains:
+The reference proposal template contains:
 
 1. cover section with fixed branding and scalar placeholders;
 2. optional Document Control page;
@@ -64,6 +65,11 @@ single-body mode, Markdown H1 maps to Word Heading 1 and `headingOffset` is
 zero. If a template contains fixed Heading 1 section titles and separate
 Markdown slots underneath, the section fragment uses a positive heading
 offset.
+
+This proposal topology is not a universal template contract. The engine also
+supports a one-scalar template, a template containing only
+`{{ds.Body}:MD}`, multiple independent body slots, nested objects and
+collections, headers/footers, and conditional branches.
 
 ## 5. Scope
 
@@ -91,6 +97,8 @@ offset.
 
 - semantic DOCX-to-Markdown extraction from the main document body (selected
   and implemented);
+- deterministic JSON Schema generation from placeholder-bearing templates
+  (selected and implemented);
 - MCP server over Core;
 - RTL/Arabic after a dedicated spike;
 - PDF delivery after implementation and license review;
@@ -126,7 +134,7 @@ offset.
 ```text
 docxgen inspect
   --template <template.docx>
-  [--schema-out <template.schema.json>]
+  [--schema-out <inspection.json>]
   [--include-text-probe]
   [--json]
 ```
@@ -142,11 +150,35 @@ Responsibilities:
 - detect suspicious split/unclosed placeholders;
 - check the required style contract;
 - reconcile discovered placeholders with an adjacent template schema;
-- optionally emit an initial editable JSON Schema.
+- optionally emit the inspection DTO for tooling.
 
 `inspect` never renders or modifies the template.
 
-### 6.3 `scaffold-model`
+### 6.3 `generate-schema`
+
+```text
+docxgen generate-schema
+  --template <template.docx>
+  --out <template.schema.json>
+  [--template-id <id>]
+  [--template-version <version>]
+  [--check]
+  [--overwrite]
+  [--json]
+```
+
+The command statically derives a self-contained Draft 2020-12 model contract
+from scalar, object, collection, conditional, switch, expression, Markdown,
+and image bindings in all inspected document parts. Every reachable binding
+is required, matching strict-mode preflight and union-of-branches analysis.
+The schema contains exact template identity, version, and hash metadata.
+
+Generation is deterministic. `--check` performs a non-mutating normalized-text
+comparison suitable for CI. The command never infers business formats, enums,
+ranges, defaults, descriptions, or semantic optionality from Word labels or
+visual layout.
+
+### 6.4 `scaffold-model`
 
 ```text
 docxgen scaffold-model
@@ -159,7 +191,7 @@ docxgen scaffold-model
 The generated model contains `$schema`, model contract version, template
 identity/version, empty required values, and `$comment` guidance.
 
-### 6.4 `validate-model`
+### 6.5 `validate-model`
 
 ```text
 docxgen validate-model
@@ -187,7 +219,7 @@ not require document generation:
 - remote image and raw HTML policy;
 - Markdown preprocessing diagnostics.
 
-### 6.5 `render`
+### 6.6 `render`
 
 ```text
 docxgen render
@@ -224,12 +256,12 @@ preflight but does not write the final path.
 `--append-document-version` reads `data.ds.Document.Version`. Given output
 `Proposal.docx` and version `3.0`, it resolves `Proposal-v3.0.docx`.
 
-### 6.6 `convert`
+### 6.7 `convert`
 
 Creates an unbranded draft from Markdown and an optional style reference.
 Production proposals should use `render`.
 
-### 6.7 `extract`
+### 6.8 `extract`
 
 Extracts the main DOCX body into portable Markdown and exports embedded images:
 
@@ -252,7 +284,7 @@ constructs are omitted or downgraded with stable diagnostics. Headers,
 footers, comments, footnotes, and tracked deletions are outside the initial
 contract.
 
-### 6.8 `validate`
+### 6.9 `validate`
 
 Validates an existing DOCX using Open XML SDK and product-specific checks for
 leftover placeholders, broken relationships, and required package parts.
@@ -304,12 +336,16 @@ proposal.docx
 proposal.schema.json
 ```
 
-The schema declares required values, exact types, formats, length constraints,
-collection item shapes, and template metadata. It includes an
-`x-docxgen-templateHash` extension. `inspect` detects stale contracts.
+`generate-schema` derives required values, structural types, nested collection
+item shapes, template identity/version, and the `x-docxgen-templateHash`
+extension directly from placeholder-bearing DOCX content. `inspect` detects
+stale adjacent contracts.
 
-Requiredness cannot be inferred reliably from placeholder text alone, so the
-schema is maintained alongside the template and checked against it.
+All statically reachable bindings are required because static template
+analysis cannot prove runtime branch reachability. Business formats, enums,
+ranges, descriptions, defaults, and optional business semantics cannot be
+inferred reliably from placeholder text; they require a future explicit
+annotation contract or deliberate schema review.
 
 ### 8.4 Machine-readable command reports
 

@@ -6,14 +6,13 @@ Markdown draft from an existing DOCX:
 
 ```text
 DOCX template + model.json + Markdown/assets -> validated DOCX
+DOCX template with placeholders -> deterministic JSON Schema
 DOCX -> Markdown + embedded image assets
 ```
 
-Phase 1 is released. The tool supports template inspection, model
-scaffolding and validation, Markdown rendering, template-less conversion,
-Open XML validation, images, tables, collections, automatic TOC refresh, and
-optional document-version suffixes. The next minor release adds semantic
-DOCX-to-Markdown extraction.
+Version 1.0.0 is released. The current `develop` line also supports semantic
+DOCX-to-Markdown extraction and deterministic JSON Schema generation from
+placeholder-bearing templates.
 
 The core design rule is simple: content lives in Markdown/JSON; branding and
 page layout live in the Word template.
@@ -22,15 +21,16 @@ page layout live in the Word template.
 
 | Command | Purpose | Writes a DOCX |
 |---|---|---:|
-| `inspect` | Reads the template contract: placeholder paths, kinds, loops, required styles, template ID/version/hash | No |
+| `inspect` | Reports the template contract: placeholder paths, kinds, loops, styles, diagnostics, identity, and hash | No |
+| `generate-schema` | Turns the statically reachable placeholder shape into a self-contained Draft 2020-12 model schema | No |
 | `render` | Validates inputs, binds JSON/Markdown, expands loops and Markdown, preserves template pages, post-processes fields/properties, and optionally validates OOXML | Yes |
 
-An AI agent should call `inspect` before authoring a model. It should never
-guess placeholder names.
+An AI agent should call `inspect`, generate or verify the adjacent schema, and
+then scaffold the model. It should never guess placeholder names.
 
 ## Document topology
 
-A normal governed template contains:
+A proposal template commonly contains:
 
 1. a cover page with fixed artwork/logo and scalar placeholders;
 2. an optional Document Control page and revision-history loop;
@@ -42,6 +42,10 @@ The number of chapters and paragraphs is not encoded in JSON. Long-form
 content is ordinary Markdown; headings naturally create as many chapters and
 subchapters as needed. The body expands across pages while the template keeps
 its cover, section geometry, headers, footers, TOC, and final page.
+
+This topology is not an engine requirement. A template containing only
+`{{ds.Body}:MD}`, a single scalar, several Markdown slots, nested collections,
+or another arbitrary placeholder topology is valid.
 
 The included `templates/proposal.docx` is a synthetic, non-confidential
 reference template. An official corporate template can replace it after the
@@ -68,6 +72,21 @@ dotnet run --project src/Akode.DocxGen.Cli -- inspect `
   --template templates/proposal.docx `
   --json
 ```
+
+Generate a structural schema for a new template:
+
+```powershell
+dotnet run --project src/Akode.DocxGen.Cli -- generate-schema `
+  --template templates/proposal.docx `
+  --out artifacts/proposal.generated.schema.json `
+  --template-id akode-proposal-reference `
+  --template-version 1.0.0 `
+  --overwrite `
+  --json
+```
+
+Use `--check` instead of `--overwrite` in CI to fail when the checked-in
+generated schema differs without modifying it.
 
 Generate an editable model:
 
@@ -134,8 +153,12 @@ templates/proposal.schema.json
 ```
 
 The adjacent schema owns the exact required fields, collection shapes,
-template identity, and template hash. This makes a validation hook deterministic
-and gives the agent exact JSON Pointer paths and actionable hints.
+template identity, and template hash. `generate-schema` derives that structural
+contract from scalars, `:MD`, `:IMG`, objects, loops, conditions, expressions,
+headers, and footers. It deliberately does not guess dates, email formats,
+enums, descriptions, defaults, or optional business semantics from visible
+labels. This makes a validation hook deterministic and gives the agent exact
+JSON Pointer paths and actionable hints.
 
 A shortened model looks like this:
 
@@ -275,6 +298,7 @@ logos and designed artwork normally stay in the template. See
 | Command | Result |
 |---|---|
 | `inspect` | Template contract, diagnostics, identity, hash, and styles |
+| `generate-schema` | Deterministic self-contained schema, or non-mutating drift check |
 | `scaffold-model` | `model.json` plus optional Markdown stubs |
 | `validate-model` | Hook-friendly model/Markdown/assets preflight |
 | `render` | Final template-based DOCX |

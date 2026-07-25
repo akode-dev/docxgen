@@ -6,6 +6,8 @@
 flowchart LR
     Author["Human or AI author"] --> MD["Markdown and JSON"]
     Designer["Template designer"] --> T["DOCX template and schema"]
+    T --> Generator["Schema generator"]
+    Generator --> Schema["Draft 2020-12 contract"]
     MD --> CLI["Akode.DocxGen CLI"]
     T --> CLI
     CLI --> O["Generated DOCX"]
@@ -36,6 +38,7 @@ flowchart TD
 Owns domain-level behavior:
 
 - model contracts and parsing;
+- deterministic template-specific JSON Schema generation;
 - base/template schema validation;
 - Markdown preprocessing and anchored sections;
 - merge precedence;
@@ -115,21 +118,25 @@ as semantic downgrades.
 ## Template and schema relationship
 
 The DOCX is the visual authority. The adjacent JSON Schema is the data-contract
-authority. `inspect` bridges them:
+authority. Inspection and generation bridge them:
 
 ```mermaid
 flowchart LR
-    DOCX["proposal.docx"] --> Inspect["inspect"]
-    Schema["proposal.schema.json"] --> Inspect
+    DOCX["proposal.docx"] --> Generate["generate-schema"]
+    Generate --> Schema["proposal.schema.json"]
+    DOCX --> Inspect["inspect"]
+    Schema --> Inspect
     Inspect --> Contract["TemplateSchema"]
     Contract --> Agent["Agent/IDE"]
     Contract --> Validate["validate-model"]
     Contract --> Render["render"]
 ```
 
-The schema stores template id/version and a template hash extension. A hash
-mismatch makes the contract stale; the template owner must inspect and review
-the regenerated schema.
+The DOCX adapter converts DocxTemplater's static schema tree into a
+technology-neutral Core shape and overlays `:MD`/`:IMG` semantics. Core uses
+that same shape for schema generation and nested scaffolds. The schema stores
+template id/version and a template hash extension. A hash mismatch makes the
+contract stale; the template owner must inspect, regenerate, and review it.
 
 ## Determinism
 

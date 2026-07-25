@@ -8,6 +8,9 @@
       "$ref": "#/$defs/inspectSuccess"
     },
     {
+      "$ref": "#/$defs/generateSchemaSuccess"
+    },
+    {
       "$ref": "#/$defs/scaffoldModelSuccess"
     },
     {
@@ -47,6 +50,7 @@
         "command": {
           "enum": [
             "inspect",
+            "generate-schema",
             "scaffold-model",
             "validate-model",
             "render",
@@ -196,6 +200,25 @@
             },
             "data": {
               "$ref": "#/$defs/inspectData"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "generateSchemaSuccess": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/successEnvelope"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "command": {
+              "const": "generate-schema"
+            },
+            "data": {
+              "$ref": "#/$defs/generateSchemaData"
             }
           }
         }
@@ -558,6 +581,52 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "generateSchemaData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output",
+        "outputBytes",
+        "templateId",
+        "templateVersion",
+        "templateHash",
+        "bindingCount",
+        "checked",
+        "durationMs"
+      ],
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "templateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "templateHash": {
+          "$ref": "#/$defs/hash"
+        },
+        "bindingCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checked": {
+          "type": "boolean"
         },
         "durationMs": {
           "type": "integer",

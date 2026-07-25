@@ -11,7 +11,7 @@ The normative Draft 2020-12 schema is
 | Field | Meaning |
 |---|---|
 | `reportVersion` | JSON contract version, currently `1.0` |
-| `command` | `inspect`, `scaffold-model`, `validate-model`, `render`, `convert`, `extract`, or `validate` |
+| `command` | `inspect`, `generate-schema`, `scaffold-model`, `validate-model`, `render`, `convert`, `extract`, or `validate` |
 | `ok` | Whether the operation succeeded |
 | `exitCode` | Numeric stable process exit code `0` through `7` |
 | `errorCode` | Primary diagnostic code; present only on failure |
@@ -78,6 +78,11 @@ Successful `extract` data contains `output`, `outputBytes`,
 `assetsDirectory`, the absolute `assets` path array, `durationMs`, and
 semantic `stats` counts for paragraphs, headings, list items, tables, and
 image occurrences.
+
+Successful `generate-schema` data contains `output`, `outputBytes`,
+`templateId`, `templateVersion`, `templateHash`, `bindingCount`, `checked`,
+and `durationMs`. `checked` is true only for a successful non-mutating
+`--check`.
 
 ## Failure example
 
