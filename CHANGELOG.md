@@ -10,6 +10,8 @@ Versioning.
 
 ### Added
 
+- Public **DocxGen** product identity with `docxgen`/`docxgen.exe` commands,
+  `Akode.DocxGen.*` namespaces, and consistent agent-facing contracts.
 - Ready-to-use `Akode.DocxGen` runtime package and
   `DocxGenPipelineFactory.CreatePipeline()` for in-process .NET applications.
 - Self-contained ARM64 release artifacts for Windows, Linux, and macOS, in
@@ -28,30 +30,6 @@ Versioning.
 - Hierarchical template inspection and scaffold generation for arbitrary
   template topologies, plus non-mutating `generate-schema --check` drift
   detection and stable `SCH` diagnostics.
-
-### Changed
-
-- Established the former organization-specific product as **DocxGen**.
-- Renamed .NET namespaces and projects to `Akode.DocxGen.*`, the dotnet tool
-  package to `Akode.DocxGen.Tool`, and standalone executables to
-  `docxgen`/`docxgen.exe`.
-- Standardized machine-readable extension fields, Markdown section anchors,
-  and the debug environment variable on the complete `docxgen` name.
-- Moved the historical rendering experiment under `research/renderer-spike`
-  and removed it from the production solution.
-- Reworked public documentation and package/release metadata for CLI,
-  AI-agent, and embedded library consumers.
-
-### Breaking
-
-- The product identity changes public namespaces, package IDs, executable names,
-  `x-docxgen-*` schema extension fields, `docxgen:section` anchors, and the
-  `DOCXGEN_DEBUG` environment variable. This release is therefore 2.0.0.
-
-## [1.0.0] - 2026-07-24
-
-### Added
-
 - Cross-platform .NET 10 CLI commands: `inspect`, `scaffold-model`,
   `validate-model`, `render`, `convert`, and `validate`.
 - Deterministic JSON model envelope with base and adjacent template schemas,
@@ -68,7 +46,7 @@ Versioning.
   designed for coding agents and validation hooks.
 - Synthetic proposal template with cover, Document Control, revision loop,
   TOC, Markdown body, closing page, adjacent schema, and runnable sample.
-- 80 automated tests plus Microsoft Word/PDF visual acceptance evidence.
+- 102 automated tests plus Microsoft Word/PDF visual acceptance evidence.
 - Locked dependencies, reviewed permissive-license gate, third-party notices,
   cross-platform CI, dotnet tool package, and self-contained single-file
   release workflow for Windows, Linux, and macOS x64.
@@ -81,5 +59,4 @@ Versioning.
   disabled, and non-public address rejection.
 
 [Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/akode-dev/docxgen/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v1.0.0
+[2.0.0]: https://github.com/akode-dev/docxgen/releases/tag/v2.0.0

@@ -1,23 +1,19 @@
-# ADR-0009: Publish as DocxGen under the Akode namespace
+# ADR-0009: Public product and package naming
 
 - Status: Accepted
 - Date: 2026-07-25
 
 ## Context
 
-The original organization-specific name tied a reusable document engine to a
-private identity. It also produced an executable whose product and package
-names were harder to recognize in an AI-agent tool allow-list.
-
-The repository is intended for three equal consumption modes:
+The repository serves three equal consumption modes:
 
 - a cross-platform command-line executable called by people and agents;
 - a ready-to-use .NET library embedded in another solution;
 - technology-neutral Core contracts used with custom adapters.
 
-The product already has a published `v1.0.0`, so changing namespaces, package
-IDs, executable names, schema extension names, and agent-facing identifiers is
-a breaking public-contract change.
+These modes need one recognizable product name and deterministic identifiers
+across command lines, .NET APIs, schemas, release archives, and AI-agent tool
+allow-lists.
 
 ## Decision
 
@@ -41,9 +37,7 @@ The production solution is `DocxGen.sln`. Historical experiments live below
 GitHub release assets use lowercase `docxgen-<rid>` names for predictable
 automation.
 
-Version 2.0.0 introduces this naming contract. No compatibility aliases retain the old
-organization or shortened product name because the explicit requirement is to
-remove those identities from source, binaries, templates, and documentation.
+Version 2.0.0 is the first public release governed by this naming contract.
 
 ## Consequences
 
@@ -52,8 +46,6 @@ remove those identities from source, binaries, templates, and documentation.
 - NuGet consumers can choose a ready-to-run implementation or Core contracts
   without referencing the CLI.
 - Windows, Linux, and macOS release archives have consistent names.
-- Existing source consumers must update namespace and package references.
-- Existing hooks, schemas, and anchored Markdown must update renamed public
-  identifiers.
-- Changelog, migration notes, and release notes must classify the change as
-  breaking.
+- Hooks, schemas, anchored Markdown, packages, and executables share the same
+  stable identifiers.
+- Future changes to these names require a new ADR and semantic-version review.

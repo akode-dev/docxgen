@@ -176,7 +176,7 @@ reference model against a generated adjacent schema.
 - DOCX semantic diff;
 - advanced captions and cross-references.
 
-### P8 — Open-source productization and Akode namespace
+### P8 — Open-source productization and public packaging
 
 Selected on 2026-07-25. The complete acceptance slice is:
 
@@ -192,13 +192,13 @@ Selected on 2026-07-25. The complete acceptance slice is:
 - add contribution, conduct, security, support, issue, and pull-request
   guidance;
 - update the reference template, schemas, agent permissions, package metadata,
-  release workflow, and every public document to the new naming contract;
-- prove the product identity with an old-name repository scan, package/tool smoke tests,
+  release workflow, and every public document to the shared naming contract;
+- prove naming consistency with a repository scan, package/tool smoke tests,
   complete solution verification, structural DOCX checks, and page-by-page
   visual review.
 
 Because namespace, package, executable, schema-extension, environment-variable,
-and Markdown-anchor names change, P8 is the next major product release.
+and Markdown-anchor names are public API, P8 is a major product release.
 
 P8 implementation is complete on 2026-07-25. Verification covers:
 
@@ -208,6 +208,7 @@ P8 implementation is complete on 2026-07-25. Verification covers:
 - local installation and execution of `Akode.DocxGen.Tool`, including
   `docxgen --version`, template inspection, and model validation;
 - self-contained single-file publication for all six approved x64/ARM64 RIDs;
-- old-name scans across source, DOCX XML, package contents, and executables;
+- naming-consistency scans across source, DOCX XML, package contents, and
+  executables;
 - structural template integration plus visual inspection of all five raw
   template pages.
