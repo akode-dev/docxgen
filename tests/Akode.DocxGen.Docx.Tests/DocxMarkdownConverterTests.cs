@@ -47,9 +47,43 @@ public sealed class DocxMarkdownConverterTests
             .Numbering;
         numbering.ShouldNotBeNull();
         numbering!.ChildElements[^1].ShouldBeOfType<NumberingIdMacAtCleanup>();
-        var bodyText = package.MainDocumentPart!.Document!.Body!.InnerText;
-        bodyText.ShouldContain("☒");
-        bodyText.ShouldContain("☐");
+        var listParagraphs = package.MainDocumentPart!.Document!.Body!
+            .Elements<Paragraph>()
+            .Where(paragraph =>
+                paragraph.ParagraphProperties?.NumberingProperties is not null)
+            .ToArray();
+        listParagraphs.Length.ShouldBe(4);
+        listParagraphs[0].InnerText.ShouldBe("Completed");
+        listParagraphs[1].InnerText.ShouldBe("Pending");
+        ResolveMarker(numbering, listParagraphs[0]).ShouldBe("☒");
+        ResolveMarker(numbering, listParagraphs[1]).ShouldBe("☐");
+        listParagraphs[2].InnerText.ShouldBe("Third");
+        listParagraphs[3].InnerText.ShouldBe("Fourth");
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☒");
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☐");
+    }
+
+    private static string? ResolveMarker(
+        Numbering numbering,
+        Paragraph paragraph)
+    {
+        var properties = paragraph.ParagraphProperties?.NumberingProperties;
+        var numberId = properties?.NumberingId?.Val?.Value;
+        var level = properties?.NumberingLevelReference?.Val?.Value ?? 0;
+        var abstractId = numbering
+            .Elements<NumberingInstance>()
+            .Single(instance => instance.NumberID?.Value == numberId)
+            .AbstractNumId?
+            .Val?
+            .Value;
+        return numbering
+            .Elements<AbstractNum>()
+            .Single(item => item.AbstractNumberId?.Value == abstractId)
+            .Elements<Level>()
+            .Single(item => item.LevelIndex?.Value == level)
+            .LevelText?
+            .Val?
+            .Value;
     }
 
     private static MemoryStream CreateStyleReferenceWithNumberingCleanup()

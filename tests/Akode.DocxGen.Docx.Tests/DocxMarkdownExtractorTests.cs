@@ -40,6 +40,9 @@ public sealed class DocxMarkdownExtractorTests
                 - Bullet first
                 - Bullet second
 
+                - [x] Task complete
+                - [ ] Task pending
+
                 1. First
                 2. Second
 
@@ -81,6 +84,8 @@ public sealed class DocxMarkdownExtractorTests
             result.Markdown.ShouldContain("[link](https://example.com)");
             result.Markdown.ShouldContain("- Bullet first");
             result.Markdown.ShouldContain("- Bullet second");
+            result.Markdown.ShouldContain("- [x] Task complete");
+            result.Markdown.ShouldContain("- [ ] Task pending");
             result.Markdown.ShouldContain("1. First");
             result.Markdown.ShouldContain("2. Second");
             result.Markdown.ShouldContain("> A quoted sentence.");
@@ -95,7 +100,7 @@ public sealed class DocxMarkdownExtractorTests
             result.Assets.ShouldHaveSingleItem();
             result.Assets[0].Content.ToArray().ShouldBe(PixelPng);
             result.Stats.Headings.ShouldBe(1);
-            result.Stats.ListItems.ShouldBe(4);
+            result.Stats.ListItems.ShouldBe(6);
             result.Stats.Tables.ShouldBe(1);
             result.Stats.Images.ShouldBe(1);
             result.Diagnostics.ShouldNotContain(

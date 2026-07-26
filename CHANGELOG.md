@@ -6,6 +6,12 @@ Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Rendered GitHub-flavored Markdown task-list checkboxes as native Word list
+  markers instead of combining a bullet marker with an inline checkbox, and
+  preserved those markers when extracting the DOCX back to Markdown.
+
 ## [2.2.0] - 2026-07-26
 
 ### Changed
