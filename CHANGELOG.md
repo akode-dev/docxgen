@@ -6,6 +6,19 @@ Versioning.
 
 ## [Unreleased]
 
+## [2.1.3] - 2026-07-26
+
+### Added
+
+- Rendered GitHub-flavored Markdown task-list markers as checked and unchecked
+  boxes instead of omitting them with `W-MD-002`.
+
+### Fixed
+
+- Kept generated numbering instances before Word's
+  `numIdMacAtCleanup` marker, so list-heavy Markdown remains valid when a
+  real-world DOCX is used as the style reference.
+
 ## [2.1.2] - 2026-07-25
 
 ### Fixed

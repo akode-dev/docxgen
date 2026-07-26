@@ -88,6 +88,9 @@ public sealed record MarkdownEmphasisNode(
 /// <summary>Inline code.</summary>
 public sealed record MarkdownCodeInlineNode(string Code) : MarkdownInlineNode;
 
+/// <summary>A checked or unchecked GitHub-flavored Markdown task marker.</summary>
+public sealed record MarkdownTaskListNode(bool Checked) : MarkdownInlineNode;
+
 /// <summary>A clickable hyperlink.</summary>
 public sealed record MarkdownLinkNode(
     Uri Url,

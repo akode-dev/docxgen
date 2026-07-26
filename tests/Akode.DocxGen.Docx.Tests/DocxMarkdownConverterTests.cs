@@ -1,0 +1,90 @@
+using System.Text;
+using Akode.DocxGen.Core.Diagnostics;
+using Akode.DocxGen.Core.Pipeline;
+using Akode.DocxGen.Docx.Conversion;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Shouldly;
+using Xunit;
+
+namespace Akode.DocxGen.Docx.Tests;
+
+public sealed class DocxMarkdownConverterTests
+{
+    [Fact]
+    public async Task InsertsNumberingBeforeMacCleanupInAStyleReference()
+    {
+        using var styleReference = CreateStyleReferenceWithNumberingCleanup();
+        using var markdown = new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                """
+                - [x] Completed
+                - [ ] Pending
+
+                3. Third
+                4. Fourth
+                """),
+            writable: false);
+
+        var result = await new DocxMarkdownConverter().ConvertAsync(
+            new ConvertRequest(
+                new InputArtifact("tasks.md", markdown),
+                new InputArtifact("style.docx", styleReference),
+                validateOutput: true),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+        using var document = result.Document;
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Diagnostics.ShouldNotContain(
+            diagnostic => diagnostic.Code == DiagnosticCode.MarkdownFeatureDowngraded);
+        result.Validation.ShouldNotBeNull();
+        result.Validation.IsValid.ShouldBeTrue();
+
+        using var package = WordprocessingDocument.Open(document, false);
+        var numbering = package.MainDocumentPart?
+            .NumberingDefinitionsPart?
+            .Numbering;
+        numbering.ShouldNotBeNull();
+        numbering!.ChildElements[^1].ShouldBeOfType<NumberingIdMacAtCleanup>();
+        var bodyText = package.MainDocumentPart!.Document!.Body!.InnerText;
+        bodyText.ShouldContain("☒");
+        bodyText.ShouldContain("☐");
+    }
+
+    private static MemoryStream CreateStyleReferenceWithNumberingCleanup()
+    {
+        var stream = new MemoryStream();
+        using (var package = WordprocessingDocument.Create(
+                   stream,
+                   WordprocessingDocumentType.Document,
+                   autoSave: true))
+        {
+            var main = package.AddMainDocumentPart();
+            main.Document = new Document(new Body(new Paragraph(new Run(new Text("Sample")))));
+            var numberingPart = main.AddNewPart<NumberingDefinitionsPart>();
+            numberingPart.Numbering = new Numbering(
+                new AbstractNum(
+                    new Level(
+                        new StartNumberingValue { Val = 1 },
+                        new NumberingFormat { Val = NumberFormatValues.Decimal },
+                        new LevelText { Val = "%1." })
+                    {
+                        LevelIndex = 0,
+                    })
+                {
+                    AbstractNumberId = 0,
+                },
+                new NumberingInstance(new AbstractNumId { Val = 0 })
+                {
+                    NumberID = 1,
+                },
+                new NumberingIdMacAtCleanup { Val = 1 });
+            numberingPart.Numbering.Save();
+            main.Document.Save();
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+}
