@@ -11,6 +11,12 @@ template.docx
 template.schema.json
 ```
 
+Generated schemas describe every detected property as optional. Promote only
+genuine business requirements to JSON Schema `required` arrays. The reference
+proposal keeps its cover metadata and revision history optional so a Markdown
+body can be rendered without a separate JSON model; when those objects are
+supplied, their formats and collection-item rules are still validated.
+
 The reference proposal demonstrates one possible shape:
 
 1. branded cover;

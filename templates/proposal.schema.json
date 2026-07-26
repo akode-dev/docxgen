@@ -23,17 +23,9 @@
           }
         },
         "data": {
-          "required": [
-            "ds"
-          ],
           "properties": {
             "ds": {
               "type": "object",
-              "required": [
-                "Document",
-                "Revisions",
-                "Body"
-              ],
               "properties": {
                 "Document": {
                   "$ref": "#/$defs/document"
@@ -63,17 +55,6 @@
     },
     "document": {
       "type": "object",
-      "required": [
-        "Title",
-        "Description",
-        "Project",
-        "Client",
-        "Version",
-        "Status",
-        "Date",
-        "Classification",
-        "Author"
-      ],
       "properties": {
         "Title": {
           "$ref": "#/$defs/nonEmptyString"
@@ -103,12 +84,6 @@
         },
         "Author": {
           "type": "object",
-          "required": [
-            "FirstName",
-            "LastName",
-            "Role",
-            "Email"
-          ],
           "properties": {
             "FirstName": {
               "$ref": "#/$defs/nonEmptyString"

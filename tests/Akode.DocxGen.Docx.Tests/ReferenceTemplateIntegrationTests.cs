@@ -18,6 +18,50 @@ namespace Akode.DocxGen.Docx.Tests;
 public sealed class ReferenceTemplateIntegrationTests
 {
     [Fact]
+    public async Task RendersReferenceTemplateFromMarkdownWithoutCoverMetadata()
+    {
+        var root = FindRepositoryRoot();
+        var templatePath = Path.Combine(root, "templates", "proposal.docx");
+        var markdownPath = Path.Combine(root, "samples", "proposal.md");
+        var pipeline = CreatePipeline();
+        await using var inspectionTemplate = File.OpenRead(templatePath);
+        var inspection = await pipeline.InspectAsync(
+            new InspectRequest(
+                new InputArtifact(templatePath, inspectionTemplate)),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        inspection.Schema.Placeholders.ShouldAllBe(
+            placeholder => !placeholder.Required);
+
+        await using var renderTemplate = File.OpenRead(templatePath);
+        await using var markdown = File.OpenRead(markdownPath);
+        var result = await pipeline.RenderAsync(
+            new RenderRequest(
+                new InputArtifact(templatePath, renderTemplate),
+                model: null,
+                markdown: new InputArtifact(markdownPath, markdown),
+                assetsRoot: Path.Combine(root, "samples"),
+                options: new RenderOptions
+                {
+                    Culture = "en-US",
+                    Strict = false,
+                },
+                validateOutput: true),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        result.IsSuccess.ShouldBeTrue(
+            string.Join(
+                Environment.NewLine,
+                result.Diagnostics.Select(
+                    item => $"{item.Code}: {item.Message} {item.Hint}")));
+        result.BoundPaths.ShouldContain("ds.Body");
+        result.UnboundPaths.ShouldContain("ds.Document.Title");
+        result.Diagnostics.ShouldContain(
+            diagnostic => diagnostic.Code == "W-MDL-007");
+        result.Validation.ShouldNotBeNull().IsValid.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task RendersAndValidatesTheCompleteReferenceDocument()
     {
         var root = FindRepositoryRoot();

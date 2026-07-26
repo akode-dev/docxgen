@@ -53,14 +53,20 @@ docxgen generate-schema
 ```
 
 The command discovers nested objects and collections, branches, expressions,
-headers/footers, `:MD`, and `:IMG`. Every discovered binding is required to
-match strict-mode rendering. It does not infer business formats, enums,
-descriptions, defaults, or optionality from visible Word labels.
+headers/footers, `:MD`, and `:IMG`. Discovered properties are optional because
+DOCX placeholder syntax describes the accepted data shape, not business
+requiredness. Add deliberate `required` entries to a reviewed adjacent schema,
+or enable strict rendering when every placeholder must be populated. The
+command does not infer business formats, enums, descriptions, defaults, or
+requiredness from visible Word labels.
 
 ID defaults to a safe lowercase form of the DOCX filename; version defaults to
 `1.0.0`. `--check` compares `--out` to deterministic generation without
 writing and returns template error `3` with `E-SCH-002` when it is missing or
-out of date. `--check` and `--overwrite` are mutually exclusive.
+out of date. A schema deliberately extended with business constraints is no
+longer the untouched generated baseline and should be reviewed as a governed
+contract instead of compared with `--check`. `--check` and `--overwrite` are
+mutually exclusive.
 
 ## `scaffold-model`
 

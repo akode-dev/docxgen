@@ -6,7 +6,7 @@
 |---|---|
 | Product | DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Version 2.1 release |
+| Status | Version 2.2 release |
 | Primary users | Document teams, developers, CI, and AI agents |
 | Runtime model | Offline deterministic CLI and embeddable .NET pipeline |
 | License policy | MIT/BSD/Apache-2.0 only |
@@ -172,9 +172,12 @@ docxgen generate-schema
 
 The command statically derives a self-contained Draft 2020-12 model contract
 from scalar, object, collection, conditional, switch, expression, Markdown,
-and image bindings in all inspected document parts. Every reachable binding
-is required, matching strict-mode preflight and union-of-branches analysis.
-The schema contains exact template identity, version, and hash metadata.
+and image bindings in all inspected document parts. Reachable bindings are
+emitted as optional properties because the presence of a DOCX placeholder does
+not encode business requiredness. A reviewed adjacent schema may explicitly
+promote selected paths to `required`; strict-mode preflight may require every
+placeholder at runtime. The schema contains exact template identity, version,
+and hash metadata.
 
 Generation is deterministic. `--check` performs a non-mutating normalized-text
 comparison suitable for CI. The command never infers business formats, enums,
@@ -339,16 +342,16 @@ template.docx
 template.schema.json
 ```
 
-`generate-schema` derives required values, structural types, nested collection
+`generate-schema` derives optional structural properties, nested collection
 item shapes, template identity/version, and the `x-docxgen-templateHash`
 extension directly from placeholder-bearing DOCX content. `inspect` detects
 stale adjacent contracts.
 
-All statically reachable bindings are required because static template
-analysis cannot prove runtime branch reachability. Business formats, enums,
-ranges, descriptions, defaults, and optional business semantics cannot be
-inferred reliably from placeholder text; they require a future explicit
-annotation contract or deliberate schema review.
+DOCX placeholder syntax cannot state whether an empty value is acceptable.
+Generated properties are therefore optional. Business-required paths,
+formats, enums, ranges, descriptions, and defaults require a deliberate schema
+review. An explicit adjacent-schema `required` entry is authoritative and is
+not weakened by lenient rendering.
 
 ### 8.4 Machine-readable command reports
 
