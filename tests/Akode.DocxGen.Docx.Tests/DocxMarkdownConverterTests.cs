@@ -63,6 +63,90 @@ public sealed class DocxMarkdownConverterTests
         package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☐");
     }
 
+    [Fact]
+    public async Task RendersNestedTaskCheckboxesAsTheOnlyListMarkers()
+    {
+        using var markdown = new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                """
+                - [x] Parent
+                    - [ ] Child
+                """),
+            writable: false);
+
+        var result = await new DocxMarkdownConverter().ConvertAsync(
+            new ConvertRequest(
+                new InputArtifact("nested-tasks.md", markdown),
+                validateOutput: true),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+        using var document = result.Document;
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Validation.ShouldNotBeNull();
+        result.Validation.IsValid.ShouldBeTrue();
+
+        using var package = WordprocessingDocument.Open(document, false);
+        var numbering = package.MainDocumentPart?
+            .NumberingDefinitionsPart?
+            .Numbering;
+        numbering.ShouldNotBeNull();
+        var listParagraphs = package.MainDocumentPart!.Document!.Body!
+            .Elements<Paragraph>()
+            .Where(paragraph =>
+                paragraph.ParagraphProperties?.NumberingProperties is not null)
+            .ToArray();
+        listParagraphs.Length.ShouldBe(2);
+        listParagraphs[0].InnerText.ShouldBe("Parent");
+        listParagraphs[1].InnerText.ShouldBe("Child");
+        ResolveMarker(numbering!, listParagraphs[0]).ShouldBe("☒");
+        ResolveMarker(numbering, listParagraphs[1]).ShouldBe("☐");
+        ResolveLevel(listParagraphs[0]).ShouldBe(0);
+        ResolveLevel(listParagraphs[1]).ShouldBe(1);
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☒");
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☐");
+    }
+
+    [Fact]
+    public async Task RendersOrderedTaskItemsWithCheckboxMarkersInsteadOfNumbers()
+    {
+        using var markdown = new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                """
+                1. [x] Completed
+                2. [ ] Pending
+                """),
+            writable: false);
+
+        var result = await new DocxMarkdownConverter().ConvertAsync(
+            new ConvertRequest(
+                new InputArtifact("ordered-tasks.md", markdown),
+                validateOutput: true),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+        using var document = result.Document;
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Validation.ShouldNotBeNull();
+        result.Validation.IsValid.ShouldBeTrue();
+
+        using var package = WordprocessingDocument.Open(document, false);
+        var numbering = package.MainDocumentPart?
+            .NumberingDefinitionsPart?
+            .Numbering;
+        numbering.ShouldNotBeNull();
+        var listParagraphs = package.MainDocumentPart!.Document!.Body!
+            .Elements<Paragraph>()
+            .Where(paragraph =>
+                paragraph.ParagraphProperties?.NumberingProperties is not null)
+            .ToArray();
+        listParagraphs.Length.ShouldBe(2);
+        listParagraphs[0].InnerText.ShouldBe("Completed");
+        listParagraphs[1].InnerText.ShouldBe("Pending");
+        ResolveMarker(numbering!, listParagraphs[0]).ShouldBe("☒");
+        ResolveMarker(numbering, listParagraphs[1]).ShouldBe("☐");
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☒");
+        package.MainDocumentPart.Document.Body.InnerText.ShouldNotContain("☐");
+    }
+
     private static string? ResolveMarker(
         Numbering numbering,
         Paragraph paragraph)
@@ -85,6 +169,14 @@ public sealed class DocxMarkdownConverterTests
             .Val?
             .Value;
     }
+
+    private static int ResolveLevel(Paragraph paragraph) =>
+        paragraph
+            .ParagraphProperties?
+            .NumberingProperties?
+            .NumberingLevelReference?
+            .Val?
+            .Value ?? 0;
 
     private static MemoryStream CreateStyleReferenceWithNumberingCleanup()
     {

@@ -277,6 +277,9 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             }
 
             var inline = RenderInlineChildren(paragraph.ChildElements);
+            var listInfo = blockContext
+                ? numbering.Resolve(properties)
+                : null;
             if (string.IsNullOrWhiteSpace(inline))
             {
                 if (paragraph.Descendants<Break>().Any(
@@ -286,6 +289,12 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                         "page-break",
                         "/word/document.xml",
                         "A Word page break was omitted because Markdown has no portable page-break semantic.");
+                }
+
+                if (listInfo?.TaskChecked is not null)
+                {
+                    listItemCount++;
+                    return RenderListItem(listInfo, inline);
                 }
 
                 return RenderedParagraph.Empty;
@@ -310,22 +319,10 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                     false);
             }
 
-            var listInfo = numbering.Resolve(properties);
             if (listInfo is not null && blockContext)
             {
                 listItemCount++;
-                var indentation = new string(' ', listInfo.Level * 4);
-                var marker = listInfo.TaskChecked switch
-                {
-                    true => "- [x]",
-                    false => "- [ ]",
-                    null when listInfo.Ordered =>
-                        listInfo.Number.ToString(CultureInfo.InvariantCulture) + ".",
-                    _ => "-",
-                };
-                return new RenderedParagraph(
-                    $"{indentation}{marker} {inline.Trim()}",
-                    true);
+                return RenderListItem(listInfo, inline);
             }
 
             if (style is "Code" && blockContext)
@@ -352,6 +349,27 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             }
 
             return new RenderedParagraph(inline.Trim(), false);
+        }
+
+        private static RenderedParagraph RenderListItem(
+            NumberingResolver.ListInfo listInfo,
+            string inline)
+        {
+            var indentation = new string(' ', listInfo.Level * 4);
+            var marker = listInfo.TaskChecked switch
+            {
+                true => "- [x]",
+                false => "- [ ]",
+                null when listInfo.Ordered =>
+                    listInfo.Number.ToString(CultureInfo.InvariantCulture) + ".",
+                _ => "-",
+            };
+            var content = inline.Trim();
+            return new RenderedParagraph(
+                content.Length == 0
+                    ? $"{indentation}{marker}"
+                    : $"{indentation}{marker} {content}",
+                true);
         }
 
         private string RenderInlineChildren(IEnumerable<OpenXmlElement> elements)

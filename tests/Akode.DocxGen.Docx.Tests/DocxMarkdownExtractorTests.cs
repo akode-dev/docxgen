@@ -160,6 +160,37 @@ public sealed class DocxMarkdownExtractorTests
     }
 
     [Fact]
+    public async Task RoundTripPreservesEmptyTaskItems()
+    {
+        using var input = new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                """
+                - [ ]
+                - [x]
+                """),
+            writable: false);
+        var converted = await new DocxMarkdownConverter().ConvertAsync(
+            new ConvertRequest(
+                new InputArtifact("empty-tasks.md", input)),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+        using var document = converted.Document;
+
+        var result = await new DocxMarkdownExtractor().ExtractAsync(
+            new ExtractRequest(
+                new InputArtifact("empty-tasks.docx", document),
+                "empty-tasks.assets"),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Markdown.Trim().ShouldBe(
+            """
+            - [ ]
+            - [x]
+            """);
+        result.Stats.ListItems.ShouldBe(2);
+    }
+
+    [Fact]
     public async Task GeneratedTocFieldIsOmittedWithWarning()
     {
         using var input = new MemoryStream(
