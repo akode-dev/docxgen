@@ -84,7 +84,7 @@ engine requirements.
 - base and template-specific JSON Schema validation;
 - hook-friendly `validate-model`;
 - Markdown body and anchored-section preprocessing;
-- local images, links, lists, tables, quotes, and code;
+- local images, links, lists, task lists, tables, quotes, and code;
 - model collections and conditional blocks;
 - rendering through a proven permissive OSS engine;
 - post-processing through Open XML SDK;
@@ -394,6 +394,7 @@ Supported:
 - paragraphs;
 - bold, italic, strikeout, and inline code;
 - nested ordered and unordered lists;
+- checked and unchecked GFM task-list markers;
 - GFM pipe tables;
 - block quotes;
 - fenced code;

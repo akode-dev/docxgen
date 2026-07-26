@@ -247,9 +247,9 @@ Supported directives include:
 - `{ "$file": "assets/client-logo.png" }`;
 - `{ "$text": "*literal, not Markdown*" }`.
 
-Markdown supports headings, paragraphs, emphasis, links, nested lists, fenced
-code, block quotes, GFM tables, horizontal rules, and local PNG, JPEG, GIF,
-BMP, or SVG images. Local paths are contained below `--assets-dir`.
+Markdown supports headings, paragraphs, emphasis, links, nested lists, task
+lists, fenced code, block quotes, GFM tables, horizontal rules, and local PNG,
+JPEG, GIF, BMP, or SVG images. Local paths are contained below `--assets-dir`.
 
 ## Project layout
 
