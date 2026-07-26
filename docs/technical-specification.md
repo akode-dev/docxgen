@@ -6,7 +6,7 @@
 |---|---|
 | Product | DocxGen |
 | Target | .NET 10 / C# 14 |
-| Status | Version 2.1 release |
+| Status | Version 2.2 release |
 | Primary users | Document teams, developers, CI, and AI agents |
 | Runtime model | Offline deterministic CLI and embeddable .NET pipeline |
 | License policy | MIT/BSD/Apache-2.0 only |
