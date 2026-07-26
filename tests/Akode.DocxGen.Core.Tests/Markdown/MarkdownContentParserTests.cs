@@ -91,6 +91,28 @@ public sealed class MarkdownContentParserTests
         content.Diagnostics.ShouldBeEmpty();
     }
 
+    [Fact]
+    public void PreservesTaskListMarkersWithoutDowngradeWarnings()
+    {
+        var content = MarkdownContentParser.Parse(
+            """
+            - [x] Completed
+            - [ ] Pending
+            """,
+            DefaultOptions,
+            new StubAssetResolver());
+
+        var list = content.Blocks.ShouldHaveSingleItem()
+            .ShouldBeOfType<MarkdownListNode>();
+        var completed = list.Items[0].Blocks.ShouldHaveSingleItem()
+            .ShouldBeOfType<MarkdownParagraphNode>();
+        completed.Inlines[0].ShouldBe(new MarkdownTaskListNode(Checked: true));
+        var pending = list.Items[1].Blocks.ShouldHaveSingleItem()
+            .ShouldBeOfType<MarkdownParagraphNode>();
+        pending.Inlines[0].ShouldBe(new MarkdownTaskListNode(Checked: false));
+        content.Diagnostics.ShouldBeEmpty();
+    }
+
     private static RenderOptions DefaultOptions { get; } = new()
     {
         Culture = "en-US",

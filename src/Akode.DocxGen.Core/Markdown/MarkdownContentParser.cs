@@ -5,6 +5,7 @@ using Akode.DocxGen.Core.Pipeline;
 using Akode.DocxGen.Core.Security;
 using Markdig;
 using Markdig.Extensions.Tables;
+using Markdig.Extensions.TaskLists;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
@@ -211,6 +212,10 @@ public static class MarkdownContentParser
 
                 case CodeInline code:
                     result.Add(new MarkdownCodeInlineNode(code.Content));
+                    break;
+
+                case TaskList taskList:
+                    result.Add(new MarkdownTaskListNode(taskList.Checked));
                     break;
 
                 case EmphasisInline emphasis:
