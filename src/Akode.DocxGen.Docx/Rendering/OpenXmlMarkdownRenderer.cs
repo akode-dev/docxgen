@@ -18,13 +18,19 @@ internal sealed class OpenXmlMarkdownRenderer
     private readonly long contentWidthEmu;
     private readonly int bulletNumberId;
     private readonly int orderedNumberId;
+    private readonly int uncheckedTaskNumberId;
+    private readonly int checkedTaskNumberId;
     private uint nextDrawingId;
 
     public OpenXmlMarkdownRenderer(MainDocumentPart mainPart)
     {
         this.mainPart = mainPart ?? throw new ArgumentNullException(nameof(mainPart));
         contentWidthEmu = GetContentWidthEmu(mainPart);
-        (bulletNumberId, orderedNumberId) = EnsureNumbering(mainPart);
+        (
+            bulletNumberId,
+            orderedNumberId,
+            uncheckedTaskNumberId,
+            checkedTaskNumberId) = EnsureNumbering(mainPart);
         nextDrawingId = (mainPart.Document?.Descendants<DW.DocProperties>()
                 ?? [])
             .Select(properties => properties.Id?.Value ?? 0U)
@@ -113,10 +119,23 @@ internal sealed class OpenXmlMarkdownRenderer
             {
                 if (!numbered && block is MarkdownParagraphNode paragraph)
                 {
+                    var itemNumberingId = numberingId;
+                    IReadOnlyList<MarkdownInlineNode> paragraphInlines =
+                        paragraph.Inlines;
+                    if (paragraph.Inlines.Count > 0
+                        && paragraph.Inlines[0] is MarkdownTaskListNode taskList)
+                    {
+                        itemNumberingId = taskList.Checked
+                            ? checkedTaskNumberId
+                            : uncheckedTaskNumberId;
+                        paragraphInlines = RemoveTaskListMarker(
+                            paragraph.Inlines);
+                    }
+
                     result.Add(CreateParagraph(
-                        paragraph.Inlines,
+                        paragraphInlines,
                         ResolveStyleId("ListParagraph", "List Paragraph"),
-                        numberingId,
+                        itemNumberingId,
                         Math.Clamp(level, 0, 8)));
                     numbered = true;
                     continue;
@@ -152,6 +171,23 @@ internal sealed class OpenXmlMarkdownRenderer
         }
 
         return result;
+    }
+
+    private static MarkdownInlineNode[] RemoveTaskListMarker(
+        IReadOnlyList<MarkdownInlineNode> inlines)
+    {
+        var content = new MarkdownInlineNode[inlines.Count - 1];
+        for (var index = 1; index < inlines.Count; index++)
+        {
+            content[index - 1] = inlines[index];
+        }
+
+        if (content.Length > 0 && content[0] is MarkdownTextNode text)
+        {
+            content[0] = new MarkdownTextNode(text.Text.TrimStart());
+        }
+
+        return content;
     }
 
     private Paragraph CreateParagraph(
@@ -710,7 +746,11 @@ internal sealed class OpenXmlMarkdownRenderer
         return Math.Max((long)pageWidth - left - right, 1L) * EmuPerTwip;
     }
 
-    private static (int Bullet, int Ordered) EnsureNumbering(MainDocumentPart main)
+    private static (
+        int Bullet,
+        int Ordered,
+        int UncheckedTask,
+        int CheckedTask) EnsureNumbering(MainDocumentPart main)
     {
         var part = main.NumberingDefinitionsPart
             ?? main.AddNewPart<NumberingDefinitionsPart>();
@@ -728,8 +768,18 @@ internal sealed class OpenXmlMarkdownRenderer
 
         var bulletAbstract = CreateAbstractNumber(nextAbstractId, ordered: false);
         var orderedAbstract = CreateAbstractNumber(nextAbstractId + 1, ordered: true);
+        var uncheckedTaskAbstract = CreateAbstractNumber(
+            nextAbstractId + 2,
+            ordered: false,
+            taskMarker: "☐");
+        var checkedTaskAbstract = CreateAbstractNumber(
+            nextAbstractId + 3,
+            ordered: false,
+            taskMarker: "☒");
         InsertAbstractNumber(part.Numbering, bulletAbstract);
         InsertAbstractNumber(part.Numbering, orderedAbstract);
+        InsertAbstractNumber(part.Numbering, uncheckedTaskAbstract);
+        InsertAbstractNumber(part.Numbering, checkedTaskAbstract);
         var bulletInstance = new NumberingInstance(
             new AbstractNumId { Val = nextAbstractId })
         {
@@ -740,10 +790,26 @@ internal sealed class OpenXmlMarkdownRenderer
         {
             NumberID = nextNumberId + 1,
         };
+        var uncheckedTaskInstance = new NumberingInstance(
+            new AbstractNumId { Val = nextAbstractId + 2 })
+        {
+            NumberID = nextNumberId + 2,
+        };
+        var checkedTaskInstance = new NumberingInstance(
+            new AbstractNumId { Val = nextAbstractId + 3 })
+        {
+            NumberID = nextNumberId + 3,
+        };
         InsertNumberingInstance(part.Numbering, bulletInstance);
         InsertNumberingInstance(part.Numbering, orderedInstance);
+        InsertNumberingInstance(part.Numbering, uncheckedTaskInstance);
+        InsertNumberingInstance(part.Numbering, checkedTaskInstance);
         part.Numbering.Save();
-        return (nextNumberId, nextNumberId + 1);
+        return (
+            nextNumberId,
+            nextNumberId + 1,
+            nextNumberId + 2,
+            nextNumberId + 3);
     }
 
     private static void InsertAbstractNumber(
@@ -777,7 +843,10 @@ internal sealed class OpenXmlMarkdownRenderer
         }
     }
 
-    private static AbstractNum CreateAbstractNumber(int id, bool ordered)
+    private static AbstractNum CreateAbstractNumber(
+        int id,
+        bool ordered,
+        string? taskMarker = null)
     {
         var abstractNumber = new AbstractNum { AbstractNumberId = id };
         var bullets = new[] { "•", "○", "▪" };
@@ -796,7 +865,7 @@ internal sealed class OpenXmlMarkdownRenderer
                     {
                         Val = ordered
                             ? $"%{level + 1}."
-                            : bullets[level % bullets.Length],
+                            : taskMarker ?? bullets[level % bullets.Length],
                     },
                     new LevelJustification { Val = LevelJustificationValues.Left },
                     new PreviousParagraphProperties(
