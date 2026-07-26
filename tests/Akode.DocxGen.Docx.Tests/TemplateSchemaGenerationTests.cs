@@ -48,6 +48,18 @@ public sealed class TemplateSchemaGenerationTests
             .GetProperty("$ref")
             .GetString()
             .ShouldBe("#/$defs/text");
+        schema.RootElement
+            .GetProperty("properties")
+            .GetProperty("data")
+            .TryGetProperty("required", out _)
+            .ShouldBeFalse();
+        schema.RootElement
+            .GetProperty("properties")
+            .GetProperty("data")
+            .GetProperty("properties")
+            .GetProperty("ds")
+            .TryGetProperty("required", out _)
+            .ShouldBeFalse();
     }
 
     [Fact]
@@ -101,7 +113,7 @@ public sealed class TemplateSchemaGenerationTests
             });
         using var validModel = JsonDocument.Parse(modelJson);
         schema.Evaluate(validModel.RootElement).IsValid.ShouldBeTrue();
-        using var invalidModel = JsonDocument.Parse(
+        using var modelWithoutBody = JsonDocument.Parse(
             """
             {
               "modelVersion": "1.0",
@@ -109,7 +121,7 @@ public sealed class TemplateSchemaGenerationTests
               "data": { "ds": {} }
             }
             """);
-        schema.Evaluate(invalidModel.RootElement).IsValid.ShouldBeFalse();
+        schema.Evaluate(modelWithoutBody.RootElement).IsValid.ShouldBeTrue();
 
         var directory = CreateTemporaryDirectory();
         try
@@ -154,6 +166,63 @@ public sealed class TemplateSchemaGenerationTests
             body.InnerText.ShouldContain("Generated heading");
             body.InnerText.ShouldContain("A generated paragraph.");
             body.InnerText.ShouldNotContain("{{");
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task AdjacentSchemaCanDeliberatelyRequireSelectedPlaceholders()
+    {
+        var directory = CreateTemporaryDirectory();
+        try
+        {
+            var templatePath = Path.Combine(directory, "governed.docx");
+            await File.WriteAllBytesAsync(
+                templatePath,
+                CreateTemplate(
+                    Paragraph("{{ds.Title}}"),
+                    Paragraph("{{ds.Description}}")),
+                TestContext.Current.CancellationToken).ConfigureAwait(true);
+            await File.WriteAllTextAsync(
+                Path.ChangeExtension(templatePath, ".schema.json"),
+                """
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "required": ["ds"],
+                      "properties": {
+                        "ds": {
+                          "type": "object",
+                          "required": ["Title"],
+                          "properties": {
+                            "Title": { "type": "string", "minLength": 1 },
+                            "Description": { "type": "string", "minLength": 1 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                """,
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+                TestContext.Current.CancellationToken).ConfigureAwait(true);
+            await using var template = File.OpenRead(templatePath);
+
+            var inspection = await CreatePipeline().InspectAsync(
+                new InspectRequest(
+                    new InputArtifact(templatePath, template)),
+                TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+            inspection.Schema.Placeholders
+                .Single(placeholder => placeholder.Path == "ds.Title")
+                .Required.ShouldBeTrue();
+            inspection.Schema.Placeholders
+                .Single(placeholder => placeholder.Path == "ds.Description")
+                .Required.ShouldBeFalse();
         }
         finally
         {

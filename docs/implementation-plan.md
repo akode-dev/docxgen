@@ -6,7 +6,7 @@ design decisions live in `docs/adr/`; released behavior lives in
 
 ## Current release
 
-DocxGen 2.1 is a cross-platform .NET 10 CLI and embeddable library for governed
+DocxGen 2.2 is a cross-platform .NET 10 CLI and embeddable library for governed
 DOCX generation and semantic DOCX extraction.
 
 Shipped capabilities:

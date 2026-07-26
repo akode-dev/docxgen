@@ -20,6 +20,12 @@ docxgen generate-schema --template template.docx --out template.schema.json --ch
 ```
 
 The first command generates the contract; the second is suitable for CI.
+Generated placeholder properties are optional. A marker tells DocxGen where a
+value may be rendered; it does not tell DocxGen whether the business document
+requires that value. Add selected paths to JSON Schema `required` arrays only
+after deliberate review. Those explicit requirements remain mandatory even in
+lenient mode. Use strict rendering when one run must populate every detected
+placeholder.
 
 ## Optional document sections
 

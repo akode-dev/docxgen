@@ -12,7 +12,7 @@ needed.
    product scope requires an explicitly selected roadmap item.
 4. Inspect the working tree before editing. Preserve unrelated user changes.
 
-Version 2.1 is the current release line. Preserve the eight-command CLI,
+Version 2.2 is the current release line. Preserve the eight-command CLI,
 model/report schemas, stable diagnostics, security defaults, deterministic
 template-schema generation, template contract, and cross-platform packaging
 behavior. New product scope belongs to the roadmap unless the user or issue

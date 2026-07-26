@@ -215,14 +215,15 @@ template therefore ships its own schema. Generate its structural baseline:
 docxgen generate-schema --template template.docx --out template.schema.json
 ```
 
-The generated schema is self-contained, closes discovered objects, requires
-all statically reachable bindings, models nested collections, constrains
-template identity/version, and records the template hash. `inspect`
-cross-checks the adjacent schema with discovered placeholders.
+The generated schema is self-contained, closes discovered objects, exposes all
+statically reachable bindings as optional properties, models nested
+collections, constrains template identity/version, and records the template
+hash. `inspect` cross-checks the adjacent schema with discovered placeholders.
 
 Schema generation is deliberately syntax-driven. Dates, emails, enums,
-descriptions, defaults, numeric limits, and business optionality are not
-guessed from labels or document appearance.
+descriptions, defaults, numeric limits, and business-required fields are not
+guessed from labels or document appearance. Add selected paths to `required`
+only when the document contract genuinely requires them.
 
 ## Agent behavior
 
