@@ -6,6 +6,14 @@ Versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Generated template schemas now treat discovered placeholders as optional
+  properties; only deliberate adjacent-schema `required` entries or strict
+  rendering make values mandatory.
+- Made the reference proposal metadata and revision collection optional so a
+  Markdown-only render does not require unrelated cover values.
+
 ## [2.1.3] - 2026-07-26
 
 ### Added

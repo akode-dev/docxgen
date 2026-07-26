@@ -23,16 +23,9 @@
           }
         },
         "data": {
-          "required": [
-            "ds"
-          ],
           "properties": {
             "ds": {
               "type": "object",
-              "required": [
-                "Document",
-                "Body"
-              ],
               "properties": {
                 "Document": {
                   "$ref": "#/$defs/document"
@@ -58,15 +51,6 @@
     },
     "document": {
       "type": "object",
-      "required": [
-        "Title",
-        "Description",
-        "ClientName",
-        "Date",
-        "Version",
-        "Status",
-        "Author"
-      ],
       "properties": {
         "Title": {
           "$ref": "#/$defs/nonEmptyString"
@@ -92,10 +76,6 @@
         },
         "Author": {
           "type": "object",
-          "required": [
-            "FirstName",
-            "LastName"
-          ],
           "properties": {
             "FirstName": {
               "$ref": "#/$defs/nonEmptyString"
@@ -111,11 +91,6 @@
     },
     "documentControl": {
       "type": "object",
-      "required": [
-        "Owner",
-        "Classification",
-        "Revisions"
-      ],
       "properties": {
         "Owner": {
           "$ref": "#/$defs/nonEmptyString"

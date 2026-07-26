@@ -1,6 +1,6 @@
 # ADR-0008: Generate JSON Schema from placeholder-bearing DOCX templates
 
-- Status: Accepted
+- Status: Superseded by ADR-0010
 - Date: 2026-07-25
 
 ## Context

@@ -231,10 +231,6 @@ internal static class TemplateJsonSchemaGenerator
         return new JsonObject
         {
             ["type"] = "object",
-            ["required"] = JsonArrayOf(
-                properties
-                    .Select(property => property.Name)
-                    .Order(StringComparer.Ordinal)),
             ["properties"] = propertySchemas,
             ["additionalProperties"] = false,
         };
