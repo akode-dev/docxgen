@@ -40,6 +40,9 @@ public sealed class DocxMarkdownExtractorTests
                 - Bullet first
                 - Bullet second
 
+                - [x] Task complete
+                - [ ] Task pending
+
                 1. First
                 2. Second
 
@@ -81,6 +84,8 @@ public sealed class DocxMarkdownExtractorTests
             result.Markdown.ShouldContain("[link](https://example.com)");
             result.Markdown.ShouldContain("- Bullet first");
             result.Markdown.ShouldContain("- Bullet second");
+            result.Markdown.ShouldContain("- [x] Task complete");
+            result.Markdown.ShouldContain("- [ ] Task pending");
             result.Markdown.ShouldContain("1. First");
             result.Markdown.ShouldContain("2. Second");
             result.Markdown.ShouldContain("> A quoted sentence.");
@@ -95,7 +100,7 @@ public sealed class DocxMarkdownExtractorTests
             result.Assets.ShouldHaveSingleItem();
             result.Assets[0].Content.ToArray().ShouldBe(PixelPng);
             result.Stats.Headings.ShouldBe(1);
-            result.Stats.ListItems.ShouldBe(4);
+            result.Stats.ListItems.ShouldBe(6);
             result.Stats.Tables.ShouldBe(1);
             result.Stats.Images.ShouldBe(1);
             result.Diagnostics.ShouldNotContain(
@@ -152,6 +157,37 @@ public sealed class DocxMarkdownExtractorTests
         result.Diagnostics.ShouldHaveSingleItem();
         result.Diagnostics[0].Code.ShouldBe(DiagnosticCode.ExtractionFailure);
         result.Diagnostics[0].Hint.ShouldNotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task RoundTripPreservesEmptyTaskItems()
+    {
+        using var input = new MemoryStream(
+            Encoding.UTF8.GetBytes(
+                """
+                - [ ]
+                - [x]
+                """),
+            writable: false);
+        var converted = await new DocxMarkdownConverter().ConvertAsync(
+            new ConvertRequest(
+                new InputArtifact("empty-tasks.md", input)),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+        using var document = converted.Document;
+
+        var result = await new DocxMarkdownExtractor().ExtractAsync(
+            new ExtractRequest(
+                new InputArtifact("empty-tasks.docx", document),
+                "empty-tasks.assets"),
+            TestContext.Current.CancellationToken).ConfigureAwait(true);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Markdown.Trim().ShouldBe(
+            """
+            - [ ]
+            - [x]
+            """);
+        result.Stats.ListItems.ShouldBe(2);
     }
 
     [Fact]

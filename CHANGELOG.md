@@ -6,6 +6,14 @@ Versioning.
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-07-26
+
+### Changed
+
+- Rendered GitHub-flavored Markdown task-list checkboxes as native Word list
+  markers instead of combining a bullet marker with an inline checkbox, and
+  preserved those markers when extracting the DOCX back to Markdown.
+
 ## [2.2.0] - 2026-07-26
 
 ### Changed
@@ -122,7 +130,8 @@ Versioning.
 - Opt-in remote image downloads with timeout, size/media-type limits, redirects
   disabled, and non-public address rejection.
 
-[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/akode-dev/docxgen/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/akode-dev/docxgen/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/akode-dev/docxgen/compare/v2.1.3...v2.2.0
 [2.1.3]: https://github.com/akode-dev/docxgen/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/akode-dev/docxgen/compare/v2.1.1...v2.1.2

@@ -277,6 +277,9 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             }
 
             var inline = RenderInlineChildren(paragraph.ChildElements);
+            var listInfo = blockContext
+                ? numbering.Resolve(properties)
+                : null;
             if (string.IsNullOrWhiteSpace(inline))
             {
                 if (paragraph.Descendants<Break>().Any(
@@ -286,6 +289,12 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                         "page-break",
                         "/word/document.xml",
                         "A Word page break was omitted because Markdown has no portable page-break semantic.");
+                }
+
+                if (listInfo?.TaskChecked is not null)
+                {
+                    listItemCount++;
+                    return RenderListItem(listInfo, inline);
                 }
 
                 return RenderedParagraph.Empty;
@@ -310,17 +319,10 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                     false);
             }
 
-            var listInfo = numbering.Resolve(properties);
             if (listInfo is not null && blockContext)
             {
                 listItemCount++;
-                var indentation = new string(' ', listInfo.Level * 4);
-                var marker = listInfo.Ordered
-                    ? listInfo.Number.ToString(CultureInfo.InvariantCulture) + "."
-                    : "-";
-                return new RenderedParagraph(
-                    $"{indentation}{marker} {inline.Trim()}",
-                    true);
+                return RenderListItem(listInfo, inline);
             }
 
             if (style is "Code" && blockContext)
@@ -347,6 +349,27 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             }
 
             return new RenderedParagraph(inline.Trim(), false);
+        }
+
+        private static RenderedParagraph RenderListItem(
+            NumberingResolver.ListInfo listInfo,
+            string inline)
+        {
+            var indentation = new string(' ', listInfo.Level * 4);
+            var marker = listInfo.TaskChecked switch
+            {
+                true => "- [x]",
+                false => "- [ ]",
+                null when listInfo.Ordered =>
+                    listInfo.Number.ToString(CultureInfo.InvariantCulture) + ".",
+                _ => "-",
+            };
+            var content = inline.Trim();
+            return new RenderedParagraph(
+                content.Length == 0
+                    ? $"{indentation}{marker}"
+                    : $"{indentation}{marker} {content}",
+                true);
         }
 
         private string RenderInlineChildren(IEnumerable<OpenXmlElement> elements)
@@ -1134,6 +1157,7 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                 numberingProperties?.NumberingLevelReference?.Val?.Value ?? 0);
             var ordered = true;
             var start = 1;
+            bool? taskChecked = null;
             if (instances.TryGetValue(numberingId.Value, out var instance)
                 && instance.AbstractNumId?.Val?.Value is { } abstractId
                 && abstracts.TryGetValue(abstractId, out var abstractNumbering))
@@ -1144,6 +1168,12 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
                 ordered = definition?.NumberingFormat?.Val?.Value
                     != NumberFormatValues.Bullet;
                 start = definition?.StartNumberingValue?.Val?.Value ?? 1;
+                taskChecked = definition?.LevelText?.Val?.Value switch
+                {
+                    "☒" or "☑" => true,
+                    "☐" => false,
+                    _ => null,
+                };
                 var overrideValue = instance
                     .Elements<LevelOverride>()
                     .FirstOrDefault(item => item.LevelIndex?.Value == level)?
@@ -1168,9 +1198,13 @@ public sealed class DocxMarkdownExtractor : IDocxMarkdownExtractor
             var key = (numberingId.Value, level);
             var number = next.TryGetValue(key, out var current) ? current : start;
             next[key] = number + 1;
-            return new ListInfo(ordered, level, number);
+            return new ListInfo(ordered, level, number, taskChecked);
         }
 
-        public sealed record ListInfo(bool Ordered, int Level, int Number);
+        public sealed record ListInfo(
+            bool Ordered,
+            int Level,
+            int Number,
+            bool? TaskChecked);
     }
 }
